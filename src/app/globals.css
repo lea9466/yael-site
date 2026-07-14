@@ -3,20 +3,21 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Brand colors (fixed, see .cursor/rules/10-project-context.mdc) */
+  --color-brand-green-deep: #3f5f47;
+  --color-brand-green-olive: #6f8e6e;
+  --color-brand-beige: #e3c7a6;
+  --color-brand-coral: #d98a80;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand-green-deep: var(--color-brand-green-deep);
+  --color-brand-green-olive: var(--color-brand-green-olive);
+  --color-brand-beige: var(--color-brand-beige);
+  --color-brand-coral: var(--color-brand-coral);
 }
 
 body {

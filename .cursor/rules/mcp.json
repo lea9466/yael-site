@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "supabase-yael": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=snqedtijppnidxxsafor",
+      "headers": {
+        "Authorization": "Bearer YOUR_SUPABASE_ACCESS_TOKEN"
+      }
+    }
+  }
+}

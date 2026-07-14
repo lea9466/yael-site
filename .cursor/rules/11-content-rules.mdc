@@ -1,0 +1,150 @@
+---
+description: Business content rules for services, recipes, articles and testimonials
+alwaysApply: false
+globs:
+  - "src/**/*"
+  - "supabase/**/*"
+---
+
+# Homepage
+
+The homepage section order is fixed:
+
+1. Hero
+2. Short about section
+3. Services
+4. Yael's approach
+5. Testimonials
+6. Certificates
+7. Recent articles
+8. Recent recipes
+9. Contact CTA
+10. Footer
+
+The administrator may edit content but may not reorder sections.
+
+The Hero includes:
+
+- Main title
+- Subtitle
+- Required primary button
+- Optional secondary button
+- Image, animation or video
+
+# Services
+
+Each service includes:
+
+- Title
+- Slug
+- Short description
+- Full introduction
+- Cover image
+- Target audience list
+- Benefits list
+- Process steps
+- Optional FAQ
+- Related testimonials
+- CTA title
+- CTA text
+- CTA button
+- External or internal link
+- SEO fields
+- Featured flag
+- Status
+
+List items support add, edit, remove and drag-and-drop ordering.
+
+# Recipes
+
+Each recipe includes:
+
+- Title
+- Slug
+- Description
+- Cover image
+- Up to 6 additional media items
+- Category
+- Tags
+- Preparation duration
+- Servings
+- Difficulty
+- Ingredients
+- Preparation steps
+- Optional Yael tip
+- Featured flag
+- SEO fields
+- Status
+
+Do not create a separate recipe summary field.
+
+Recipe cards use a shortened version of the description.
+
+Ingredients and steps are dynamic ordered lists.
+
+Related recipes are selected automatically by category or tags.
+
+# Articles
+
+Each article includes:
+
+- Title
+- Slug
+- Rich content
+- Cover image
+- Optional media gallery
+- Category
+- Tags
+- Automatic reading time
+- Featured flag
+- SEO fields
+- Status
+
+Related articles are selected automatically by category or tags.
+
+# Testimonials
+
+Testimonials do not use star ratings.
+
+Each testimonial includes:
+
+- Name
+- Optional city
+- Content
+- Optional service relation
+- Featured flag
+- Published state
+
+The homepage displays one testimonial at a time in a carousel.
+
+Long testimonials show a "קראי עוד" action.
+
+# Certificates
+
+Each certificate includes:
+
+- Title
+- Organization
+- Optional year
+- Image
+- Optional description
+- Display order
+
+# Contact Form
+
+Fields:
+
+- Full name, required
+- Email, required
+- Phone, optional
+- Message, required
+- Privacy policy checkbox, required
+
+The form must state that users should not submit medical or sensitive information.
+
+After submission:
+
+- Save the message in Supabase.
+- Send an email to Yael through Resend.
+- Show a success message.
+- Do not send an automatic email to the visitor.

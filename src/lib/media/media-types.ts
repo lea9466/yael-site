@@ -1,3 +1,5 @@
+import type { MediaSortValue } from "@/lib/validations/media";
+
 export type MediaRecord = {
   id: string;
   storage_path: string;
@@ -10,6 +12,33 @@ export type MediaRecord = {
   alt_text: string | null;
   uploaded_by: string | null;
   created_at: string;
+};
+
+export type MediaListItem = MediaRecord & {
+  publicUrl: string | null;
+};
+
+export type MediaLibraryStats = {
+  totalCount: number;
+  totalSizeBytes: number;
+};
+
+export type MediaLibraryPagination = {
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+};
+
+export type MediaLibraryData = {
+  items: MediaListItem[];
+  stats: MediaLibraryStats;
+  pagination: MediaLibraryPagination;
+  query: {
+    q: string;
+    sort: MediaSortValue;
+    page: number;
+  };
 };
 
 export type ProcessedImage = {
@@ -37,3 +66,26 @@ export type DeleteMediaResult =
       error: string;
       usages?: MediaUsageReference[];
     };
+
+export type UpdateMediaAltTextResult =
+  | { success: true; media: MediaRecord }
+  | { success: false; error: string };
+
+export type BulkDeleteMediaEntry = {
+  id: string;
+  fileName: string;
+};
+
+export type BulkDeleteBlockedEntry = BulkDeleteMediaEntry & {
+  usages: MediaUsageReference[];
+};
+
+export type BulkDeleteFailedEntry = BulkDeleteMediaEntry & {
+  message: string;
+};
+
+export type BulkDeleteMediaResult = {
+  deleted: BulkDeleteMediaEntry[];
+  blocked: BulkDeleteBlockedEntry[];
+  failed: BulkDeleteFailedEntry[];
+};

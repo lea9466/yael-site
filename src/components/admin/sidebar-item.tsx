@@ -9,6 +9,7 @@ type SidebarItemProps = {
   icon: LucideIcon;
   enabled: boolean;
   active: boolean;
+  collapsed?: boolean;
   onNavigate?: () => void;
 };
 
@@ -18,10 +19,12 @@ export function SidebarItem({
   icon: Icon,
   enabled,
   active,
+  collapsed = false,
   onNavigate,
 }: SidebarItemProps) {
   const itemClasses = cn(
-    "flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2.5 text-sm transition-colors",
+    "flex items-center rounded-[var(--radius-md)] text-sm transition-colors",
+    collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
     enabled
       ? active
         ? "bg-[var(--color-accent)] font-medium text-[var(--color-primary)] shadow-[var(--shadow-sm)]"
@@ -32,13 +35,17 @@ export function SidebarItem({
   const content = (
     <>
       <Icon aria-hidden="true" className="size-[18px] shrink-0" />
-      <span className="truncate">{label}</span>
+      <span className={cn("truncate", collapsed && "sr-only")}>{label}</span>
     </>
   );
 
   if (!enabled) {
     return (
-      <span aria-disabled="true" className={itemClasses}>
+      <span
+        aria-disabled="true"
+        title={collapsed ? label : undefined}
+        className={itemClasses}
+      >
         {content}
       </span>
     );
@@ -49,6 +56,7 @@ export function SidebarItem({
       href={href}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
+      title={collapsed ? label : undefined}
       className={itemClasses}
     >
       {content}

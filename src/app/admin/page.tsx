@@ -85,6 +85,7 @@ export default async function AdminDashboardPage() {
               description={action.description}
               icon={action.icon}
               enabled={action.enabled}
+              href={action.href}
             />
           ))}
         </div>

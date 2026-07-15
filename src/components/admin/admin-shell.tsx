@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { AdminInactivityGuard } from "@/components/admin/admin-inactivity-guard";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { useSidebarCollapse } from "@/lib/hooks/use-sidebar-collapse";
 import { cn } from "@/lib/utils/cn";
 
 type AdminShellProps = {
@@ -17,6 +18,7 @@ type AdminShellProps = {
 export function AdminShell({ fullName, email, children }: AdminShellProps) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { collapsed, toggle } = useSidebarCollapse();
 
   const handleClose = useCallback(() => {
     setIsMobileOpen(false);
@@ -44,6 +46,8 @@ export function AdminShell({ fullName, email, children }: AdminShellProps) {
         currentPath={pathname}
         fullName={fullName}
         isMobileOpen={isMobileOpen}
+        collapsed={collapsed}
+        onToggleCollapse={toggle}
         onClose={handleClose}
       />
 
@@ -53,7 +57,7 @@ export function AdminShell({ fullName, email, children }: AdminShellProps) {
           email={email}
           onMenuOpen={handleOpen}
         />
-        <main className="admin-content-area min-w-0 flex-1 px-4 py-6 sm:px-6 sm:py-8">
+        <main className="admin-content-area min-w-0 flex-1 px-4 py-6 sm:px-8 sm:py-10">
           {children}
         </main>
       </div>

@@ -44,13 +44,13 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         label: "שירותים",
         href: "/admin/services",
         icon: Wrench,
-        enabled: false,
+        enabled: true,
       },
       {
         label: "מתכונים",
         href: "/admin/recipes",
         icon: ChefHat,
-        enabled: false,
+        enabled: true,
       },
       {
         label: "מאמרים",
@@ -100,9 +100,9 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       },
       {
         label: "ספריית מדיה",
-        href: "/admin/media-library",
+        href: "/admin/media",
         icon: Image,
-        enabled: false,
+        enabled: true,
       },
       {
         label: "הגדרות אתר",
@@ -119,6 +119,7 @@ export type QuickActionItem = {
   description: string;
   icon: LucideIcon;
   enabled: boolean;
+  href?: string;
 };
 
 export const DASHBOARD_QUICK_ACTIONS: QuickActionItem[] = [
@@ -126,13 +127,15 @@ export const DASHBOARD_QUICK_ACTIONS: QuickActionItem[] = [
     label: "שירות חדש",
     description: "יצירת שירות חדש במערכת",
     icon: Wrench,
-    enabled: false,
+    enabled: true,
+    href: "/admin/services/new",
   },
   {
     label: "מתכון חדש",
     description: "הוספת מתכון חדש לאתר",
     icon: ChefHat,
-    enabled: false,
+    enabled: true,
+    href: "/admin/recipes/new",
   },
   {
     label: "מאמר חדש",
@@ -156,4 +159,9 @@ export const DASHBOARD_QUICK_ACTIONS: QuickActionItem[] = [
 
 export const ADMIN_ROUTE_LABELS: Record<string, string> = {
   "/admin": "לוח בקרה",
+  "/admin/media": "ספריית מדיה",
+  "/admin/services": "שירותים",
+  "/admin/services/new": "שירות חדש",
+  "/admin/recipes": "מתכונים",
+  "/admin/recipes/new": "מתכון חדש",
 };

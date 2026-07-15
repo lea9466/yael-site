@@ -67,8 +67,18 @@
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
 
-  --sidebar-width: 270px;
+  --sidebar-width: 280px;
+  --sidebar-width-expanded: 280px;
+  --sidebar-width-collapsed: 80px;
   --header-height: 72px;
+
+  --z-page: 0;
+  --z-sticky: 20;
+  --z-dropdown: 40;
+  --z-modal-backdrop: 50;
+  --z-modal: 9999;
+  --z-modal-dropdown: 10000;
+  --z-toast: 10001;
 
   --font-primary: var(--font-main);
   --font-secondary: var(--font-main);
@@ -251,7 +261,14 @@
       flex: none;
       margin-inline-start: auto;
       max-width: calc(100% - var(--sidebar-width));
+      transition:
+        max-width 0.3s ease,
+        width 0.3s ease;
       width: calc(100% - var(--sidebar-width));
+    }
+
+    .admin-sidebar {
+      transition: width 0.3s ease;
     }
   }
 
@@ -280,5 +297,51 @@
 
   .sidebar-nav::-webkit-scrollbar-thumb:hover {
     background: var(--color-secondary);
+  }
+
+  .upload-dialog-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-color: color-mix(in srgb, var(--color-secondary) 70%, transparent)
+      transparent;
+    scrollbar-width: thin;
+  }
+
+  .upload-dialog-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .upload-dialog-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .upload-dialog-scroll::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-secondary) 70%, transparent);
+    border-radius: var(--radius-full);
+  }
+
+  .upload-dialog-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--color-secondary);
+  }
+
+  #portal-root {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    isolation: isolate;
+    pointer-events: none;
+  }
+
+  #portal-root > * {
+    pointer-events: auto;
+  }
+
+  .dialog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    isolation: isolate;
   }
 }

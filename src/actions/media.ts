@@ -2,21 +2,25 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { PUBLIC_MEDIA_BUCKET } from "@/lib/media/constants";
+import { deleteMediaItem } from "@/lib/media/delete-media.server";
 import { MEDIA_ERRORS } from "@/lib/media/media-errors";
-import { findMediaUsages } from "@/lib/media/check-usage";
-import {
-  processImageBuffer,
-  sanitizeOriginalFileName,
-} from "@/lib/media/process-image";
+import { uploadMediaFromFile } from "@/lib/media/upload-media.server";
 import type {
+  BulkDeleteMediaResult,
   DeleteMediaResult,
+  MediaListItem,
   MediaRecord,
+  UpdateMediaAltTextResult,
   UploadMediaResult,
 } from "@/lib/media/media-types";
+import { fetchMediaLibrary } from "@/lib/media/queries";
 import { getAuthenticatedAdmin, createClient } from "@/lib/auth/session";
+import { MAX_BATCH_UPLOAD_CONCURRENCY } from "@/lib/media/constants";
 import {
+  bulkDeleteMediaSchema,
   deleteMediaSchema,
+  listMediaQuerySchema,
+  updateMediaAltTextSchema,
   uploadMediaSchema,
 } from "@/lib/validations/media";
 
@@ -38,17 +42,6 @@ async function getAdminSupabase(): Promise<{
   };
 }
 
-async function removeStorageObject(
-  supabase: SupabaseClient,
-  storagePath: string
-): Promise<boolean> {
-  const { error } = await supabase.storage
-    .from(PUBLIC_MEDIA_BUCKET)
-    .remove([storagePath]);
-
-  return !error;
-}
-
 export async function uploadMediaAction(
   formData: FormData
 ): Promise<UploadMediaResult> {
@@ -64,6 +57,10 @@ export async function uploadMediaAction(
     return { success: false, error: MEDIA_ERRORS.missingFile };
   }
 
+  if (file.size === 0) {
+    return { success: false, error: MEDIA_ERRORS.invalidFile };
+  }
+
   const parsedMeta = uploadMediaSchema.safeParse({
     altText: formData.get("altText")?.toString() ?? undefined,
   });
@@ -77,60 +74,12 @@ export async function uploadMediaAction(
     };
   }
 
-  try {
-    const inputBuffer = Buffer.from(await file.arrayBuffer());
-    const processed = await processImageBuffer(inputBuffer, file.type);
-
-    if (!processed.success) {
-      return { success: false, error: processed.error };
-    }
-
-    const { image } = processed;
-    const originalFileName = sanitizeOriginalFileName(file.name);
-
-    const { error: uploadError } = await session.supabase.storage
-      .from(PUBLIC_MEDIA_BUCKET)
-      .upload(image.storagePath, image.buffer, {
-        contentType: image.mimeType,
-        upsert: false,
-        cacheControl: "31536000",
-      });
-
-    if (uploadError) {
-      return { success: false, error: MEDIA_ERRORS.generic };
-    }
-
-    const { data: inserted, error: insertError } = await session.supabase
-      .from("media_library")
-      .insert({
-        storage_path: image.storagePath,
-        file_name: image.fileName,
-        original_file_name: originalFileName,
-        mime_type: image.mimeType,
-        width: image.width,
-        height: image.height,
-        size_bytes: image.sizeBytes,
-        alt_text: parsedMeta.data.altText ?? null,
-        uploaded_by: session.adminId,
-      })
-      .select(
-        "id, storage_path, file_name, original_file_name, mime_type, width, height, size_bytes, alt_text, uploaded_by, created_at"
-      )
-      .single();
-
-    if (insertError || !inserted) {
-      await removeStorageObject(session.supabase, image.storagePath);
-
-      return { success: false, error: MEDIA_ERRORS.generic };
-    }
-
-    return {
-      success: true,
-      media: inserted as MediaRecord,
-    };
-  } catch {
-    return { success: false, error: MEDIA_ERRORS.generic };
-  }
+  return uploadMediaFromFile({
+    supabase: session.supabase,
+    adminId: session.adminId,
+    file,
+    altText: parsedMeta.data.altText,
+  });
 }
 
 export async function deleteMediaAction(
@@ -153,51 +102,172 @@ export async function deleteMediaAction(
     };
   }
 
+  const result = await deleteMediaItem(session.supabase, parsed.data.mediaId);
+
+  if (result.outcome === "deleted") {
+    return { success: true };
+  }
+
+  if (result.outcome === "blocked") {
+    return {
+      success: false,
+      error: MEDIA_ERRORS.deleteInUse,
+      usages: result.usages,
+    };
+  }
+
+  return {
+    success: false,
+    error: result.message,
+  };
+}
+
+async function processBulkDelete(
+  supabase: SupabaseClient,
+  mediaIds: string[]
+): Promise<BulkDeleteMediaResult> {
+  const result: BulkDeleteMediaResult = {
+    deleted: [],
+    blocked: [],
+    failed: [],
+  };
+
+  let index = 0;
+
+  async function worker(): Promise<void> {
+    while (index < mediaIds.length) {
+      const currentIndex = index;
+      index += 1;
+      const mediaId = mediaIds[currentIndex];
+      const itemResult = await deleteMediaItem(supabase, mediaId);
+
+      if (itemResult.outcome === "deleted") {
+        result.deleted.push({
+          id: itemResult.id,
+          fileName: itemResult.fileName,
+        });
+      } else if (itemResult.outcome === "blocked") {
+        result.blocked.push({
+          id: itemResult.id,
+          fileName: itemResult.fileName,
+          usages: itemResult.usages,
+        });
+      } else {
+        result.failed.push({
+          id: itemResult.id,
+          fileName: itemResult.fileName,
+          message: itemResult.message,
+        });
+      }
+    }
+  }
+
+  const workerCount = Math.min(MAX_BATCH_UPLOAD_CONCURRENCY, mediaIds.length);
+  await Promise.all(Array.from({ length: workerCount }, () => worker()));
+
+  return result;
+}
+
+export async function bulkDeleteMediaAction(
+  mediaIds: string[]
+): Promise<BulkDeleteMediaResult | { error: string }> {
+  const session = await getAdminSupabase();
+
+  if (!session) {
+    return { error: MEDIA_ERRORS.unauthorized };
+  }
+
+  const parsed = bulkDeleteMediaSchema.safeParse({ mediaIds });
+
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues[0];
+
+    return {
+      error: firstIssue?.message ?? MEDIA_ERRORS.generic,
+    };
+  }
+
+  return processBulkDelete(session.supabase, parsed.data.mediaIds);
+}
+
+export async function updateMediaAltTextAction(
+  mediaId: string,
+  altText: string
+): Promise<UpdateMediaAltTextResult> {
+  const session = await getAdminSupabase();
+
+  if (!session) {
+    return { success: false, error: MEDIA_ERRORS.unauthorized };
+  }
+
+  const parsed = updateMediaAltTextSchema.safeParse({ mediaId, altText });
+
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues[0];
+
+    return {
+      success: false,
+      error: firstIssue?.message ?? MEDIA_ERRORS.generic,
+    };
+  }
+
   try {
-    const { data: mediaRow, error: loadError } = await session.supabase
+    const { data: updated, error } = await session.supabase
       .from("media_library")
-      .select("id, storage_path")
+      .update({ alt_text: parsed.data.altText })
       .eq("id", parsed.data.mediaId)
+      .select(
+        "id, storage_path, file_name, original_file_name, mime_type, width, height, size_bytes, alt_text, uploaded_by, created_at"
+      )
       .maybeSingle();
 
-    if (loadError) {
+    if (error) {
       return { success: false, error: MEDIA_ERRORS.generic };
     }
 
-    if (!mediaRow) {
+    if (!updated) {
       return { success: false, error: MEDIA_ERRORS.deleteNotFound };
     }
 
-    const usages = await findMediaUsages(session.supabase, parsed.data.mediaId);
-
-    if (usages.length > 0) {
-      return {
-        success: false,
-        error: MEDIA_ERRORS.deleteInUse,
-        usages,
-      };
-    }
-
-    const storageDeleted = await removeStorageObject(
-      session.supabase,
-      mediaRow.storage_path
-    );
-
-    if (!storageDeleted) {
-      return { success: false, error: MEDIA_ERRORS.generic };
-    }
-
-    const { error: deleteError } = await session.supabase
-      .from("media_library")
-      .delete()
-      .eq("id", parsed.data.mediaId);
-
-    if (deleteError) {
-      return { success: false, error: MEDIA_ERRORS.generic };
-    }
-
-    return { success: true };
+    return {
+      success: true,
+      media: updated as MediaRecord,
+    };
   } catch {
     return { success: false, error: MEDIA_ERRORS.generic };
   }
+}
+
+export async function searchMediaPickerAction(
+  q = "",
+  page = 1
+): Promise<{
+  success: boolean;
+  items: MediaListItem[];
+  totalPages: number;
+  error?: string;
+}> {
+  const session = await getAdminSupabase();
+
+  if (!session) {
+    return { success: false, items: [], totalPages: 1, error: MEDIA_ERRORS.unauthorized };
+  }
+
+  const parsed = listMediaQuerySchema.safeParse({ q, page, sort: "newest" });
+
+  if (!parsed.success) {
+    return { success: false, items: [], totalPages: 1, error: MEDIA_ERRORS.generic };
+  }
+
+  const data = await fetchMediaLibrary(parsed.data);
+
+  if (!data) {
+    return { success: false, items: [], totalPages: 1, error: MEDIA_ERRORS.generic };
+  }
+
+  return {
+    success: true,
+    items: data.items,
+    totalPages: data.pagination.totalPages,
+  };
 }

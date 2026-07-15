@@ -1,0 +1,16 @@
+export const RECIPE_ERRORS = {
+  unauthorized: "אין הרשאה לבצע פעולה זו.",
+  generic: "אירעה שגיאה. נסו שוב מאוחר יותר.",
+  notFound: "המתכון לא נמצא.",
+  slugTaken: "כתובת המתכון כבר בשימוש.",
+  coverRequired: "יש לבחור תמונת כיסוי.",
+  coverRequiredPublish: "תמונת כיסוי נדרשת לפרסום.",
+  mediaNotFound: "התמונה שנבחרה לא נמצאה.",
+  categoryRequired: "יש לבחור קטגוריה.",
+  categoryInvalid: "ניתן לבחור רק קטגוריות מתכונים.",
+  categoryMissing: "אין קטגוריות מתכונים במערכת. יש ליצור קטגוריה לפני פרסום.",
+  tagInvalid: "ניתן לבחור רק תגיות מתכונים.",
+  archiveOnlyDelete: "ניתן למחוק לצמיתות רק מתכון בארכיון.",
+  duplicateFailed: "שכפול המתכון נכשל.",
+  galleryLimit: "ניתן להוסיף עד 6 תמונות לגלריה.",
+} as const;

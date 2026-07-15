@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTransition } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 import { logoutAction } from "@/actions/auth";
 import { SidebarItem } from "@/components/admin/sidebar-item";
 import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
 import { ADMIN_NAV_SECTIONS } from "@/constants/navigation";
 import { cn } from "@/lib/utils/cn";
 
@@ -14,6 +15,8 @@ type AdminSidebarProps = {
   currentPath: string;
   fullName: string;
   isMobileOpen: boolean;
+  collapsed: boolean;
+  onToggleCollapse: () => void;
   onClose: () => void;
 };
 
@@ -34,6 +37,8 @@ export function AdminSidebar({
   currentPath,
   fullName,
   isMobileOpen,
+  collapsed,
+  onToggleCollapse,
   onClose,
 }: AdminSidebarProps) {
   const drawerRef = useRef<HTMLElement>(null);
@@ -106,13 +111,15 @@ export function AdminSidebar({
     });
   };
 
+  const showCollapsed = collapsed && isDesktop;
+
   return (
     <aside
       ref={drawerRef}
       aria-label="תפריט צד"
       aria-hidden={!isDesktop && !isMobileOpen}
       className={cn(
-        "flex h-dvh w-[var(--sidebar-width)] shrink-0 flex-col overflow-hidden bg-[var(--color-primary)] text-[var(--color-text-on-primary)]",
+        "admin-sidebar flex h-dvh w-[var(--sidebar-width)] shrink-0 flex-col overflow-hidden bg-[var(--color-primary)] text-[var(--color-text-on-primary)]",
         "max-lg:fixed max-lg:top-0 max-lg:z-50 max-lg:inset-inline-start-0 max-lg:shadow-[var(--shadow-lg)] max-lg:transition-transform",
         isMobileOpen
           ? "max-lg:translate-x-0"
@@ -120,9 +127,47 @@ export function AdminSidebar({
         "lg:fixed lg:top-0 lg:z-30 lg:inset-inline-start-0 lg:translate-x-0 lg:shadow-none"
       )}
     >
-      <div className="shrink-0 border-b border-[var(--color-text-on-primary)]/10 px-[var(--spacing-lg)] py-[var(--spacing-lg)]">
-        <p className="text-lg font-semibold">יעל כנייבסקי</p>
-        <p className="text-sm text-[var(--color-text-on-primary)]/75">מערכת ניהול</p>
+      <div
+        className={cn(
+          "shrink-0 border-b border-[var(--color-text-on-primary)]/10 py-[var(--spacing-lg)]",
+          showCollapsed ? "px-3" : "px-[var(--spacing-lg)]"
+        )}
+      >
+        <div
+          className={cn(
+            "flex items-center gap-2",
+            showCollapsed ? "flex-col" : "justify-between"
+          )}
+        >
+          <div className={cn("min-w-0", showCollapsed && "text-center")}>
+            <p
+              className={cn(
+                "font-semibold",
+                showCollapsed ? "text-sm" : "text-lg"
+              )}
+            >
+              {showCollapsed ? "יעל" : "יעל קנייבסקי"}
+            </p>
+            {!showCollapsed ? (
+              <p className="text-sm text-[var(--color-text-on-primary)]/75">
+                מערכת ניהול
+              </p>
+            ) : null}
+          </div>
+
+          <IconButton
+            label={showCollapsed ? "הרחבת תפריט" : "כיווץ תפריט"}
+            size="sm"
+            className="hidden text-[var(--color-text-on-primary)] hover:bg-[var(--color-secondary)]/60 lg:inline-flex"
+            onClick={onToggleCollapse}
+          >
+            {showCollapsed ? (
+              <PanelLeftOpen aria-hidden="true" className="size-4" />
+            ) : (
+              <PanelLeftClose aria-hidden="true" className="size-4" />
+            )}
+          </IconButton>
+        </div>
       </div>
 
       <nav
@@ -131,9 +176,11 @@ export function AdminSidebar({
       >
         {ADMIN_NAV_SECTIONS.map((section) => (
           <div key={section.title} className="mb-5 last:mb-0">
-            <p className="mb-2 px-3 text-caption font-medium text-[var(--color-text-on-primary)]/60">
-              {section.title}
-            </p>
+            {!showCollapsed ? (
+              <p className="mb-2 px-3 text-caption font-medium text-[var(--color-text-on-primary)]/60">
+                {section.title}
+              </p>
+            ) : null}
             <ul className="space-y-1">
               {section.items.map((item) => {
                 const isActive =
@@ -149,6 +196,7 @@ export function AdminSidebar({
                       icon={item.icon}
                       enabled={item.enabled}
                       active={isActive}
+                      collapsed={showCollapsed}
                       onNavigate={onClose}
                     />
                   </li>
@@ -159,33 +207,57 @@ export function AdminSidebar({
         ))}
       </nav>
 
-      <div className="shrink-0 border-t border-[var(--color-text-on-primary)]/10 px-[var(--spacing-lg)] py-[var(--spacing-md)]">
-        <div className="mb-3 flex items-center gap-3">
+      <div
+        className={cn(
+          "shrink-0 border-t border-[var(--color-text-on-primary)]/10 py-[var(--spacing-md)]",
+          showCollapsed ? "px-3" : "px-[var(--spacing-lg)]"
+        )}
+      >
+        <div
+          className={cn(
+            "mb-3 flex items-center gap-3",
+            showCollapsed && "justify-center"
+          )}
+        >
           <span
             aria-hidden="true"
+            title={showCollapsed ? fullName : undefined}
             className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-full)] bg-[var(--color-accent)] text-sm font-semibold text-[var(--color-primary)]"
           >
             {getInitials(fullName)}
           </span>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium">{fullName}</p>
-            <p className="text-caption text-[var(--color-text-on-primary)]/70">
-              מנהלת מערכת
-            </p>
-          </div>
+          {!showCollapsed ? (
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium">{fullName}</p>
+              <p className="text-caption text-[var(--color-text-on-primary)]/70">
+                מנהלת מערכת
+              </p>
+            </div>
+          ) : null}
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          loading={isPending}
-          loadingText="מתנתק..."
-          onClick={handleLogout}
-          className="w-full border-[var(--color-text-on-primary)]/20 bg-transparent text-[var(--color-text-on-primary)] hover:bg-[var(--color-secondary)]/60 hover:text-[var(--color-text-on-primary)]"
-        >
-          <LogOut aria-hidden="true" className="size-4" />
-          התנתקות
-        </Button>
+        {showCollapsed ? (
+          <IconButton
+            label="התנתקות"
+            size="sm"
+            className="mx-auto w-full text-[var(--color-text-on-primary)] hover:bg-[var(--color-secondary)]/60"
+            onClick={handleLogout}
+          >
+            <LogOut aria-hidden="true" className="size-4" />
+          </IconButton>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            loading={isPending}
+            loadingText="מתנתק..."
+            onClick={handleLogout}
+            className="w-full border-[var(--color-text-on-primary)]/20 bg-transparent text-[var(--color-text-on-primary)] hover:bg-[var(--color-secondary)]/60 hover:text-[var(--color-text-on-primary)]"
+          >
+            <LogOut aria-hidden="true" className="size-4" />
+            התנתקות
+          </Button>
+        )}
       </div>
     </aside>
   );

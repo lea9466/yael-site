@@ -6,4 +6,5 @@ export const MEDIA_ERRORS = {
   missingFile: "לא נבחר קובץ להעלאה.",
   deleteInUse: "לא ניתן למחוק את הקובץ כי הוא עדיין בשימוש.",
   deleteNotFound: "הקובץ לא נמצא.",
+  uploadAborted: "העלאת הקובץ בוטלה.",
 } as const;

@@ -6,9 +6,33 @@ import { ChevronLeft } from "lucide-react";
 
 import { ADMIN_ROUTE_LABELS } from "@/constants/navigation";
 
+function getBreadcrumbLabel(pathname: string): string {
+  if (ADMIN_ROUTE_LABELS[pathname]) {
+    return ADMIN_ROUTE_LABELS[pathname];
+  }
+
+  if (/^\/admin\/services\/[^/]+\/preview$/.test(pathname)) {
+    return "תצוגה מקדימה";
+  }
+
+  if (/^\/admin\/services\/[^/]+$/.test(pathname)) {
+    return "עריכת שירות";
+  }
+
+  if (/^\/admin\/recipes\/[^/]+\/preview$/.test(pathname)) {
+    return "תצוגה מקדימה";
+  }
+
+  if (/^\/admin\/recipes\/[^/]+$/.test(pathname)) {
+    return "עריכת מתכון";
+  }
+
+  return "מערכת ניהול";
+}
+
 export function Breadcrumbs() {
   const pathname = usePathname();
-  const currentLabel = ADMIN_ROUTE_LABELS[pathname] ?? "מערכת ניהול";
+  const currentLabel = getBreadcrumbLabel(pathname);
 
   return (
     <nav aria-label="מיקום במערכת" className="text-sm">

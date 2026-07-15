@@ -7,6 +7,13 @@ import {
   adminActivityCookieOptions,
 } from "@/lib/auth/constants";
 
+function isServerActionRequest(request: NextRequest): boolean {
+  return (
+    request.method === "POST" &&
+    (request.headers.has("Next-Action") || request.headers.has("next-action"))
+  );
+}
+
 export async function middleware(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -43,7 +50,13 @@ export async function middleware(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
+    const isServerAction = isServerActionRequest(request);
+
     if (!user) {
+      if (isServerAction) {
+        return response;
+      }
+
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -53,6 +66,10 @@ export async function middleware(request: NextRequest) {
       const elapsed = Date.now() - Number(lastActivity);
 
       if (!Number.isNaN(elapsed) && elapsed > ADMIN_INACTIVITY_MS) {
+        if (isServerAction) {
+          return response;
+        }
+
         const redirectResponse = NextResponse.redirect(
           new URL("/login?reason=inactivity", request.url)
         );

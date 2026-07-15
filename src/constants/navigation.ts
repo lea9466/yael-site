@@ -84,7 +84,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         label: "קטגוריות",
         href: "/admin/categories",
         icon: FolderTree,
-        enabled: false,
+        enabled: true,
       },
       {
         label: "תגיות",
@@ -164,4 +164,6 @@ export const ADMIN_ROUTE_LABELS: Record<string, string> = {
   "/admin/services/new": "שירות חדש",
   "/admin/recipes": "מתכונים",
   "/admin/recipes/new": "מתכון חדש",
+  "/admin/categories": "קטגוריות",
+  "/admin/categories/new": "קטגוריה חדשה",
 };

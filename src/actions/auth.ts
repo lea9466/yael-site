@@ -1,7 +1,8 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
+import { ADMIN_LAST_ACTIVITY_COOKIE } from "@/lib/auth/constants";
 import { AUTH_ERRORS } from "@/lib/auth/errors";
 import {
   createActionClient,
@@ -59,12 +60,12 @@ export async function logoutAction(): Promise<LogoutResult> {
   try {
     const supabase = await createClient();
     await supabase.auth.signOut();
-    redirect("/login");
-  } catch (error) {
-    if (error instanceof Error && error.message === "NEXT_REDIRECT") {
-      throw error;
-    }
 
+    const cookieStore = await cookies();
+    cookieStore.delete(ADMIN_LAST_ACTIVITY_COOKIE);
+
+    return { success: true };
+  } catch {
     return {
       success: false,
       error: AUTH_ERRORS.generic,

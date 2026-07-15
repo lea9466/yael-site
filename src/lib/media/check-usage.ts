@@ -30,38 +30,50 @@ async function findHardForeignKeyUsages(
       table: "services",
       column: "cover_media_id",
       label: "שירות — תמונת כיסוי",
+      nameColumn: "title",
     },
     {
       table: "services",
       column: "seo_og_media_id",
       label: "שירות — תמונת SEO",
+      nameColumn: "title",
     },
     {
       table: "recipes",
       column: "cover_media_id",
       label: "מתכון — תמונת כיסוי",
+      nameColumn: "title",
     },
     {
       table: "recipes",
       column: "seo_og_media_id",
       label: "מתכון — תמונת SEO",
+      nameColumn: "title",
     },
     {
       table: "articles",
       column: "cover_media_id",
       label: "מאמר — תמונת כיסוי",
+      nameColumn: "title",
     },
     {
       table: "articles",
       column: "seo_og_media_id",
       label: "מאמר — תמונת SEO",
+      nameColumn: "title",
+    },
+    {
+      table: "categories",
+      column: "image_media_id",
+      label: "קטגוריה — תמונה",
+      nameColumn: "name",
     },
   ] as const;
 
   for (const check of checks) {
     const { data, error } = await supabase
       .from(check.table)
-      .select("title")
+      .select(check.nameColumn)
       .eq(check.column, mediaId);
 
     if (error || !data) {
@@ -69,8 +81,10 @@ async function findHardForeignKeyUsages(
     }
 
     for (const row of data) {
+      const displayName = row[check.nameColumn as keyof typeof row];
+
       usages.push({
-        label: `${check.label}: ${row.title}`,
+        label: `${check.label}: ${String(displayName ?? "")}`,
       });
     }
   }

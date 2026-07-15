@@ -19,6 +19,10 @@ import {
   restoreServiceAction,
   updateServiceAction,
 } from "@/actions/services";
+import { AdminFormBody } from "@/components/admin/admin-form-section";
+import { AdminFormHeader } from "@/components/admin/admin-form-header";
+import { AdminFormShell } from "@/components/admin/admin-form-shell";
+import { AdminFormStickyBar } from "@/components/admin/admin-form-sticky-bar";
 import { AdminSeoSection } from "@/components/admin/admin-seo-section";
 import { ServiceArchiveDialog } from "@/components/services/service-archive-dialog";
 import { ServiceDeleteDialog } from "@/components/services/service-delete-dialog";
@@ -43,11 +47,13 @@ import {
   getSectionsWithErrors,
   getFieldErrorMessage,
 } from "@/lib/forms/validation-feedback";
-import { SERVICE_REPEATER_LIMITS, SERVICE_FORM_SECTIONS } from "@/lib/services/constants";
+import { SERVICE_REPEATER_LIMITS } from "@/lib/services/constants";
 import { STATUS_LABELS } from "@/lib/services/constants";
 import { slugifyTitle } from "@/lib/services/slug";
 import type { ServiceDetail } from "@/lib/services/types";
 import { useUnsavedChangesWarning } from "@/lib/hooks/use-unsaved-changes-warning";
+import { ADMIN_LIST_PATHS } from "@/lib/forms/admin-list-paths";
+import { redirectAfterSave } from "@/lib/forms/redirect-after-save";
 import {
   mapZodErrors,
   serviceDraftInputSchema,
@@ -188,8 +194,8 @@ export function ServiceForm({
   });
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("basic");
   const [seoOpen, setSeoOpen] = useState(false);
+  const [saveSucceeded, setSaveSucceeded] = useState(false);
 
   const initialSnapshot = useMemo(
     () =>
@@ -205,7 +211,7 @@ export function ServiceForm({
     [values, content]
   );
 
-  const isDirty = currentSnapshot !== initialSnapshot;
+  const isDirty = !saveSucceeded && currentSnapshot !== initialSnapshot;
   useUnsavedChangesWarning(isDirty && !isPending);
 
   const errorSections = useMemo(
@@ -228,8 +234,7 @@ export function ServiceForm({
     const summary = buildValidationSummary(errors, fallback);
     setFieldErrors(errors);
     showToast("error", summary);
-
-    const { sectionId } = focusFirstFieldError(errors);
+    focusFirstFieldError(errors);
 
     if (
       Object.keys(errors).some(
@@ -237,10 +242,6 @@ export function ServiceForm({
       )
     ) {
       setSeoOpen(true);
-    }
-
-    if (sectionId) {
-      setActiveSection(sectionId);
     }
   };
 
@@ -279,6 +280,10 @@ export function ServiceForm({
   });
 
   const handleSaveDraft = () => {
+    if (isPending) {
+      return;
+    }
+
     startTransition(async () => {
       closeToast();
       setFieldErrors({});
@@ -307,20 +312,21 @@ export function ServiceForm({
         return;
       }
 
+      setSaveSucceeded(true);
       setFieldErrors({});
-      showToast("success", "השירות נשמר כטיוטה.");
-
-      if (mode === "create" && result.data?.id) {
-        router.replace(`/admin/services/${result.data.id}`);
-        router.refresh();
-        return;
-      }
-
-      router.refresh();
+      redirectAfterSave(
+        router,
+        ADMIN_LIST_PATHS.service,
+        "השירות נשמר כטיוטה."
+      );
     });
   };
 
   const handlePublish = () => {
+    if (isPending) {
+      return;
+    }
+
     startTransition(async () => {
       closeToast();
       setFieldErrors({});
@@ -353,15 +359,13 @@ export function ServiceForm({
         return;
       }
 
+      setSaveSucceeded(true);
       setFieldErrors({});
-      showToast("success", "השירות פורסם בהצלחה.");
-      setValues((current) => ({ ...current, status: "published" }));
-
-      if (mode === "create" && result.data?.id) {
-        router.replace(`/admin/services/${result.data.id}`);
-      }
-
-      router.refresh();
+      redirectAfterSave(
+        router,
+        ADMIN_LIST_PATHS.service,
+        "השירות פורסם בהצלחה."
+      );
     });
   };
 
@@ -422,22 +426,31 @@ export function ServiceForm({
       }
 
       setDeleteOpen(false);
-      router.push("/admin/services");
-      router.refresh();
+      setSaveSucceeded(true);
+      redirectAfterSave(router, ADMIN_LIST_PATHS.service, "השירות נמחק.");
     });
   };
 
   const currentStatus = initialService?.status ?? values.status;
 
   return (
-    <div className="mx-auto w-full max-w-7xl">
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-page-title">
-              {mode === "create" ? "שירות חדש" : "עריכת שירות"}
-            </h1>
-            {mode === "edit" ? (
+    <AdminFormShell width="wide">
+      <AdminFormStickyBar>
+        <AdminFormHeader
+          breadcrumbs={[
+            { label: "שירותים", href: ADMIN_LIST_PATHS.service },
+            {
+              label: mode === "create" ? "שירות חדש" : "עריכת שירות",
+            },
+          ]}
+          title={mode === "create" ? "שירות חדש" : "עריכת שירות"}
+          description={
+            mode === "create"
+              ? "יצירת שירות חדש לאתר"
+              : "עדכון פרטי השירות והתוכן שלו"
+          }
+          meta={
+            mode === "edit" ? (
               <Badge
                 variant={
                   currentStatus === "published"
@@ -449,27 +462,84 @@ export function ServiceForm({
               >
                 {STATUS_LABELS[currentStatus]}
               </Badge>
-            ) : null}
-          </div>
-          <p className="text-muted">
-            {mode === "create"
-              ? "יצירת שירות חדש לאתר"
-              : "עדכון פרטי השירות והתוכן שלו"}
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          {mode === "edit" ? (
-            <Link
-              href={`/admin/services/${initialService!.id}/preview`}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-transparent px-4 text-sm font-medium text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface-soft)]"
-            >
-              <Eye aria-hidden="true" className="size-4" />
-              תצוגה מקדימה
-            </Link>
-          ) : null}
-        </div>
-      </div>
+            ) : null
+          }
+          actions={
+            <>
+              <Link
+                href={ADMIN_LIST_PATHS.service}
+                className="inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-medium text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface-soft)]"
+              >
+                ביטול
+              </Link>
+              <Button
+                loading={isPending}
+                loadingText="שומר..."
+                disabled={isPending}
+                onClick={handleSaveDraft}
+              >
+                <Save aria-hidden="true" className="size-4" />
+                שמירה
+              </Button>
+              <Button
+                variant="secondary"
+                loading={isPending}
+                loadingText="מפרסם..."
+                disabled={isPending}
+                onClick={handlePublish}
+              >
+                <Send aria-hidden="true" className="size-4" />
+                פרסום
+              </Button>
+              {mode === "edit" ? (
+                <Link
+                  href={`/admin/services/${initialService!.id}/preview`}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-medium text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface-soft)]"
+                >
+                  <Eye aria-hidden="true" className="size-4" />
+                  תצוגה מקדימה
+                </Link>
+              ) : null}
+              {mode === "edit" && currentStatus !== "archived" ? (
+                <Button
+                  variant="outline"
+                  onClick={() => setArchiveOpen(true)}
+                  disabled={isPending}
+                >
+                  <Archive aria-hidden="true" className="size-4" />
+                  העברה לארכיון
+                </Button>
+              ) : null}
+              {mode === "edit" && currentStatus === "archived" ? (
+                <>
+                  <Button
+                    variant="outline"
+                    disabled={isPending}
+                    onClick={() => handleRestore(false)}
+                  >
+                    שחזור כטיוטה
+                  </Button>
+                  <Button
+                    variant="outline"
+                    disabled={isPending}
+                    onClick={() => handleRestore(true)}
+                  >
+                    שחזור ופרסום
+                  </Button>
+                  <Button
+                    variant="danger"
+                    disabled={isPending}
+                    onClick={() => setDeleteOpen(true)}
+                  >
+                    <Trash2 aria-hidden="true" className="size-4" />
+                    מחיקה לצמיתות
+                  </Button>
+                </>
+              ) : null}
+            </>
+          }
+        />
+      </AdminFormStickyBar>
 
       <FormToast
         open={toast.open}
@@ -479,49 +549,14 @@ export function ServiceForm({
         onClose={closeToast}
       />
 
-      <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
-        <nav
-          aria-label="אזורי הטופס"
-          className="lg:sticky lg:top-24 lg:self-start"
-        >
-          <ul className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0">
-            {SERVICE_FORM_SECTIONS.map((section) => (
-              <li key={section.id}>
-                <button
-                  type="button"
-                  className={cn(
-                    "flex w-full items-center justify-between gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-3 py-2 text-start text-sm transition-colors",
-                    activeSection === section.id
-                      ? "bg-[var(--color-primary)] text-[var(--color-text-on-primary)]"
-                      : "bg-[var(--color-surface-soft)] text-[var(--color-text)] hover:bg-[var(--color-surface-soft)]/80",
-                    errorSections.has(section.id) &&
-                      activeSection !== section.id &&
-                      "border border-[var(--color-error)] bg-[var(--color-error-soft)]/50 text-[var(--color-error)]"
-                  )}
-                  onClick={() => setActiveSection(section.id)}
-                >
-                  <span>{section.label}</span>
-                  {errorSections.has(section.id) ? (
-                    <span
-                      aria-hidden="true"
-                      className="size-2 rounded-full bg-[var(--color-error)]"
-                    />
-                  ) : null}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="space-y-8 pb-28">
+      <AdminFormBody>
+        <div className="space-y-12">
           <section
             id="section-basic"
             className={cn(
-              "space-y-5 rounded-[var(--radius-xl)] border bg-[var(--color-surface)] p-5 sm:p-6",
-              errorSections.has("basic")
-                ? "border-[var(--color-error)] ring-2 ring-[var(--color-error)]/15"
-                : "border-[var(--color-border)]",
-              activeSection !== "basic" && "hidden lg:block"
+              "admin-form-section space-y-5",
+              errorSections.has("basic") &&
+                "rounded-[var(--radius-md)] ring-2 ring-[var(--color-error)]/20"
             )}
           >
             <h2 className="text-section-title">מידע בסיסי</h2>
@@ -604,11 +639,9 @@ export function ServiceForm({
           <section
             id="section-content"
             className={cn(
-              "space-y-4 rounded-[var(--radius-xl)] border bg-[var(--color-surface)] p-5 sm:p-6",
-              errorSections.has("content")
-                ? "border-[var(--color-error)] ring-2 ring-[var(--color-error)]/15"
-                : "border-[var(--color-border)]",
-              activeSection !== "content" && "hidden lg:block"
+              "admin-form-section space-y-4",
+              errorSections.has("content") &&
+                "rounded-[var(--radius-md)] ring-2 ring-[var(--color-error)]/20"
             )}
           >
             <h2 className="text-section-title">תוכן השירות</h2>
@@ -634,11 +667,9 @@ export function ServiceForm({
           <section
             id="section-audience"
             className={cn(
-              "rounded-[var(--radius-xl)] border bg-[var(--color-surface)] p-5 sm:p-6",
-              errorSections.has("audience")
-                ? "border-[var(--color-error)] ring-2 ring-[var(--color-error)]/15"
-                : "border-[var(--color-border)]",
-              activeSection !== "audience" && "hidden lg:block"
+              "admin-form-section",
+              errorSections.has("audience") &&
+                "rounded-[var(--radius-md)] ring-2 ring-[var(--color-error)]/20"
             )}
           >
             <RepeaterField
@@ -667,11 +698,9 @@ export function ServiceForm({
           <section
             id="section-benefits"
             className={cn(
-              "rounded-[var(--radius-xl)] border bg-[var(--color-surface)] p-5 sm:p-6",
-              errorSections.has("benefits")
-                ? "border-[var(--color-error)] ring-2 ring-[var(--color-error)]/15"
-                : "border-[var(--color-border)]",
-              activeSection !== "benefits" && "hidden lg:block"
+              "admin-form-section",
+              errorSections.has("benefits") &&
+                "rounded-[var(--radius-md)] ring-2 ring-[var(--color-error)]/20"
             )}
           >
             <RepeaterField
@@ -699,11 +728,9 @@ export function ServiceForm({
           <section
             id="section-process"
             className={cn(
-              "rounded-[var(--radius-xl)] border bg-[var(--color-surface)] p-5 sm:p-6",
-              errorSections.has("process")
-                ? "border-[var(--color-error)] ring-2 ring-[var(--color-error)]/15"
-                : "border-[var(--color-border)]",
-              activeSection !== "process" && "hidden lg:block"
+              "admin-form-section",
+              errorSections.has("process") &&
+                "rounded-[var(--radius-md)] ring-2 ring-[var(--color-error)]/20"
             )}
           >
             <RepeaterField
@@ -744,11 +771,9 @@ export function ServiceForm({
           <section
             id="section-faq"
             className={cn(
-              "rounded-[var(--radius-xl)] border bg-[var(--color-surface)] p-5 sm:p-6",
-              errorSections.has("faq")
-                ? "border-[var(--color-error)] ring-2 ring-[var(--color-error)]/15"
-                : "border-[var(--color-border)]",
-              activeSection !== "faq" && "hidden lg:block"
+              "admin-form-section",
+              errorSections.has("faq") &&
+                "rounded-[var(--radius-md)] ring-2 ring-[var(--color-error)]/20"
             )}
           >
             <RepeaterField
@@ -788,11 +813,9 @@ export function ServiceForm({
           <section
             id="section-cta"
             className={cn(
-              "space-y-4 rounded-[var(--radius-xl)] border bg-[var(--color-surface)] p-5 sm:p-6",
-              errorSections.has("cta")
-                ? "border-[var(--color-error)] ring-2 ring-[var(--color-error)]/15"
-                : "border-[var(--color-border)]",
-              activeSection !== "cta" && "hidden lg:block"
+              "admin-form-section space-y-4",
+              errorSections.has("cta") &&
+                "rounded-[var(--radius-md)] ring-2 ring-[var(--color-error)]/20"
             )}
           >
             <h2 className="text-section-title">הנעה לפעולה</h2>
@@ -926,71 +949,7 @@ export function ServiceForm({
             }}
           />
         </div>
-      </div>
-
-      <div className="sticky bottom-0 z-[var(--z-sticky)] -mx-4 border-t border-[var(--color-border)] bg-[var(--color-surface)]/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-            <Button
-              loading={isPending}
-              loadingText="שומר..."
-              onClick={handleSaveDraft}
-            >
-              <Save aria-hidden="true" className="size-4" />
-              שמירה כטיוטה
-            </Button>
-            <Button
-              variant="secondary"
-              loading={isPending}
-              loadingText="מפרסם..."
-              onClick={handlePublish}
-            >
-              <Send aria-hidden="true" className="size-4" />
-              פרסום
-            </Button>
-          </div>
-
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-            {mode === "edit" && currentStatus !== "archived" ? (
-              <Button
-                variant="outline"
-                onClick={() => setArchiveOpen(true)}
-                disabled={isPending}
-              >
-                <Archive aria-hidden="true" className="size-4" />
-                העברה לארכיון
-              </Button>
-            ) : null}
-
-            {mode === "edit" && currentStatus === "archived" ? (
-              <>
-                <Button
-                  variant="outline"
-                  disabled={isPending}
-                  onClick={() => handleRestore(false)}
-                >
-                  שחזור כטיוטה
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={isPending}
-                  onClick={() => handleRestore(true)}
-                >
-                  שחזור ופרסום
-                </Button>
-                <Button
-                  variant="danger"
-                  disabled={isPending}
-                  onClick={() => setDeleteOpen(true)}
-                >
-                  <Trash2 aria-hidden="true" className="size-4" />
-                  מחיקה לצמיתות
-                </Button>
-              </>
-            ) : null}
-          </div>
-        </div>
-      </div>
+      </AdminFormBody>
 
       <ServiceArchiveDialog
         open={archiveOpen}
@@ -1007,6 +966,6 @@ export function ServiceForm({
         onClose={() => setDeleteOpen(false)}
         onConfirm={handleDelete}
       />
-    </div>
+    </AdminFormShell>
   );
 }

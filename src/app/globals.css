@@ -6,16 +6,17 @@
   --token-accent: #e3c7a6;
   --token-soft-accent: #d98a80;
 
-  --token-background: #f8f5f1;
+  --token-background: #fafaf9;
   --token-surface: #ffffff;
-  --token-surface-soft: #f3efe9;
+  --token-surface-soft: #f5f5f4;
+  --token-form-surface: #ffffff;
 
   --token-text: #2f3e34;
-  --token-text-muted: #6f756f;
+  --token-text-muted: #6b7280;
   --token-text-on-primary: #ffffff;
 
-  --token-border: #e6ded3;
-  --token-border-strong: #d4c7b8;
+  --token-border: #e7e5e4;
+  --token-border-strong: #d6d3d1;
 
   --token-success: #4e7a5d;
   --token-success-soft: #e7f1e9;
@@ -36,6 +37,7 @@
   --color-background: var(--token-background);
   --color-surface: var(--token-surface);
   --color-surface-soft: var(--token-surface-soft);
+  --color-form-surface: var(--token-form-surface);
   --color-text: var(--token-text);
   --color-text-muted: var(--token-text-muted);
   --color-text-on-primary: var(--token-text-on-primary);
@@ -240,6 +242,18 @@
 
   .admin-content-area {
     background: var(--color-background);
+  }
+
+  .admin-form-shell {
+    text-align: right;
+  }
+
+  .admin-form-body {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .admin-form-sticky-bar {
+    margin-bottom: 0;
   }
 
   .admin-layout-root {

@@ -22,29 +22,39 @@ export function RecipeTagPicker({
   onChange,
 }: RecipeTagPickerProps) {
   const [searchValue, setSearchValue] = useState("");
-  const [items, setItems] = useState<RecipeTagSummary[]>(initialTags);
+  const [searchResults, setSearchResults] = useState<RecipeTagSummary[] | null>(
+    null
+  );
   const [loadError, setLoadError] = useState("");
   const [isLoading, startLoading] = useTransition();
 
+  const trimmedSearch = searchValue.trim();
+  const items =
+    trimmedSearch.length === 0 ? initialTags : (searchResults ?? []);
+
   useEffect(() => {
+    if (trimmedSearch.length === 0) {
+      return;
+    }
+
     const timeout = window.setTimeout(() => {
       startLoading(async () => {
         setLoadError("");
-        const result = await searchRecipeTagsAction(searchValue);
+        const result = await searchRecipeTagsAction(trimmedSearch);
 
         if (!result.success) {
           setLoadError(result.error);
           return;
         }
 
-        setItems(result.items);
+        setSearchResults(result.items);
       });
     }, 300);
 
     return () => {
       window.clearTimeout(timeout);
     };
-  }, [searchValue]);
+  }, [trimmedSearch]);
 
   const toggleTag = (tagId: string) => {
     if (selectedIds.includes(tagId)) {
@@ -73,7 +83,15 @@ export function RecipeTagPicker({
       <Input
         value={searchValue}
         placeholder="חיפוש תגית"
-        onChange={(event) => setSearchValue(event.target.value)}
+        onChange={(event) => {
+          const nextValue = event.target.value;
+          setSearchValue(nextValue);
+
+          if (nextValue.trim().length === 0) {
+            setSearchResults(null);
+            setLoadError("");
+          }
+        }}
       />
 
       {loadError ? (

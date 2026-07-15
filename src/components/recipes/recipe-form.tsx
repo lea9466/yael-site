@@ -21,6 +21,10 @@ import {
   restoreRecipeToDraftAction,
   updateRecipeAction,
 } from "@/actions/recipes";
+import { AdminFormBody } from "@/components/admin/admin-form-section";
+import { AdminFormHeader } from "@/components/admin/admin-form-header";
+import { AdminFormShell } from "@/components/admin/admin-form-shell";
+import { AdminFormStickyBar } from "@/components/admin/admin-form-sticky-bar";
 import { AdminSeoSection } from "@/components/admin/admin-seo-section";
 import { RecipeArchiveDialog } from "@/components/recipes/recipe-archive-dialog";
 import { RecipeDeleteDialog } from "@/components/recipes/recipe-delete-dialog";
@@ -54,6 +58,8 @@ import {
   focusFirstFieldError,
   getFieldErrorMessage,
 } from "@/lib/forms/recipe-validation-feedback";
+import { ADMIN_LIST_PATHS } from "@/lib/forms/admin-list-paths";
+import { redirectAfterSave } from "@/lib/forms/redirect-after-save";
 import { useUnsavedChangesWarning } from "@/lib/hooks/use-unsaved-changes-warning";
 import {
   DIFFICULTY_LABELS,
@@ -225,6 +231,7 @@ export function RecipeForm({
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
+  const [saveSucceeded, setSaveSucceeded] = useState(false);
 
   const hasCategories = categories.length > 0;
 
@@ -245,7 +252,7 @@ export function RecipeForm({
     [values, content]
   );
 
-  const isDirty = currentSnapshot !== initialSnapshot;
+  const isDirty = !saveSucceeded && currentSnapshot !== initialSnapshot;
   useUnsavedChangesWarning(isDirty && !isPending);
 
   const showToast = (variant: "success" | "error", message: string) => {
@@ -310,6 +317,10 @@ export function RecipeForm({
   });
 
   const handleSaveDraft = () => {
+    if (isPending) {
+      return;
+    }
+
     startTransition(async () => {
       closeToast();
       setFieldErrors({});
@@ -338,22 +349,23 @@ export function RecipeForm({
         return;
       }
 
+      setSaveSucceeded(true);
       setFieldErrors({});
-      showToast("success", "המתכון נשמר כטיוטה.");
-
-      if (mode === "create" && result.data?.id) {
-        router.replace(`/admin/recipes/${result.data.id}`);
-        router.refresh();
-        return;
-      }
-
-      router.refresh();
+      redirectAfterSave(
+        router,
+        ADMIN_LIST_PATHS.recipe,
+        "המתכון נשמר כטיוטה."
+      );
     });
   };
 
   const handlePublish = () => {
     if (!hasCategories) {
       showToast("error", RECIPE_ERRORS.categoryMissing);
+      return;
+    }
+
+    if (isPending) {
       return;
     }
 
@@ -388,15 +400,13 @@ export function RecipeForm({
         return;
       }
 
+      setSaveSucceeded(true);
       setFieldErrors({});
-      showToast("success", "המתכון פורסם בהצלחה.");
-      setValues((current) => ({ ...current, status: "published" }));
-
-      if (mode === "create" && result.data?.id) {
-        router.replace(`/admin/recipes/${result.data.id}`);
-      }
-
-      router.refresh();
+      redirectAfterSave(
+        router,
+        ADMIN_LIST_PATHS.recipe,
+        "המתכון פורסם בהצלחה."
+      );
     });
   };
 
@@ -456,38 +466,27 @@ export function RecipeForm({
       }
 
       setDeleteOpen(false);
-      router.push("/admin/recipes");
-      router.refresh();
+      setSaveSucceeded(true);
+      redirectAfterSave(router, ADMIN_LIST_PATHS.recipe, "המתכון נמחק.");
     });
   };
 
   const currentStatus = initialRecipe?.status ?? values.status;
 
   return (
-    <div className="mx-auto w-full max-w-[1600px]">
-      <nav
-        aria-label="ניווט"
-        className="mb-4 text-sm text-[var(--color-text-muted)]"
-      >
-        <Link
-          href="/admin/recipes"
-          className="transition-colors hover:text-[var(--color-text)]"
-        >
-          מתכונים
-        </Link>
-        <span aria-hidden="true"> / </span>
-        <span className="text-[var(--color-text)]">
-          {mode === "create" ? "מתכון חדש" : "עריכת מתכון"}
-        </span>
-      </nav>
-
-      <div className="sticky top-0 z-[var(--z-sticky)] -mx-4 border-b border-[var(--color-border)]/70 bg-[var(--color-background)]/90 px-4 py-4 backdrop-blur sm:-mx-8 sm:px-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-page-title">
-              {mode === "create" ? "מתכון חדש" : "עריכת מתכון"}
-            </h1>
-            {mode === "edit" ? (
+    <AdminFormShell width="wide">
+      <AdminFormStickyBar>
+        <AdminFormHeader
+          breadcrumbs={[
+            { label: "מתכונים", href: ADMIN_LIST_PATHS.recipe },
+            {
+              label: mode === "create" ? "מתכון חדש" : "עריכת מתכון",
+            },
+          ]}
+          title={mode === "create" ? "מתכון חדש" : "עריכת מתכון"}
+          description="יצירה ועריכה של מתכון, כולל תמונות, רכיבים ושלבי הכנה"
+          meta={
+            mode === "edit" ? (
               <Badge
                 variant={
                   currentStatus === "published"
@@ -499,83 +498,91 @@ export function RecipeForm({
               >
                 {STATUS_LABELS[currentStatus]}
               </Badge>
-            ) : null}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              loading={isPending}
-              loadingText="שומר..."
-              onClick={handleSaveDraft}
-            >
-              <Save aria-hidden="true" className="size-4" />
-              שמירה
-            </Button>
-            <Button
-              variant="secondary"
-              loading={isPending}
-              loadingText="מפרסם..."
-              disabled={!hasCategories}
-              onClick={handlePublish}
-            >
-              <Send aria-hidden="true" className="size-4" />
-              פרסום
-            </Button>
-            {mode === "edit" ? (
+            ) : null
+          }
+          actions={
+            <>
               <Link
-                href={`/admin/recipes/${initialRecipe!.id}/preview`}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-transparent px-4 text-sm font-medium text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface-soft)]"
+                href={ADMIN_LIST_PATHS.recipe}
+                className="inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-medium text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface-soft)]"
               >
-                <Eye aria-hidden="true" className="size-4" />
-                תצוגה מקדימה
+                ביטול
               </Link>
-            ) : null}
-            {mode === "edit" ? (
-              <DropdownMenu
-                triggerLabel="עוד"
-                trigger={
-                  <Button variant="outline" type="button" disabled={isPending}>
-                    <MoreHorizontal aria-hidden="true" className="size-4" />
-                    עוד...
-                  </Button>
-                }
+              <Button
+                loading={isPending}
+                loadingText="שומר..."
+                disabled={isPending}
+                onClick={handleSaveDraft}
               >
-                {currentStatus !== "archived" ? (
-                  <DropdownMenuItem onSelect={() => setArchiveOpen(true)}>
-                    <Archive aria-hidden="true" className="size-4" />
-                    העברה לארכיון
-                  </DropdownMenuItem>
-                ) : null}
-                {currentStatus === "archived" ? (
-                  <>
-                    <DropdownMenuItem onSelect={() => handleRestore(false)}>
-                      שחזור כטיוטה
+                <Save aria-hidden="true" className="size-4" />
+                שמירה
+              </Button>
+              <Button
+                variant="secondary"
+                loading={isPending}
+                loadingText="מפרסם..."
+                disabled={!hasCategories || isPending}
+                onClick={handlePublish}
+              >
+                <Send aria-hidden="true" className="size-4" />
+                פרסום
+              </Button>
+              {mode === "edit" ? (
+                <Link
+                  href={`/admin/recipes/${initialRecipe!.id}/preview`}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-medium text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface-soft)]"
+                >
+                  <Eye aria-hidden="true" className="size-4" />
+                  תצוגה מקדימה
+                </Link>
+              ) : null}
+              {mode === "edit" ? (
+                <DropdownMenu
+                  triggerLabel="עוד"
+                  trigger={
+                    <Button variant="outline" type="button" disabled={isPending}>
+                      <MoreHorizontal aria-hidden="true" className="size-4" />
+                      עוד...
+                    </Button>
+                  }
+                >
+                  {currentStatus !== "archived" ? (
+                    <DropdownMenuItem onSelect={() => setArchiveOpen(true)}>
+                      <Archive aria-hidden="true" className="size-4" />
+                      העברה לארכיון
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        if (!hasCategories) {
-                          showToast("error", RECIPE_ERRORS.categoryMissing);
-                          return;
-                        }
-                        handleRestore(true);
-                      }}
-                    >
-                      שחזור ופרסום
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      destructive
-                      onSelect={() => setDeleteOpen(true)}
-                    >
-                      <Trash2 aria-hidden="true" className="size-4" />
-                      מחיקה לצמיתות
-                    </DropdownMenuItem>
-                  </>
-                ) : null}
-              </DropdownMenu>
-            ) : null}
-          </div>
-        </div>
-      </div>
+                  ) : null}
+                  {currentStatus === "archived" ? (
+                    <>
+                      <DropdownMenuItem onSelect={() => handleRestore(false)}>
+                        שחזור כטיוטה
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          if (!hasCategories) {
+                            showToast("error", RECIPE_ERRORS.categoryMissing);
+                            return;
+                          }
+                          handleRestore(true);
+                        }}
+                      >
+                        שחזור ופרסום
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        destructive
+                        onSelect={() => setDeleteOpen(true)}
+                      >
+                        <Trash2 aria-hidden="true" className="size-4" />
+                        מחיקה לצמיתות
+                      </DropdownMenuItem>
+                    </>
+                  ) : null}
+                </DropdownMenu>
+              ) : null}
+            </>
+          }
+        />
+      </AdminFormStickyBar>
 
       <FormToast
         open={toast.open}
@@ -585,7 +592,8 @@ export function RecipeForm({
         onClose={closeToast}
       />
 
-      <div className="space-y-16 py-8">
+      <AdminFormBody>
+        <div className="space-y-16">
         <section id="section-basic" className="space-y-5">
           <h2 className="text-section-title">מידע בסיסי</h2>
 
@@ -594,7 +602,13 @@ export function RecipeForm({
               role="alert"
               className="rounded-[var(--radius-lg)] border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] px-4 py-3 text-sm text-[var(--color-warning)]"
             >
-              {RECIPE_ERRORS.categoryMissing}
+              <p>{RECIPE_ERRORS.categoryMissing}</p>
+              <Link
+                href="/admin/categories/new?type=recipe"
+                className="mt-2 inline-flex font-medium underline underline-offset-2"
+              >
+                יצירת קטגוריית מתכונים
+              </Link>
             </div>
           ) : null}
 
@@ -927,7 +941,8 @@ export function RecipeForm({
             setOgPreview(preview);
           }}
         />
-      </div>
+        </div>
+      </AdminFormBody>
 
       <RecipeArchiveDialog
         open={archiveOpen}
@@ -944,6 +959,6 @@ export function RecipeForm({
         onClose={() => setDeleteOpen(false)}
         onConfirm={handleDelete}
       />
-    </div>
+    </AdminFormShell>
   );
 }

@@ -1,3 +1,4 @@
+import { PostSaveToastListener } from "@/components/admin/post-save-toast-listener";
 import { RecipesListClient } from "@/components/recipes/recipes-list-client";
 import { RecipesPageError } from "@/components/recipes/recipes-page-error";
 import { fetchRecipesList } from "@/lib/recipes/queries";
@@ -38,9 +39,12 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
   }
 
   return (
-    <RecipesListClient
-      key={`${data.query.q}-${data.query.status}-${data.query.featured}-${data.query.category}-${data.query.tag}-${data.query.sort}-${data.query.page}`}
-      data={data}
-    />
+    <>
+      <PostSaveToastListener />
+      <RecipesListClient
+        key={`${data.query.q}-${data.query.status}-${data.query.featured}-${data.query.category}-${data.query.tag}-${data.query.sort}-${data.query.page}`}
+        data={data}
+      />
+    </>
   );
 }

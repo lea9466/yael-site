@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { LogOut, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
@@ -41,6 +42,7 @@ export function AdminSidebar({
   onToggleCollapse,
   onClose,
 }: AdminSidebarProps) {
+  const router = useRouter();
   const drawerRef = useRef<HTMLElement>(null);
   const [isPending, startTransition] = useTransition();
   const [isDesktop, setIsDesktop] = useState(false);
@@ -107,7 +109,12 @@ export function AdminSidebar({
 
   const handleLogout = () => {
     startTransition(async () => {
-      await logoutAction();
+      const result = await logoutAction();
+
+      if (result.success) {
+        router.replace("/login");
+        router.refresh();
+      }
     });
   };
 

@@ -27,6 +27,10 @@ function getBreadcrumbLabel(pathname: string): string {
     return "עריכת מתכון";
   }
 
+  if (/^\/admin\/categories\/[^/]+$/.test(pathname)) {
+    return "עריכת קטגוריה";
+  }
+
   return "מערכת ניהול";
 }
 

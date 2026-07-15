@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 import { logoutAction } from "@/actions/auth";
@@ -8,6 +9,7 @@ import { ADMIN_INACTIVITY_MS } from "@/lib/auth/constants";
 const ACTIVITY_EVENTS = ["mousedown", "keydown", "scroll", "touchstart"] as const;
 
 export function AdminInactivityGuard() {
+  const router = useRouter();
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -17,7 +19,14 @@ export function AdminInactivityGuard() {
       }
 
       timeoutRef.current = setTimeout(() => {
-        void logoutAction();
+        void (async () => {
+          const result = await logoutAction();
+
+          if (result.success) {
+            router.replace("/login?reason=inactivity");
+            router.refresh();
+          }
+        })();
       }, ADMIN_INACTIVITY_MS);
     };
 
@@ -36,7 +45,7 @@ export function AdminInactivityGuard() {
         window.removeEventListener(eventName, resetTimer);
       });
     };
-  }, []);
+  }, [router]);
 
   return null;
 }

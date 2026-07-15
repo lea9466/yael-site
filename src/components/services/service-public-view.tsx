@@ -2,18 +2,31 @@ import Image from "next/image";
 
 import { escapeHtml, formatServiceParagraphs } from "@/lib/services/sanitize";
 import type { ServiceDetail } from "@/lib/services/types";
+import { cn } from "@/lib/utils/cn";
 
 type ServicePublicViewProps = {
   service: ServiceDetail;
+  mode?: "public" | "preview";
 };
 
-export function ServicePublicView({ service }: ServicePublicViewProps) {
+export function ServicePublicView({
+  service,
+  mode = "public",
+}: ServicePublicViewProps) {
+  const isPreview = mode === "preview";
   const ogImageUrl = service.ogUrl ?? service.coverUrl;
   const paragraphs = formatServiceParagraphs(service.full_introduction);
 
   return (
-    <article className="mx-auto w-full max-w-5xl space-y-10">
-      <header className="space-y-4">
+    <article
+      className={cn(
+        "w-full space-y-10",
+        isPreview
+          ? "rounded-[var(--radius-xl)] bg-[var(--color-surface)] p-4 sm:p-8"
+          : "mx-auto max-w-5xl"
+      )}
+    >
+      <header className={cn("space-y-4", isPreview && "mx-auto w-full max-w-[900px]")}>
         {service.coverUrl ? (
           <div className="relative aspect-[16/9] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-surface-soft)]">
             <Image
@@ -35,7 +48,7 @@ export function ServicePublicView({ service }: ServicePublicViewProps) {
         </div>
       </header>
 
-      <section className="space-y-4">
+      <section className={cn("space-y-4", isPreview && "mx-auto w-full max-w-[900px]")}>
         {paragraphs.map((paragraph) => (
           <p key={paragraph} className="text-body leading-8">
             {escapeHtml(paragraph)}

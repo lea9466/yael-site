@@ -53,10 +53,10 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         enabled: true,
       },
       {
-        label: "מאמרים",
+        label: "פוסטים",
         href: "/admin/articles",
         icon: BookOpen,
-        enabled: false,
+        enabled: true,
       },
     ],
   },
@@ -90,7 +90,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         label: "תגיות",
         href: "/admin/tags",
         icon: Tag,
-        enabled: false,
+        enabled: true,
       },
       {
         label: "תעודות",
@@ -138,10 +138,11 @@ export const DASHBOARD_QUICK_ACTIONS: QuickActionItem[] = [
     href: "/admin/recipes/new",
   },
   {
-    label: "מאמר חדש",
-    description: "פרסום מאמר חדש",
+    label: "פוסט חדש",
+    description: "פרסום פוסט חדש",
     icon: BookOpen,
-    enabled: false,
+    enabled: true,
+    href: "/admin/articles/new",
   },
   {
     label: "פניות חדשות",
@@ -164,6 +165,10 @@ export const ADMIN_ROUTE_LABELS: Record<string, string> = {
   "/admin/services/new": "שירות חדש",
   "/admin/recipes": "מתכונים",
   "/admin/recipes/new": "מתכון חדש",
+  "/admin/articles": "פוסטים",
+  "/admin/articles/new": "פוסט חדש",
   "/admin/categories": "קטגוריות",
   "/admin/categories/new": "קטגוריה חדשה",
+  "/admin/tags": "תגיות",
+  "/admin/tags/new": "תגית חדשה",
 };

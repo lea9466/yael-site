@@ -113,10 +113,10 @@ const galleryItemSchema = z.object({
 const slugSchema = z
   .string()
   .trim()
-  .min(1, "יש להזין כתובת מאמר")
-  .max(120, "כתובת המאמר ארוכה מדי")
+  .min(1, "יש להזין כתובת פוסט")
+  .max(120, "כתובת הפוסט ארוכה מדי")
   .refine((value) => isValidArticleSlug(value), {
-    message: "כתובת המאמר יכולה להכיל אותיות באנגלית, מספרים ומקפים בלבד",
+    message: "כתובת הפוסט יכולה להכיל אותיות באנגלית, מספרים ומקפים בלבד",
   })
   .refine((value) => !isReservedArticleSlug(value), {
     message: "כתובת זו שמורה למערכת",
@@ -228,4 +228,4 @@ export type ListArticlesQuery = z.infer<typeof listArticlesQuerySchema>;
 export const ARTICLE_BODY_SCHEMA = z
   .string()
   .trim()
-  .max(ARTICLE_BODY_MAX, "תוכן המאמר ארוך מדי");
+  .max(ARTICLE_BODY_MAX, "תוכן הפוסט ארוך מדי");

@@ -7,12 +7,11 @@ import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { deleteCategoryAction } from "@/actions/categories";
 import { AdminListItem } from "@/components/admin/admin-empty-state";
 import { CategoryDeleteDialog } from "@/components/categories/category-delete-dialog";
-import { Badge } from "@/components/ui/badge";
+import { ContentTypeBadge } from "@/components/admin/content-type-badge";
 import {
   DropdownMenu,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { CATEGORY_TYPE_LABELS } from "@/lib/categories/constants";
 import { formatCategoryDate } from "@/lib/categories/format";
 import type { CategoryListItem } from "@/lib/categories/types";
 
@@ -51,7 +50,7 @@ export function CategoryRow({ item }: CategoryRowProps) {
             <h3 className="truncate text-card-title" title={item.name}>
               {item.name}
             </h3>
-            <Badge variant="neutral">{CATEGORY_TYPE_LABELS[item.type]}</Badge>
+            <ContentTypeBadge type={item.type} size="sm" />
           </div>
           <p className="text-sm text-[var(--color-text-muted)]" dir="ltr">
             {item.slug}

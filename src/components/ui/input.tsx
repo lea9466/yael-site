@@ -1,12 +1,18 @@
+import { forwardRef } from "react";
+
 import { cn } from "@/lib/utils/cn";
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: boolean;
 };
 
-export function Input({ className, error, ...props }: InputProps) {
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  { className, error, ...props },
+  ref
+) {
   return (
     <input
+      ref={ref}
       className={cn(
         "admin-interactive h-11 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)]",
         "placeholder:text-[var(--color-text-muted)]",
@@ -20,4 +26,4 @@ export function Input({ className, error, ...props }: InputProps) {
       {...props}
     />
   );
-}
+});

@@ -4,10 +4,7 @@ export const CATEGORY_TYPES = ["recipe", "article"] as const;
 
 export type CategoryType = (typeof CATEGORY_TYPES)[number];
 
-export const CATEGORY_TYPE_LABELS: Record<CategoryType, string> = {
-  recipe: "מתכונים",
-  article: "מאמרים",
-};
+export { CONTENT_TYPE_LABELS as CATEGORY_TYPE_LABELS } from "@/lib/content-types/system";
 
 export const RESERVED_CATEGORY_SLUGS = [
   "admin",

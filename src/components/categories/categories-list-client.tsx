@@ -112,7 +112,7 @@ export function CategoriesListClient({ data }: CategoriesListClientProps) {
       <AdminPageHeader
         module="categories"
         title="קטגוריות"
-        description="ארגני את התוכן בצורה ויזואלית וברורה — לכל מתכון ומאמר בית משלו."
+        description="ארגני את התוכן בצורה ויזואלית וברורה — לכל מתכון ופוסט בית משלו."
         action={{
           label: "קטגוריה חדשה",
           href: newCategoryHref,
@@ -138,7 +138,7 @@ export function CategoriesListClient({ data }: CategoriesListClientProps) {
           },
           {
             icon: BookOpen,
-            label: "למאמרים",
+            label: "לפוסטים",
             value: data.items.filter((item) => item.type === "article").length,
             module: "articles",
             emoji: "📚",
@@ -229,7 +229,7 @@ export function CategoriesListClient({ data }: CategoriesListClientProps) {
           description={
             hasFilters
               ? "נסי לשנות את החיפוש או המסננים."
-              : "בואי ניצור קטגוריות שיעזרו לארגן את המתכונים והמאמרים בצורה יפה."
+              : "בואי ניצור קטגוריות שיעזרו לארגן את המתכונים והפוסטים בצורה יפה."
           }
           action={
             !hasFilters ? (

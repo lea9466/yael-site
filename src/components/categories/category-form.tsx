@@ -18,8 +18,8 @@ import {
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
 import { CategoryDeleteDialog } from "@/components/categories/category-delete-dialog";
+import { ContentTypeBadge } from "@/components/admin/content-type-badge";
 import { ServiceMediaPicker } from "@/components/services/service-media-picker";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { FormToast } from "@/components/ui/form-toast";
@@ -205,9 +205,7 @@ export function CategoryForm({
         meta={
           mode === "edit" && category ? (
             <>
-              <Badge variant="neutral">
-                {CATEGORY_TYPE_LABELS[category.type]}
-              </Badge>
+              <ContentTypeBadge type={category.type} size="sm" />
               <span className="text-sm text-[var(--color-text-muted)]">
                 {category.usageCount === 0
                   ? "לא בשימוש"
@@ -215,9 +213,7 @@ export function CategoryForm({
               </span>
             </>
           ) : mode === "create" ? (
-            <Badge variant="neutral">
-              {CATEGORY_TYPE_LABELS[values.type]}
-            </Badge>
+            <ContentTypeBadge type={values.type} size="sm" />
           ) : null
         }
         secondaryActions={secondaryActions}

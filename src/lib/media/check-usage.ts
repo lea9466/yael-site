@@ -53,13 +53,13 @@ async function findHardForeignKeyUsages(
     {
       table: "articles",
       column: "cover_media_id",
-      label: "מאמר — תמונת כיסוי",
+      label: "פוסט — תמונת כיסוי",
       nameColumn: "title",
     },
     {
       table: "articles",
       column: "seo_og_media_id",
-      label: "מאמר — תמונת SEO",
+      label: "פוסט — תמונת SEO",
       nameColumn: "title",
     },
     {
@@ -144,7 +144,7 @@ async function findArticleGalleryUsages(
 
     if (galleryContainsMediaId(row.content.gallery, mediaId)) {
       usages.push({
-        label: `מאמר — גלריה: ${row.title}`,
+        label: `פוסט — גלריה: ${row.title}`,
       });
     }
   }

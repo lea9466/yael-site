@@ -143,7 +143,7 @@ export default async function AdminDashboardPage() {
                   ? "recipes"
                   : action.label.includes("שירות")
                     ? "services"
-                    : action.label.includes("מאמר")
+                    : action.label.includes("פוסט")
                       ? "articles"
                       : "dashboard"
               }

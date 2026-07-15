@@ -898,7 +898,7 @@ export function RecipeForm({
             renderFields={(item, _index, updateItem) => (
               <RepeaterTextareaField
                 value={item.text}
-                placeholder="תארי את השלב — כמו שכותבים מאמר"
+                placeholder="תארי את השלב — כמו שכותבים פוסט"
                 className="min-h-36"
                 onChange={(text) => updateItem({ ...item, text })}
               />

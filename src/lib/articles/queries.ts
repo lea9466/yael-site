@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/auth/session";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
 import {
-  createDefaultArticleContent,
   normalizeArticleContent,
 } from "@/lib/articles/content";
 import { ARTICLES_PAGE_SIZE } from "@/lib/articles/constants";

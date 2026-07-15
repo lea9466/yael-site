@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { ServicePreviewBanner } from "@/components/services/service-preview-banner";
+import { PreviewShell } from "@/components/admin/preview-shell";
 import { ServicePublicView } from "@/components/services/service-public-view";
 import { fetchServiceById } from "@/lib/services/queries";
 import { requireAdmin } from "@/lib/auth/session";
@@ -24,9 +24,11 @@ export default async function ServicePreviewPage({
   }
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-1 sm:px-0">
-      <ServicePreviewBanner serviceId={service.id} status={service.status} />
-      <ServicePublicView service={service} />
-    </div>
+    <PreviewShell
+      status={service.status}
+      editHref={`/admin/services/${service.id}`}
+    >
+      <ServicePublicView service={service} mode="preview" />
+    </PreviewShell>
   );
 }

@@ -44,8 +44,10 @@ export function RecipePublicView({
   return (
     <article
       className={cn(
-        "mx-auto w-full max-w-5xl space-y-10",
-        isPreview && "rounded-[var(--radius-xl)] bg-[var(--color-surface)] p-4 sm:p-8"
+        "w-full space-y-10",
+        isPreview
+          ? "rounded-[var(--radius-xl)] bg-[var(--color-surface)] p-4 sm:p-8"
+          : "mx-auto max-w-5xl"
       )}
     >
       <header className="space-y-4">

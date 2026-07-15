@@ -1,5 +1,11 @@
 import Link from "next/link";
 
+import { isRangeFullyMarked } from "@/lib/articles/marks";
+import {
+  isExternalHttpArticleLink,
+  isInternalArticleLink,
+  isValidArticleLinkUrl,
+} from "@/lib/articles/link-validation";
 import type { ArticleBlock, ArticleTextMark } from "@/lib/articles/types";
 import { escapeHtml, sanitizePlainText } from "@/lib/services/sanitize";
 
@@ -11,13 +17,38 @@ type RenderSegment = {
 };
 
 function isValidLink(href: string): boolean {
-  try {
-    const url = new URL(href);
+  return isValidArticleLinkUrl(href);
+}
 
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
+function getValidMarks(text: string, marks: ArticleTextMark[] = []): ArticleTextMark[] {
+  return marks.filter(
+    (mark) =>
+      mark.start >= 0 &&
+      mark.end <= text.length &&
+      mark.end > mark.start &&
+      (mark.type !== "link" || (mark.href && isValidLink(mark.href)))
+  );
+}
+
+function getLinkHrefForRange(
+  marks: ArticleTextMark[],
+  rangeStart: number,
+  rangeEnd: number
+): string | undefined {
+  if (!isRangeFullyMarked(marks, "link", rangeStart, rangeEnd)) {
+    return undefined;
   }
+
+  const linkMark = marks.find(
+    (mark) =>
+      mark.type === "link" &&
+      mark.start <= rangeStart &&
+      mark.end >= rangeEnd &&
+      mark.href &&
+      isValidLink(mark.href)
+  );
+
+  return linkMark?.href;
 }
 
 function buildSegments(text: string, marks: ArticleTextMark[] = []): RenderSegment[] {
@@ -27,49 +58,48 @@ function buildSegments(text: string, marks: ArticleTextMark[] = []): RenderSegme
     return [];
   }
 
-  if (marks.length === 0) {
+  const validMarks = getValidMarks(safeText, marks);
+
+  if (validMarks.length === 0) {
     return [{ text: safeText }];
   }
 
-  const sortedMarks = marks
-    .filter(
-      (mark) =>
-        mark.start >= 0 &&
-        mark.end <= safeText.length &&
-        mark.end > mark.start &&
-        (mark.type !== "link" || (mark.href && isValidLink(mark.href)))
-    )
-    .sort((left, right) => left.start - right.start || left.end - right.end);
+  const breakpoints = new Set<number>([0, safeText.length]);
 
+  for (const mark of validMarks) {
+    breakpoints.add(mark.start);
+    breakpoints.add(mark.end);
+  }
+
+  const points = [...breakpoints].sort((left, right) => left - right);
   const segments: RenderSegment[] = [];
-  let cursor = 0;
 
-  for (const mark of sortedMarks) {
-    if (mark.start > cursor) {
-      segments.push({ text: safeText.slice(cursor, mark.start) });
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const rangeStart = points[index];
+    const rangeEnd = points[index + 1];
+
+    if (rangeStart >= rangeEnd) {
+      continue;
     }
 
-    const markedText = safeText.slice(mark.start, mark.end);
-    const segment: RenderSegment = { text: markedText };
+    const segmentText = safeText.slice(rangeStart, rangeEnd);
+    const segment: RenderSegment = { text: segmentText };
 
-    if (mark.type === "bold") {
+    if (isRangeFullyMarked(validMarks, "bold", rangeStart, rangeEnd)) {
       segment.bold = true;
     }
 
-    if (mark.type === "italic") {
+    if (isRangeFullyMarked(validMarks, "italic", rangeStart, rangeEnd)) {
       segment.italic = true;
     }
 
-    if (mark.type === "link" && mark.href && isValidLink(mark.href)) {
-      segment.href = mark.href;
+    const href = getLinkHrefForRange(validMarks, rangeStart, rangeEnd);
+
+    if (href) {
+      segment.href = href;
     }
 
     segments.push(segment);
-    cursor = mark.end;
-  }
-
-  if (cursor < safeText.length) {
-    segments.push({ text: safeText.slice(cursor) });
   }
 
   return segments.length > 0 ? segments : [{ text: safeText }];
@@ -88,16 +118,30 @@ function renderSegments(segments: RenderSegment[]): React.ReactNode[] {
     }
 
     if (segment.href) {
+      const linkClassName =
+        "font-medium text-[var(--color-primary)] underline decoration-[var(--color-primary)]/30 underline-offset-4 hover:decoration-[var(--color-primary)]";
+
+      if (isInternalArticleLink(segment.href)) {
+        return (
+          <Link key={`link-${index}`} href={segment.href} className={linkClassName}>
+            {node}
+          </Link>
+        );
+      }
+
+      const isExternal = isExternalHttpArticleLink(segment.href);
+
       return (
-        <Link
+        <a
           key={`link-${index}`}
           href={segment.href}
-          className="font-medium text-[var(--color-primary)] underline decoration-[var(--color-primary)]/30 underline-offset-4 hover:decoration-[var(--color-primary)]"
-          rel="noopener noreferrer"
-          target="_blank"
+          className={linkClassName}
+          {...(isExternal
+            ? { target: "_blank", rel: "noopener noreferrer" }
+            : {})}
         >
           {node}
-        </Link>
+        </a>
       );
     }
 
@@ -132,27 +176,27 @@ export function ArticleBlockRenderer({
   switch (block.type) {
     case "paragraph":
       return (
-        <p className="text-body leading-[1.9] text-[var(--color-text)]">
+        <p className="article-content text-body leading-[1.9] text-[var(--color-text)]">
           {renderArticleRichText(block.text, block.marks)}
         </p>
       );
     case "heading":
       if (block.level === 3) {
         return (
-          <h3 className="text-xl font-semibold leading-snug text-[var(--color-text)]">
+          <h3 className="article-content text-xl font-semibold leading-snug text-[var(--color-text)]">
             {renderArticleRichText(block.text, block.marks)}
           </h3>
         );
       }
 
       return (
-        <h2 className="text-2xl font-semibold leading-snug text-[var(--color-text)]">
+        <h2 className="article-content text-2xl font-semibold leading-snug text-[var(--color-text)]">
           {renderArticleRichText(block.text, block.marks)}
         </h2>
       );
     case "quote":
       return (
-        <blockquote className="border-s-4 border-[var(--color-sky-blue)]/50 bg-[var(--color-sky-blue-soft)]/35 px-5 py-4 text-lg italic leading-[1.85] text-[var(--color-text-muted)]">
+        <blockquote className="article-content border-s-4 border-[var(--color-sky-blue)]/50 bg-[var(--color-sky-blue-soft)]/35 px-5 py-4 text-lg italic leading-[1.85] text-[var(--color-text-muted)]">
           {renderArticleRichText(block.text, block.marks)}
         </blockquote>
       );
@@ -160,13 +204,13 @@ export function ArticleBlockRenderer({
       const ListTag = block.list_type === "ordered" ? "ol" : "ul";
       const listClass =
         block.list_type === "ordered"
-          ? "list-decimal space-y-2 ps-6 text-body leading-[1.85]"
-          : "list-disc space-y-2 ps-6 text-body leading-[1.85]";
+          ? "article-content list-decimal space-y-2 ps-6 text-body leading-[1.85]"
+          : "article-content list-disc space-y-2 ps-6 text-body leading-[1.85]";
 
       return (
         <ListTag className={listClass}>
           {block.items.map((item, index) => (
-            <li key={`${index}-${item.text}`}>
+            <li key={`${index}-${item.text}`} className="article-content">
               {renderArticleRichText(item.text, item.marks)}
             </li>
           ))}
@@ -187,7 +231,7 @@ export function ArticleBlockRenderer({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageUrl}
-            alt={imageAlt ?? block.caption ?? "תמונה במאמר"}
+            alt={imageAlt ?? block.caption ?? "תמונה בפוסט"}
             className="w-full rounded-[var(--radius-xl)] object-cover"
           />
           {block.caption ? (

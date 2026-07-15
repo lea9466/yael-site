@@ -37,6 +37,10 @@ function resolvePathLabel(path: string): string {
     return "עריכת קטגוריה";
   }
 
+  if (/^\/admin\/tags\/[^/]+$/.test(path)) {
+    return "עריכת תגית";
+  }
+
   return "מערכת ניהול";
 }
 

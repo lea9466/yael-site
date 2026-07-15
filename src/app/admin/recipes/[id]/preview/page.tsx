@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { RecipePreviewBanner } from "@/components/recipes/recipe-preview-banner";
+import { PreviewShell } from "@/components/admin/preview-shell";
 import { RecipePublicView } from "@/components/recipes/recipe-public-view";
 import { fetchRecipeById } from "@/lib/recipes/queries";
 import { requireAdmin } from "@/lib/auth/session";
@@ -24,9 +24,11 @@ export default async function RecipePreviewPage({
   }
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-1 sm:px-0">
-      <RecipePreviewBanner recipeId={recipe.id} status={recipe.status} />
+    <PreviewShell
+      status={recipe.status}
+      editHref={`/admin/recipes/${recipe.id}`}
+    >
       <RecipePublicView recipe={recipe} mode="preview" />
-    </div>
+    </PreviewShell>
   );
 }

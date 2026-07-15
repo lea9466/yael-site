@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { ImagePlus, RefreshCw, Search, Upload } from "lucide-react";
 
 import { MediaBulkActionBar } from "@/components/media/media-bulk-action-bar";
+import { Breadcrumbs } from "@/components/admin/breadcrumbs";
+import { AdminBreadcrumbsRow } from "@/components/admin/admin-breadcrumbs-row";
 import { MediaBulkDeleteDialog } from "@/components/media/media-bulk-delete-dialog";
 import { MediaDeleteDialog } from "@/components/media/media-delete-dialog";
 import { MediaEditAltDialog } from "@/components/media/media-edit-alt-dialog";
@@ -216,9 +218,13 @@ export function MediaLibraryClient({ data }: MediaLibraryClientProps) {
 
   return (
     <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-6">
-      <section className="space-y-4">
+      <section className="admin-page-header space-y-0">
+        <AdminBreadcrumbsRow>
+          <Breadcrumbs />
+        </AdminBreadcrumbsRow>
+
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="min-w-0 space-y-2">
+          <div className="admin-page-title-block min-w-0">
             <h1 className="text-page-title">ספריית מדיה</h1>
             <p className="text-muted">ניהול התמונות המשמשות באתר</p>
           </div>

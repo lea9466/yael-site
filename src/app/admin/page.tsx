@@ -3,6 +3,8 @@ import { Database, LayoutDashboard, Lightbulb, LogIn, Server, Sparkles } from "l
 import { AdminOrganicBackdrop } from "@/components/admin/admin-organic-shapes";
 import { AdminIconCircle } from "@/components/admin/admin-icon-circle";
 import { AdminStatCards } from "@/components/admin/admin-stat-cards";
+import { AdminBreadcrumbsRow } from "@/components/admin/admin-breadcrumbs-row";
+import { Breadcrumbs } from "@/components/admin/breadcrumbs";
 import { QuickActionCard } from "@/components/admin/quick-action-card";
 import { StatusCard } from "@/components/admin/status-card";
 import { Card } from "@/components/ui/card";
@@ -28,22 +30,27 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="mx-auto flex w-full min-w-0 max-w-[1400px] flex-col gap-12">
-      <section className="relative overflow-hidden rounded-[var(--radius-xl)] px-2 py-4">
-        <AdminOrganicBackdrop module="dashboard" />
-        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-4">
-            <AdminIconCircle module="dashboard" icon={LayoutDashboard} size="xl" />
-            <div className="space-y-2">
-              <h1 className="text-page-title">
-                <span aria-hidden="true" className="me-2">
-                  🌞
-                </span>
-                בוקר טוב, {adminUser.full_name}
-              </h1>
-              <p className="text-muted max-w-2xl text-base">
-                ברוכה הבאה לסטודיו הדיגיטלי שלך. היום יום מצוין ליצור תוכן
-                בריא, יפה ומלא השראה.
-              </p>
+      <section className="admin-page-header">
+        <AdminBreadcrumbsRow>
+          <Breadcrumbs />
+        </AdminBreadcrumbsRow>
+        <div className="relative overflow-hidden rounded-[var(--radius-xl)] px-1">
+          <AdminOrganicBackdrop module="dashboard" />
+          <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <AdminIconCircle module="dashboard" icon={LayoutDashboard} size="xl" />
+              <div className="admin-page-title-block">
+                <h1 className="text-page-title">
+                  <span aria-hidden="true" className="me-2">
+                    🌞
+                  </span>
+                  בוקר טוב, {adminUser.full_name}
+                </h1>
+                <p className="text-muted max-w-2xl text-base">
+                  ברוכה הבאה לסטודיו הדיגיטלי שלך. היום יום מצוין ליצור תוכן
+                  בריא, יפה ומלא השראה.
+                </p>
+              </div>
             </div>
           </div>
         </div>

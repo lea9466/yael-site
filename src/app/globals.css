@@ -178,7 +178,6 @@
   --sidebar-width: 280px;
   --sidebar-width-expanded: 280px;
   --sidebar-width-collapsed: 80px;
-  --header-height: 72px;
 
   --z-page: 0;
   --z-sticky: 20;
@@ -687,7 +686,16 @@
   }
 
   .admin-form-header {
-    padding-bottom: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .admin-page-title-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
   }
 
   .admin-form-body {
@@ -711,7 +719,10 @@
   }
 
   .admin-page-header {
-    padding-bottom: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding-bottom: var(--spacing-xl);
   }
 
   .admin-list-filters .space-y-2 > label {

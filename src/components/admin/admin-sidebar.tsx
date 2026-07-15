@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils/cn";
 type AdminSidebarProps = {
   currentPath: string;
   fullName: string;
+  email: string | null;
   isMobileOpen: boolean;
   collapsed: boolean;
   onToggleCollapse: () => void;
@@ -37,6 +38,7 @@ function getInitials(fullName: string): string {
 export function AdminSidebar({
   currentPath,
   fullName,
+  email,
   isMobileOpen,
   collapsed,
   onToggleCollapse,
@@ -236,9 +238,11 @@ export function AdminSidebar({
           {!showCollapsed ? (
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">{fullName}</p>
-              <p className="text-caption text-[var(--color-text-muted)]">
-                מנהלת מערכת
-              </p>
+              {email ? (
+                <p className="truncate text-caption text-[var(--color-text-muted)]" dir="ltr">
+                  {email}
+                </p>
+              ) : null}
             </div>
           ) : null}
         </div>

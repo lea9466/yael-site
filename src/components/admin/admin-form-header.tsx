@@ -1,20 +1,24 @@
-import Link from "next/link";
-
+import { AdminBreadcrumbNav } from "@/components/admin/breadcrumbs";
+import type { AdminBreadcrumbItem } from "@/components/admin/breadcrumbs";
+import { AdminBreadcrumbsRow } from "@/components/admin/admin-breadcrumbs-row";
 import { cn } from "@/lib/utils/cn";
 
-type AdminFormBreadcrumb = {
-  label: string;
-  href?: string;
-};
-
 type AdminFormHeaderProps = {
-  breadcrumbs: AdminFormBreadcrumb[];
+  breadcrumbs: AdminBreadcrumbItem[];
   title: string;
   description?: string;
   meta?: React.ReactNode;
   secondaryActions?: React.ReactNode;
   className?: string;
 };
+
+function withRootBreadcrumb(items: AdminBreadcrumbItem[]): AdminBreadcrumbItem[] {
+  if (items[0]?.label === "מערכת ניהול") {
+    return items;
+  }
+
+  return [{ label: "מערכת ניהול", href: "/admin" }, ...items];
+}
 
 export function AdminFormHeader({
   breadcrumbs,
@@ -24,36 +28,15 @@ export function AdminFormHeader({
   secondaryActions,
   className,
 }: AdminFormHeaderProps) {
+  const items = withRootBreadcrumb(breadcrumbs);
+
   return (
-    <header className={cn("admin-form-header space-y-4 pb-6", className)}>
-      <nav
-        aria-label="ניווט"
-        className="text-caption text-[var(--color-text-muted)]"
-      >
-        {breadcrumbs.map((crumb, index) => {
-          const isLast = index === breadcrumbs.length - 1;
+    <header className={cn("admin-form-header", className)}>
+      <AdminBreadcrumbsRow>
+        <AdminBreadcrumbNav items={items} />
+      </AdminBreadcrumbsRow>
 
-          return (
-            <span key={`${crumb.label}-${index}`}>
-              {crumb.href && !isLast ? (
-                <Link
-                  href={crumb.href}
-                  className="admin-interactive hover:text-[var(--color-primary)]"
-                >
-                  {crumb.label}
-                </Link>
-              ) : (
-                <span className={isLast ? "text-[var(--color-text)]" : undefined}>
-                  {crumb.label}
-                </span>
-              )}
-              {!isLast ? <span aria-hidden="true"> / </span> : null}
-            </span>
-          );
-        })}
-      </nav>
-
-      <div className="space-y-3 text-right">
+      <div className="admin-page-title-block text-right">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-page-title">{title}</h1>
           {meta}

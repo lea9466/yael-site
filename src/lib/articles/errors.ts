@@ -1,0 +1,17 @@
+export const ARTICLE_ERRORS = {
+  unauthorized: "אין הרשאה לבצע פעולה זו.",
+  generic: "אירעה שגיאה. נסו שוב מאוחר יותר.",
+  notFound: "המאמר לא נמצא.",
+  slugTaken: "כתובת המאמר כבר בשימוש.",
+  coverRequired: "יש לבחור תמונת כיסוי.",
+  coverRequiredPublish: "תמונת כיסוי נדרשת לפרסום.",
+  mediaNotFound: "התמונה שנבחרה לא נמצאה.",
+  categoryRequired: "יש לבחור קטגוריה.",
+  categoryInvalid: "ניתן לבחור רק קטגוריות מאמרים.",
+  categoryMissing: "אין קטגוריות מאמרים במערכת. יש ליצור קטגוריה לפני פרסום.",
+  tagInvalid: "ניתן לבחור רק תגיות מאמרים.",
+  contentRequired: "יש להוסיף תוכן למאמר.",
+  archiveOnlyDelete: "ניתן למחוק לצמיתות רק מאמר בארכיון.",
+  duplicateFailed: "שכפול המאמר נכשל.",
+  galleryLimit: "ניתן להוסיף עד 6 תמונות לגלריה.",
+} as const;

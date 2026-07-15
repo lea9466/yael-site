@@ -8,6 +8,7 @@ import { consumePostSaveToast } from "@/lib/forms/post-save-toast";
 export function PostSaveToastListener() {
   const [toast, setToast] = useState(() => {
     const message = consumePostSaveToast();
+
     return {
       open: Boolean(message),
       message: message ?? "",

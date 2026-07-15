@@ -20,17 +20,17 @@ import {
   permanentlyDeleteServiceAction,
   restoreServiceAction,
 } from "@/actions/services";
+import {
+  AdminFeaturedBadge,
+  AdminStatusBadge,
+} from "@/components/admin/admin-status-badge";
+import { AdminListItem } from "@/components/admin/admin-empty-state";
 import { ServiceArchiveDialog } from "@/components/services/service-archive-dialog";
 import { ServiceDeleteDialog } from "@/components/services/service-delete-dialog";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import {
-  STATUS_BADGE_VARIANT,
-  STATUS_LABELS,
-} from "@/lib/services/constants";
 import { formatServiceDate } from "@/lib/services/format";
 import type { ServiceListItem } from "@/lib/services/types";
 
@@ -70,16 +70,16 @@ export function ServiceRow({ item }: ServiceRowProps) {
   };
 
   return (
-    <article className="surface-card overflow-visible p-0">
-      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start">
-        <div className="relative size-28 shrink-0 overflow-hidden rounded-[var(--radius-md)] bg-[var(--color-surface-soft)] sm:size-32">
+    <AdminListItem>
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+        <div className="relative size-32 shrink-0 overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface-soft)] sm:size-36">
           {item.coverUrl ? (
             <Image
               src={item.coverUrl}
               alt={item.coverAlt ?? item.title}
               fill
-              sizes="128px"
-              className="object-cover"
+              sizes="144px"
+              className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
             />
           ) : (
             <div className="flex size-full items-center justify-center text-caption text-[var(--color-text-muted)]">
@@ -89,8 +89,8 @@ export function ServiceRow({ item }: ServiceRowProps) {
         </div>
 
         <div className="min-w-0 flex-1 space-y-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 space-y-2">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 space-y-2.5">
               <h3 className="truncate text-card-title" title={item.title}>
                 {item.title}
               </h3>
@@ -98,12 +98,8 @@ export function ServiceRow({ item }: ServiceRowProps) {
                 {item.short_description}
               </p>
               <div className="flex flex-wrap gap-2">
-                <Badge variant={STATUS_BADGE_VARIANT[item.status]}>
-                  {STATUS_LABELS[item.status]}
-                </Badge>
-                {item.featured ? (
-                  <Badge variant="info">מומלץ</Badge>
-                ) : null}
+                <AdminStatusBadge status={item.status} />
+                {item.featured ? <AdminFeaturedBadge /> : null}
               </div>
             </div>
 
@@ -132,6 +128,17 @@ export function ServiceRow({ item }: ServiceRowProps) {
                 שכפול
               </DropdownMenuItem>
 
+              {item.status === "draft" ? (
+                <DropdownMenuItem
+                  onSelect={() =>
+                    router.push(`/admin/services/${item.id}?publish=1`)
+                  }
+                >
+                  <Send aria-hidden="true" className="size-4" />
+                  פרסום
+                </DropdownMenuItem>
+              ) : null}
+
               {item.status !== "archived" ? (
                 <DropdownMenuItem onSelect={() => setArchiveOpen(true)}>
                   <Archive aria-hidden="true" className="size-4" />
@@ -143,23 +150,11 @@ export function ServiceRow({ item }: ServiceRowProps) {
                 <>
                   <DropdownMenuItem
                     onSelect={() =>
-                      runAction(() =>
-                        restoreServiceAction({ id: item.id, publish: false })
-                      )
+                      runAction(() => restoreServiceAction({ id: item.id }))
                     }
                   >
                     <RotateCcw aria-hidden="true" className="size-4" />
-                    שחזור כטיוטה
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() =>
-                      runAction(() =>
-                        restoreServiceAction({ id: item.id, publish: true })
-                      )
-                    }
-                  >
-                    <Send aria-hidden="true" className="size-4" />
-                    שחזור ופרסום
+                    שחזור
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     destructive
@@ -176,7 +171,6 @@ export function ServiceRow({ item }: ServiceRowProps) {
           <p className="text-caption text-[var(--color-text-muted)]">
             עודכן: {formatServiceDate(item.updated_at)}
           </p>
-
           {actionError ? (
             <p role="alert" className="text-caption text-[var(--color-error)]">
               {actionError}
@@ -208,6 +202,6 @@ export function ServiceRow({ item }: ServiceRowProps) {
           )
         }
       />
-    </article>
+    </AdminListItem>
   );
 }

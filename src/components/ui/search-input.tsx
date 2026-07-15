@@ -28,9 +28,10 @@ export function SearchInput({
         aria-label={ariaLabel}
         aria-disabled={disabled}
         className={cn(
-          "h-11 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-soft)] pe-4 ps-10 text-sm text-[var(--color-text)]",
+          "h-11 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] pe-4 ps-10 text-sm text-[var(--color-text)]",
           "placeholder:text-[var(--color-text-muted)]",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/20",
+          "hover:border-[var(--color-border-strong)]",
+          "focus-visible:border-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/15",
           "disabled:cursor-not-allowed disabled:opacity-70"
         )}
       />

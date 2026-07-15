@@ -3,13 +3,13 @@ import {
   BookOpen,
   ChefHat,
   FolderTree,
+  HeartHandshake,
   Image,
   LayoutDashboard,
   Mail,
-  MessageSquareQuote,
+  MessageCircleHeart,
   Settings,
-  Tags,
-  Wrench,
+  Tag,
   type LucideIcon,
 } from "lucide-react";
 
@@ -43,7 +43,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       {
         label: "שירותים",
         href: "/admin/services",
-        icon: Wrench,
+        icon: HeartHandshake,
         enabled: true,
       },
       {
@@ -66,7 +66,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       {
         label: "המלצות",
         href: "/admin/testimonials",
-        icon: MessageSquareQuote,
+        icon: MessageCircleHeart,
         enabled: false,
       },
       {
@@ -89,7 +89,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       {
         label: "תגיות",
         href: "/admin/tags",
-        icon: Tags,
+        icon: Tag,
         enabled: false,
       },
       {
@@ -126,7 +126,7 @@ export const DASHBOARD_QUICK_ACTIONS: QuickActionItem[] = [
   {
     label: "שירות חדש",
     description: "יצירת שירות חדש במערכת",
-    icon: Wrench,
+    icon: HeartHandshake,
     enabled: true,
     href: "/admin/services/new",
   },

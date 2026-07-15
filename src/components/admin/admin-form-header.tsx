@@ -12,7 +12,7 @@ type AdminFormHeaderProps = {
   title: string;
   description?: string;
   meta?: React.ReactNode;
-  actions?: React.ReactNode;
+  secondaryActions?: React.ReactNode;
   className?: string;
 };
 
@@ -21,14 +21,14 @@ export function AdminFormHeader({
   title,
   description,
   meta,
-  actions,
+  secondaryActions,
   className,
 }: AdminFormHeaderProps) {
   return (
-    <header className={cn("admin-form-header space-y-4", className)}>
+    <header className={cn("admin-form-header space-y-4 pb-6", className)}>
       <nav
         aria-label="ניווט"
-        className="text-sm text-[var(--color-text-muted)]"
+        className="text-caption text-[var(--color-text-muted)]"
       >
         {breadcrumbs.map((crumb, index) => {
           const isLast = index === breadcrumbs.length - 1;
@@ -38,7 +38,7 @@ export function AdminFormHeader({
               {crumb.href && !isLast ? (
                 <Link
                   href={crumb.href}
-                  className="transition-colors hover:text-[var(--color-text)]"
+                  className="admin-interactive hover:text-[var(--color-primary)]"
                 >
                   {crumb.label}
                 </Link>
@@ -53,16 +53,17 @@ export function AdminFormHeader({
         })}
       </nav>
 
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0 space-y-2 text-right">
+      <div className="space-y-3 text-right">
+        <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-page-title">{title}</h1>
-          {description ? <p className="text-muted">{description}</p> : null}
-          {meta ? <div className="flex flex-wrap items-center gap-2">{meta}</div> : null}
+          {meta}
         </div>
-
-        {actions ? (
-          <div className="flex shrink-0 flex-wrap items-center justify-start gap-2 lg:justify-end">
-            {actions}
+        {description ? (
+          <p className="text-muted max-w-2xl">{description}</p>
+        ) : null}
+        {secondaryActions ? (
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            {secondaryActions}
           </div>
         ) : null}
       </div>

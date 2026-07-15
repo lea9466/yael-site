@@ -20,17 +20,10 @@ export function FormField({
   className,
 }: FormFieldProps) {
   return (
-    <div
-      className={cn(
-        "space-y-2 rounded-[var(--radius-md)]",
-        error &&
-          "rounded-[var(--radius-lg)] border border-[var(--color-error)] bg-[var(--color-error-soft)]/35 p-3",
-        className
-      )}
-    >
-      <label htmlFor={htmlFor} className="text-sm font-medium">
+    <div className={cn("space-y-2.5", className)}>
+      <label htmlFor={htmlFor} className="text-sm font-medium text-[var(--color-text)]">
         {label}
-        {required ? <span className="text-[var(--color-error)]"> *</span> : null}
+        {required ? <span className="text-[var(--color-soft-accent)]"> *</span> : null}
       </label>
       {children}
       {hint ? (

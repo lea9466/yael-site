@@ -1,14 +1,16 @@
 "use client";
 
-import { CheckCircle2, Loader2, RotateCcw, X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 
+import { StatusBadge } from "@/components/ui/status-badge";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
-import { formatFileSize } from "@/lib/media/format";
 import {
-  UPLOAD_QUEUE_STATUS_LABELS,
-  type UploadQueueItem,
-} from "@/lib/media/upload-queue";
+  getUploadQueueAdminStatus,
+  getUploadQueueStatusLabel,
+} from "@/lib/admin/status-system";
+import { formatFileSize } from "@/lib/media/format";
+import type { UploadQueueItem } from "@/lib/media/upload-queue";
 import { cn } from "@/lib/utils/cn";
 
 type MediaUploadQueueItemProps = {
@@ -74,41 +76,19 @@ export function MediaUploadQueueItem({
             ) : null}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            {item.status === "uploading" ? (
-              <Loader2
-                aria-hidden="true"
-                className="size-4 shrink-0 animate-spin text-[var(--color-info)] motion-reduce:animate-none"
-              />
-            ) : null}
-
-            {item.status === "completed" ? (
-              <CheckCircle2
-                aria-hidden="true"
-                className="size-4 shrink-0 text-[var(--color-success)]"
-              />
-            ) : null}
-
-            {canRetryHint ? (
-              <RotateCcw
-                aria-hidden="true"
-                className="size-4 shrink-0 text-[var(--color-error)]"
-              />
-            ) : null}
-
-            <p>
-              <span className="text-[var(--color-text-muted)]">סטטוס: </span>
-              <span
-                className={cn(
-                  "font-medium",
-                  item.status === "completed" && "text-[var(--color-success)]",
-                  item.status === "failed" && "text-[var(--color-error)]",
-                  item.status === "uploading" && "text-[var(--color-info)]"
-                )}
-              >
-                {UPLOAD_QUEUE_STATUS_LABELS[item.status]}
-              </span>
-            </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm text-[var(--color-text-muted)]">סטטוס:</span>
+            <StatusBadge
+              size="sm"
+              status={getUploadQueueAdminStatus(item.status)}
+              label={getUploadQueueStatusLabel(item.status)}
+              icon={item.status === "uploading" ? Loader2 : undefined}
+              iconClassName={
+                item.status === "uploading"
+                  ? "animate-spin motion-reduce:animate-none"
+                  : undefined
+              }
+            />
           </div>
 
           {item.error ? (

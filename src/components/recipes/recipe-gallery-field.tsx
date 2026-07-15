@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Eye, GripVertical, Plus, Trash2 } from "lucide-react";
+import { Eye, GripVertical, Images, Plus, Trash2 } from "lucide-react";
+
+import { AdminSectionHeader } from "@/components/admin/admin-section-header";
 
 import { MediaMultiSelectDialog } from "@/components/media/media-multi-select-dialog";
 import { MediaUploadDialog } from "@/components/media/media-upload-dialog";
@@ -99,12 +101,13 @@ export function RecipeGalleryField({
 
   return (
     <div id="section-gallery" className="space-y-6">
-      <div className="space-y-1">
-        <h2 className="text-section-title">גלריה</h2>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          עד {maxItems} תמונות נוספות לצד תמונת הכיסוי.
-        </p>
-      </div>
+      <AdminSectionHeader
+        icon={Images}
+        module="recipes"
+        emoji="🖼️"
+        title="גלריה"
+        description={`עד ${maxItems} תמונות נוספות — הציגי את המנה בכל זווית.`}
+      />
 
       {items.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

@@ -24,9 +24,11 @@ export function IconButton({
       aria-label={label}
       title={label}
       className={cn(
-        "inline-flex items-center justify-center rounded-[var(--radius-md)] text-[var(--color-primary)] transition-colors",
-        "hover:bg-[var(--color-surface-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/20",
-        "disabled:cursor-not-allowed disabled:opacity-60",
+        "admin-interactive inline-flex items-center justify-center rounded-[var(--radius-md)] text-[var(--color-text-muted)]",
+        "hover:bg-[var(--color-surface-soft)] hover:text-[var(--color-primary)]",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/15",
+        "disabled:cursor-not-allowed disabled:opacity-50",
+        "active:scale-95",
         sizeClasses[size],
         className
       )}

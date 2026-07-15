@@ -1,15 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
-import { Save, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 import {
   createCategoryAction,
   deleteCategoryAction,
   updateCategoryAction,
 } from "@/actions/categories";
+import { AdminFormActionBar } from "@/components/admin/admin-form-action-bar";
 import {
   AdminFormBody,
   AdminFormDivider,
@@ -17,7 +17,6 @@ import {
 } from "@/components/admin/admin-form-section";
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
-import { AdminFormStickyBar } from "@/components/admin/admin-form-sticky-bar";
 import { CategoryDeleteDialog } from "@/components/categories/category-delete-dialog";
 import { ServiceMediaPicker } from "@/components/services/service-media-picker";
 import { Badge } from "@/components/ui/badge";
@@ -178,65 +177,51 @@ export function CategoryForm({
     });
   };
 
-  const headerActions = (
-    <>
-      <Link
-        href={ADMIN_LIST_PATHS.category}
-        className="inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-medium text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface-soft)]"
-      >
-        ביטול
-      </Link>
+  const secondaryActions =
+    canDelete ? (
       <Button
-        loading={isPending}
-        loadingText="שומר..."
+        variant="ghost"
+        size="sm"
+        type="button"
         disabled={isPending}
-        onClick={handleSubmit}
+        onClick={() => setDeleteOpen(true)}
       >
-        <Save aria-hidden="true" className="size-4" />
-        שמירה
+        <Trash2 aria-hidden="true" className="size-4" />
+        מחיקה
       </Button>
-      {canDelete ? (
-        <Button
-          variant="outline"
-          disabled={isPending}
-          onClick={() => setDeleteOpen(true)}
-        >
-          <Trash2 aria-hidden="true" className="size-4" />
-          מחיקה
-        </Button>
-      ) : null}
-    </>
-  );
+    ) : null;
 
   return (
-    <AdminFormShell width="standard">
-      <AdminFormStickyBar>
-        <AdminFormHeader
-          breadcrumbs={[
-            { label: "קטגוריות", href: ADMIN_LIST_PATHS.category },
-            {
-              label: mode === "create" ? "קטגוריה חדשה" : "עריכת קטגוריה",
-            },
-          ]}
-          title={mode === "create" ? "קטגוריה חדשה" : "עריכת קטגוריה"}
-          description="ניהול פרטי הקטגוריה והתמונה האופציונלית שלה"
-          meta={
-            mode === "edit" && category ? (
-              <>
-                <Badge variant="neutral">
-                  {CATEGORY_TYPE_LABELS[category.type]}
-                </Badge>
-                <span className="text-sm text-[var(--color-text-muted)]">
-                  {category.usageCount === 0
-                    ? "לא בשימוש"
-                    : `${category.usageCount} פריטים משויכים`}
-                </span>
-              </>
-            ) : null
-          }
-          actions={headerActions}
-        />
-      </AdminFormStickyBar>
+    <AdminFormShell width="standard" withActionBar>
+      <AdminFormHeader
+        breadcrumbs={[
+          { label: "קטגוריות", href: ADMIN_LIST_PATHS.category },
+          {
+            label: mode === "create" ? "קטגוריה חדשה" : "עריכת קטגוריה",
+          },
+        ]}
+        title={mode === "create" ? "קטגוריה חדשה" : "עריכת קטגוריה"}
+        description="ניהול פרטי הקטגוריה והתמונה האופציונלית שלה"
+        meta={
+          mode === "edit" && category ? (
+            <>
+              <Badge variant="neutral">
+                {CATEGORY_TYPE_LABELS[category.type]}
+              </Badge>
+              <span className="text-sm text-[var(--color-text-muted)]">
+                {category.usageCount === 0
+                  ? "לא בשימוש"
+                  : `${category.usageCount} פריטים משויכים`}
+              </span>
+            </>
+          ) : mode === "create" ? (
+            <Badge variant="neutral">
+              {CATEGORY_TYPE_LABELS[values.type]}
+            </Badge>
+          ) : null
+        }
+        secondaryActions={secondaryActions}
+      />
 
       <FormToast
         open={toast.open}
@@ -338,6 +323,13 @@ export function CategoryForm({
           </>
         ) : null}
       </AdminFormBody>
+
+      <AdminFormActionBar
+        cancelHref={ADMIN_LIST_PATHS.category}
+        onSave={handleSubmit}
+        isDirty={isDirty}
+        isPending={isPending}
+      />
 
       <CategoryDeleteDialog
         open={deleteOpen}

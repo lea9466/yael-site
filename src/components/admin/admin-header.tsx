@@ -27,9 +27,9 @@ function getInitials(fullName: string): string {
 
 export function AdminHeader({ fullName, email, onMenuOpen }: AdminHeaderProps) {
   return (
-    <header className="sticky top-0 z-20 shrink-0 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
-      <div className="flex min-h-[var(--header-height)] flex-col justify-center gap-3 px-4 py-3 sm:px-6">
-        <div className="flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-20 shrink-0 border-b border-[var(--color-border)]/70 bg-[var(--color-surface)]/90 backdrop-blur-md">
+      <div className="flex min-h-[var(--header-height)] flex-col justify-center gap-4 px-5 py-4 sm:px-10 lg:px-12">
+        <div className="flex items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <IconButton
               label="פתיחת תפריט ניווט"
@@ -41,7 +41,7 @@ export function AdminHeader({ fullName, email, onMenuOpen }: AdminHeaderProps) {
             <Breadcrumbs />
           </div>
 
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-3">
             <IconButton
               label="התראות - יתווסף בעתיד"
               disabled
@@ -53,15 +53,15 @@ export function AdminHeader({ fullName, email, onMenuOpen }: AdminHeaderProps) {
               />
             </IconButton>
 
-            <div className="flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-soft)] px-2 py-1.5">
+            <div className="flex items-center gap-2.5">
               <span
                 aria-hidden="true"
-                className="flex size-9 shrink-0 items-center justify-center rounded-[var(--radius-full)] bg-[var(--color-accent)] text-sm font-semibold text-[var(--color-primary)]"
+                className="flex size-9 shrink-0 items-center justify-center rounded-[var(--radius-full)] bg-[var(--color-accent)]/30 text-sm font-semibold text-[var(--color-primary)]"
               >
                 {getInitials(fullName)}
               </span>
               <div className="hidden min-w-0 sm:block">
-                <p className="truncate text-sm font-medium text-[var(--color-primary)]">
+                <p className="truncate text-sm font-medium text-[var(--color-text)]">
                   {fullName}
                 </p>
                 {email ? (
@@ -77,7 +77,7 @@ export function AdminHeader({ fullName, email, onMenuOpen }: AdminHeaderProps) {
           </div>
         </div>
 
-        <div className="hidden max-w-xl md:block">
+        <div className="hidden max-w-md md:block">
           <SearchInput
             disabled
             placeholder="חיפוש במערכת (בקרוב)"

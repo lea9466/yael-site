@@ -1,4 +1,3 @@
-import { PostSaveToastListener } from "@/components/admin/post-save-toast-listener";
 import { CategoriesListClient } from "@/components/categories/categories-list-client";
 import { CategoriesPageError } from "@/components/categories/categories-page-error";
 import { fetchCategoriesList } from "@/lib/categories/queries";
@@ -38,12 +37,9 @@ export default async function CategoriesPage({
   }
 
   return (
-    <>
-      <PostSaveToastListener />
-      <CategoriesListClient
+    <CategoriesListClient
         key={`${data.query.q}-${data.query.type}-${data.query.sort}-${data.query.page}`}
         data={data}
-      />
-    </>
+    />
   );
 }

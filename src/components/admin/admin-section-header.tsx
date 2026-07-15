@@ -1,30 +1,33 @@
 import type { LucideIcon } from "lucide-react";
 
 import { AdminIconCircle } from "@/components/admin/admin-icon-circle";
+import type { AdminModuleId } from "@/lib/admin/module-themes";
 import { cn } from "@/lib/utils/cn";
 
-type SectionHeaderProps = {
+type AdminSectionHeaderProps = {
+  icon: LucideIcon;
   title: string;
   description?: string;
-  icon?: LucideIcon;
+  module?: AdminModuleId;
   emoji?: string;
   className?: string;
 };
 
-export function SectionHeader({
+export function AdminSectionHeader({
+  icon,
   title,
   description,
-  icon,
+  module,
   emoji,
   className,
-}: SectionHeaderProps) {
+}: AdminSectionHeaderProps) {
   return (
-    <div className={cn("flex items-start gap-3", className)}>
-      {icon ? <AdminIconCircle icon={icon} module="dashboard" size="sm" /> : null}
-      <div className="space-y-2">
+    <div className={cn("admin-section-header flex items-start gap-4 text-right", className)}>
+      <AdminIconCircle icon={icon} module={module} size="md" />
+      <div className="min-w-0 flex-1 space-y-1.5">
         <h2 className="text-section-title flex items-center gap-2">
           {emoji ? (
-            <span aria-hidden="true" className="text-lg leading-none">
+            <span aria-hidden="true" className="text-xl leading-none">
               {emoji}
             </span>
           ) : null}

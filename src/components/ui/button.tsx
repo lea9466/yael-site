@@ -12,19 +12,19 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-[var(--color-primary)] text-[var(--color-text-on-primary)] hover:bg-[var(--color-secondary)] focus-visible:ring-[var(--color-primary)]/30",
+    "bg-[image:var(--gradient-warm)] text-[var(--color-text-on-primary)] shadow-[var(--shadow-sm)] hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[var(--shadow-md)] hover:brightness-[1.03] focus-visible:ring-[var(--color-primary)]/25 active:scale-[0.98]",
   secondary:
-    "bg-[var(--color-accent)] text-[var(--color-primary)] hover:opacity-90 focus-visible:ring-[var(--color-accent)]/40",
+    "border border-[var(--color-border-strong)] bg-[var(--color-cream)]/50 text-[var(--color-primary)] hover:border-[var(--color-primary)] hover:bg-[var(--color-light-sage-soft)] focus-visible:ring-[var(--color-primary)]/20 active:scale-[0.98]",
   outline:
-    "border border-[var(--color-border-strong)] bg-transparent text-[var(--color-primary)] hover:bg-[var(--color-surface-soft)] focus-visible:ring-[var(--color-primary)]/20",
+    "border border-[var(--color-border-strong)] bg-transparent text-[var(--color-primary)] hover:border-[var(--color-primary)] hover:bg-[var(--color-light-sage-soft)] focus-visible:ring-[var(--color-primary)]/20 active:scale-[0.98]",
   danger:
-    "bg-[var(--color-soft-accent)] text-[var(--color-text-on-primary)] hover:opacity-90 focus-visible:ring-[var(--color-soft-accent)]/30",
+    "bg-[var(--color-soft-accent)] text-[var(--color-text-on-primary)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-sm)] focus-visible:ring-[var(--color-soft-accent)]/30 active:scale-[0.98]",
   ghost:
-    "bg-transparent text-[var(--color-primary)] hover:bg-[var(--color-surface-soft)] focus-visible:ring-[var(--color-primary)]/20",
+    "bg-transparent text-[var(--color-primary)] hover:bg-[var(--color-light-sage-soft)] focus-visible:ring-[var(--color-primary)]/15 active:scale-[0.98]",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: "h-9 px-3 text-sm",
+  sm: "h-9 px-3.5 text-sm",
   md: "h-11 px-4 text-sm",
   lg: "h-12 px-5 text-base",
 };
@@ -48,9 +48,9 @@ export function Button({
       disabled={isDisabled}
       aria-busy={loading || undefined}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] font-medium transition-colors",
+        "admin-interactive inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] font-medium",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface)]",
-        "disabled:cursor-not-allowed disabled:opacity-60",
+        "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:transform-none disabled:hover:shadow-none",
         variantClasses[variant],
         sizeClasses[size],
         className

@@ -1,11 +1,17 @@
 "use client";
 
+import {
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { GripVertical, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { focusRepeaterItemFirstField } from "@/lib/forms/repeater-autofocus";
 import { cn } from "@/lib/utils/cn";
 
 type RepeaterFieldProps<T extends { id: string }> = {
@@ -17,6 +23,7 @@ type RepeaterFieldProps<T extends { id: string }> = {
   addLabel: string;
   emptyLabel: string;
   error?: string;
+  variant?: "default" | "article";
   onChange: (items: T[]) => void;
   createItem: () => T;
   renderFields: (
@@ -35,26 +42,66 @@ export function RepeaterField<T extends { id: string }>({
   addLabel,
   emptyLabel,
   error,
+  variant = "default",
   onChange,
   createItem,
   renderFields,
 }: RepeaterFieldProps<T>) {
   const canAdd = items.length < maxItems;
   const canRemove = items.length > minItems;
+  const isArticle = variant === "article";
+  const [pendingFocusItemId, setPendingFocusItemId] = useState<string | null>(
+    null
+  );
+  const [liveMessage, setLiveMessage] = useState("");
+  const itemRefs = useRef<Map<string, HTMLLIElement>>(new Map());
 
   const handleAdd = () => {
     if (!canAdd) {
       return;
     }
 
-    onChange([...items, createItem()]);
+    const newItem = createItem();
+    setPendingFocusItemId(newItem.id);
+    setLiveMessage("נוסף פריט חדש");
+    onChange([...items, newItem]);
   };
+
+  useLayoutEffect(() => {
+    if (!pendingFocusItemId) {
+      return;
+    }
+
+    const container = itemRefs.current.get(pendingFocusItemId);
+
+    if (!container) {
+      return;
+    }
+
+    focusRepeaterItemFirstField(container);
+    setPendingFocusItemId(null);
+  }, [pendingFocusItemId, items]);
+
+  useLayoutEffect(() => {
+    if (!liveMessage) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setLiveMessage("");
+    }, 1500);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [liveMessage]);
 
   const handleRemove = (id: string) => {
     if (!canRemove) {
       return;
     }
 
+    itemRefs.current.delete(id);
     onChange(items.filter((item) => item.id !== id));
   };
 
@@ -82,16 +129,26 @@ export function RepeaterField<T extends { id: string }>({
     onChange(nextItems);
   };
 
+  const getItemLabel = (index: number) =>
+    isArticle ? `שלב ${index + 1}` : `פריט ${index + 1}`;
+
   return (
     <div
       className={cn(
-        "space-y-4",
-        error &&
-          "rounded-[var(--radius-lg)] border border-[var(--color-error)] bg-[var(--color-error-soft)]/35 p-3"
+        "space-y-5",
+        error && "rounded-[var(--radius-lg)] p-4 ring-1 ring-[var(--color-error)]/30"
       )}
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="space-y-1">
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {liveMessage}
+      </div>
+
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0 space-y-1.5">
           <h3 className="text-sm font-medium text-[var(--color-text)]">
             {label}
           </h3>
@@ -114,43 +171,67 @@ export function RepeaterField<T extends { id: string }>({
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-soft)]/50 px-4 py-8 text-center text-sm text-[var(--color-text-muted)]">
+        <div className="rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] px-6 py-12 text-center text-sm text-[var(--color-text-muted)]">
           {emptyLabel}
         </div>
       ) : (
         <ul className="space-y-3">
-          {items.map((item, index) => (
-            <li
-              key={item.id}
-              draggable
-              onDragStart={handleDragStart(index)}
-              onDragOver={(event) => event.preventDefault()}
-              onDrop={handleDrop(index)}
-              className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-sm)]"
-            >
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-caption text-[var(--color-text-muted)]">
-                  <GripVertical aria-hidden="true" className="size-4" />
-                  פריט {index + 1}
+          {items.map((item, index) => {
+            const itemLabel = getItemLabel(index);
+
+            return (
+              <li
+                key={item.id}
+                ref={(node) => {
+                  if (node) {
+                    itemRefs.current.set(item.id, node);
+                  } else {
+                    itemRefs.current.delete(item.id);
+                  }
+                }}
+                draggable
+                onDragStart={handleDragStart(index)}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={handleDrop(index)}
+                className={cn(
+                  "admin-interactive group min-w-0 rounded-[var(--radius-lg)] bg-[var(--color-surface)] px-4 py-5",
+                  "ring-1 ring-[var(--color-border)]/80 hover:ring-[var(--color-primary)]/20 hover:shadow-[var(--shadow-sm)]",
+                  isArticle && "px-5 py-6"
+                )}
+              >
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <button
+                      type="button"
+                      aria-label={`גרירה לסידור מחדש — ${itemLabel}`}
+                      className="admin-interactive shrink-0 cursor-grab rounded-[var(--radius-sm)] p-1 text-[var(--color-text-muted)] opacity-50 transition-opacity hover:bg-[var(--color-surface-soft)] hover:text-[var(--color-primary)] group-hover:opacity-100 active:cursor-grabbing"
+                    >
+                      <GripVertical aria-hidden="true" className="size-4" />
+                    </button>
+                    <span className="text-caption font-medium text-[var(--color-text-muted)]">
+                      {itemLabel}
+                    </span>
+                  </div>
+                  <IconButton
+                    label={`הסרת ${itemLabel}`}
+                    size="sm"
+                    disabled={!canRemove}
+                    className="shrink-0 opacity-60 group-hover:opacity-100"
+                    onClick={() => handleRemove(item.id)}
+                  >
+                    <Trash2 aria-hidden="true" className="size-4" />
+                  </IconButton>
                 </div>
-                <IconButton
-                  label="הסרת פריט"
-                  size="sm"
-                  disabled={!canRemove}
-                  onClick={() => handleRemove(item.id)}
-                >
-                  <Trash2 aria-hidden="true" className="size-4" />
-                </IconButton>
-              </div>
-              {renderFields(item, index, (nextItem) => {
-                onChange(
-                  items.map((current) =>
-                    current.id === item.id ? nextItem : current
-                  )
-                );
-              })}
-            </li>
-          ))}
+                {renderFields(item, index, (nextItem) => {
+                  onChange(
+                    items.map((current) =>
+                      current.id === item.id ? nextItem : current
+                    )
+                  );
+                })}
+              </li>
+            );
+          })}
         </ul>
       )}
 
@@ -168,17 +249,23 @@ export function RepeaterTextField({
   onChange,
   placeholder,
   error,
+  id,
+  className,
 }: {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
   error?: boolean;
+  id?: string;
+  className?: string;
 }) {
   return (
     <Input
+      id={id}
       value={value}
       placeholder={placeholder}
       error={error}
+      className={cn("min-w-0", className)}
       onChange={(event) => onChange(event.target.value)}
     />
   );
@@ -189,18 +276,26 @@ export function RepeaterTextareaField({
   onChange,
   placeholder,
   error,
+  id,
+  className,
 }: {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
   error?: boolean;
+  id?: string;
+  className?: string;
 }) {
   return (
     <Textarea
+      id={id}
       value={value}
       placeholder={placeholder}
       error={error}
-      className="min-h-24"
+      className={cn(
+        "min-h-32 min-w-0 text-base leading-[var(--line-height-relaxed)]",
+        className
+      )}
       onChange={(event) => onChange(event.target.value)}
     />
   );

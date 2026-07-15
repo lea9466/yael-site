@@ -12,7 +12,7 @@ export function AdminFormStickyBar({
   return (
     <div
       className={cn(
-        "admin-form-sticky-bar sticky top-0 z-[var(--z-sticky)] -mx-4 border-b border-[var(--color-border)]/60 bg-[var(--color-form-surface)]/95 px-4 py-4 backdrop-blur sm:-mx-8 sm:px-8",
+        "admin-form-sticky-bar sticky top-0 z-[var(--z-sticky)] -mx-5 border-b border-[var(--color-border)]/50 bg-[var(--color-background)]/90 px-5 py-4 backdrop-blur-md sm:-mx-10 sm:px-10 lg:-mx-12 lg:px-12",
         className
       )}
     >

@@ -3,11 +3,20 @@
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Plus, RefreshCw } from "lucide-react";
+import { BookOpen, ChefHat, FolderTree, Plus, RefreshCw } from "lucide-react";
 
+import {
+  AdminListFilters,
+  AdminListItems,
+  AdminListPagination,
+  AdminListShell,
+  AdminListToolbar,
+} from "@/components/admin/admin-list-shell";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminEmptyState } from "@/components/admin/admin-empty-state";
+import { AdminStatCards } from "@/components/admin/admin-stat-cards";
 import { CategoryRow } from "@/components/categories/category-row";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { CATEGORY_TYPE_LABELS } from "@/lib/categories/constants";
@@ -93,29 +102,60 @@ export function CategoriesListClient({ data }: CategoriesListClientProps) {
 
   const hasFilters = data.query.q.length > 0 || data.query.type !== "all";
 
-  return (
-    <div className="mx-auto w-full max-w-7xl space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-page-title">קטגוריות</h1>
-          <p className="text-muted">ניהול קטגוריות למתכונים ומאמרים</p>
-        </div>
-        <Link
-          href={
-            data.query.type === "recipe" || data.query.type === "article"
-              ? `/admin/categories/new?type=${data.query.type}`
-              : "/admin/categories/new"
-          }
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 text-sm font-medium text-[var(--color-text-on-primary)] transition-colors hover:bg-[var(--color-secondary)]"
-        >
-          <Plus aria-hidden="true" className="size-4" />
-          קטגוריה חדשה
-        </Link>
-      </div>
+  const newCategoryHref =
+    data.query.type === "recipe" || data.query.type === "article"
+      ? `/admin/categories/new?type=${data.query.type}`
+      : "/admin/categories/new";
 
-      <div className="grid gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-soft)] p-4 lg:grid-cols-3">
+  return (
+    <AdminListShell>
+      <AdminPageHeader
+        module="categories"
+        title="קטגוריות"
+        description="ארגני את התוכן בצורה ויזואלית וברורה — לכל מתכון ומאמר בית משלו."
+        action={{
+          label: "קטגוריה חדשה",
+          href: newCategoryHref,
+          icon: <Plus aria-hidden="true" className="size-4" />,
+        }}
+      />
+
+      <AdminStatCards
+        stats={[
+          {
+            icon: FolderTree,
+            label: "קטגוריות",
+            value: data.pagination.totalCount,
+            module: "categories",
+            emoji: "🗂️",
+          },
+          {
+            icon: ChefHat,
+            label: "למתכונים",
+            value: data.items.filter((item) => item.type === "recipe").length,
+            module: "recipes",
+            emoji: "🥗",
+          },
+          {
+            icon: BookOpen,
+            label: "למאמרים",
+            value: data.items.filter((item) => item.type === "article").length,
+            module: "articles",
+            emoji: "📚",
+          },
+          {
+            icon: FolderTree,
+            label: "פנויות",
+            value: data.items.filter((item) => item.usageCount === 0).length,
+            module: "categories",
+            emoji: "✨",
+          },
+        ]}
+      />
+
+      <AdminListFilters className="lg:grid-cols-3">
         <div className="space-y-2 lg:col-span-2">
-          <label htmlFor="categories-search" className="text-sm font-medium">
+          <label htmlFor="categories-search" className="text-caption font-medium text-[var(--color-text-muted)]">
             חיפוש
           </label>
           <Input
@@ -166,12 +206,9 @@ export function CategoriesListClient({ data }: CategoriesListClientProps) {
             </option>
           ))}
         </Select>
-      </div>
+      </AdminListFilters>
 
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-[var(--color-text-muted)]">
-          {data.pagination.totalCount} קטגוריות
-        </p>
+      <AdminListToolbar countLabel={`${data.pagination.totalCount} קטגוריות`}>
         <Button
           variant="outline"
           size="sm"
@@ -181,71 +218,61 @@ export function CategoriesListClient({ data }: CategoriesListClientProps) {
           <RefreshCw aria-hidden="true" className="size-4" />
           רענון
         </Button>
-      </div>
+      </AdminListToolbar>
 
       {data.items.length === 0 ? (
-        <div className="space-y-4">
-          <EmptyState
-            title={hasFilters ? "לא נמצאו תוצאות" : "אין קטגוריות עדיין"}
-            description={
-              hasFilters
-                ? "נסו לשנות את החיפוש או המסננים."
-                : "צרו את הקטגוריה הראשונה שלכם."
-            }
-          />
-          {!hasFilters ? (
-            <Link
-              href="/admin/categories/new"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 text-sm font-medium text-[var(--color-text-on-primary)]"
-            >
-              <Plus aria-hidden="true" className="size-4" />
-              קטגוריה חדשה
-            </Link>
-          ) : null}
-        </div>
+        <AdminEmptyState
+          module="categories"
+          icon={FolderTree}
+          emoji="🗂️"
+          title={hasFilters ? "לא נמצאו תוצאות" : "עדיין אין קטגוריות"}
+          description={
+            hasFilters
+              ? "נסי לשנות את החיפוש או המסננים."
+              : "בואי ניצור קטגוריות שיעזרו לארגן את המתכונים והמאמרים בצורה יפה."
+          }
+          action={
+            !hasFilters ? (
+              <Link
+                href={newCategoryHref}
+                className="admin-btn-primary inline-flex h-11 items-center gap-2 rounded-[var(--radius-md)] px-4 text-sm font-medium"
+              >
+                <Plus aria-hidden="true" className="size-4" />
+                קטגוריה חדשה
+              </Link>
+            ) : undefined
+          }
+        />
       ) : (
-        <div className="space-y-4">
+        <AdminListItems>
           {data.items.map((item) => (
             <CategoryRow key={item.id} item={item} />
           ))}
-        </div>
+        </AdminListItems>
       )}
 
       {data.pagination.totalPages > 1 ? (
-        <div className="flex items-center justify-between gap-3">
-          <Button
-            variant="outline"
-            disabled={data.pagination.page <= 1}
-            onClick={() =>
-              router.push(
-                buildCategoriesUrl(pathname, {
-                  ...data.query,
-                  page: data.pagination.page - 1,
-                })
-              )
-            }
-          >
-            הקודם
-          </Button>
-          <p className="text-caption text-[var(--color-text-muted)]">
-            עמוד {data.pagination.page} מתוך {data.pagination.totalPages}
-          </p>
-          <Button
-            variant="outline"
-            disabled={data.pagination.page >= data.pagination.totalPages}
-            onClick={() =>
-              router.push(
-                buildCategoriesUrl(pathname, {
-                  ...data.query,
-                  page: data.pagination.page + 1,
-                })
-              )
-            }
-          >
-            הבא
-          </Button>
-        </div>
+        <AdminListPagination
+          page={data.pagination.page}
+          totalPages={data.pagination.totalPages}
+          onPrevious={() =>
+            router.push(
+              buildCategoriesUrl(pathname, {
+                ...data.query,
+                page: data.pagination.page - 1,
+              })
+            )
+          }
+          onNext={() =>
+            router.push(
+              buildCategoriesUrl(pathname, {
+                ...data.query,
+                page: data.pagination.page + 1,
+              })
+            )
+          }
+        />
       ) : null}
-    </div>
+    </AdminListShell>
   );
 }

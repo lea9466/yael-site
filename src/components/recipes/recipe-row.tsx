@@ -21,18 +21,18 @@ import {
   restoreAndPublishRecipeAction,
   restoreRecipeToDraftAction,
 } from "@/actions/recipes";
+import {
+  AdminFeaturedBadge,
+  AdminStatusBadge,
+} from "@/components/admin/admin-status-badge";
+import { AdminListItem } from "@/components/admin/admin-empty-state";
 import { RecipeArchiveDialog } from "@/components/recipes/recipe-archive-dialog";
 import { RecipeDeleteDialog } from "@/components/recipes/recipe-delete-dialog";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { FormToast } from "@/components/ui/form-toast";
-import {
-  STATUS_BADGE_VARIANT,
-  STATUS_LABELS,
-} from "@/lib/recipes/constants";
 import {
   formatDifficulty,
   formatDurationMinutes,
@@ -88,7 +88,7 @@ export function RecipeRow({ item }: RecipeRowProps) {
   };
 
   return (
-    <article className="surface-card overflow-visible p-0">
+    <AdminListItem>
       <FormToast
         open={toast.open}
         variant={toast.variant}
@@ -96,15 +96,15 @@ export function RecipeRow({ item }: RecipeRowProps) {
         onClose={() => setToast((current) => ({ ...current, open: false }))}
       />
 
-      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start">
-        <div className="relative size-28 shrink-0 overflow-hidden rounded-[var(--radius-md)] bg-[var(--color-surface-soft)] sm:size-32">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+        <div className="relative size-32 shrink-0 overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface-soft)] sm:size-36">
           {item.coverUrl ? (
             <Image
               src={item.coverUrl}
               alt={item.coverAlt ?? item.title}
               fill
-              sizes="128px"
-              className="object-cover"
+              sizes="144px"
+              className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
             />
           ) : (
             <div className="flex size-full items-center justify-center text-caption text-[var(--color-text-muted)]">
@@ -114,8 +114,8 @@ export function RecipeRow({ item }: RecipeRowProps) {
         </div>
 
         <div className="min-w-0 flex-1 space-y-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 space-y-2">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 space-y-2.5">
               <h3 className="truncate text-card-title" title={item.title}>
                 {item.title}
               </h3>
@@ -125,10 +125,8 @@ export function RecipeRow({ item }: RecipeRowProps) {
                 {formatDifficulty(item.difficulty)}
               </p>
               <div className="flex flex-wrap gap-2">
-                <Badge variant={STATUS_BADGE_VARIANT[item.status]}>
-                  {STATUS_LABELS[item.status]}
-                </Badge>
-                {item.featured ? <Badge variant="info">מומלץ</Badge> : null}
+                <AdminStatusBadge status={item.status} />
+                {item.featured ? <AdminFeaturedBadge /> : null}
               </div>
             </div>
 
@@ -238,6 +236,6 @@ export function RecipeRow({ item }: RecipeRowProps) {
           )
         }
       />
-    </article>
+    </AdminListItem>
   );
 }

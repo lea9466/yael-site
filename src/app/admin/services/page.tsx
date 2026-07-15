@@ -1,4 +1,3 @@
-import { PostSaveToastListener } from "@/components/admin/post-save-toast-listener";
 import { ServicesListClient } from "@/components/services/services-list-client";
 import { ServicesPageError } from "@/components/services/services-page-error";
 import { fetchServicesList } from "@/lib/services/queries";
@@ -37,12 +36,9 @@ export default async function ServicesPage({ searchParams }: ServicesPageProps) 
   }
 
   return (
-    <>
-      <PostSaveToastListener />
-      <ServicesListClient
+    <ServicesListClient
         key={`${data.query.q}-${data.query.status}-${data.query.featured}-${data.query.sort}-${data.query.page}`}
         data={data}
-      />
-    </>
+    />
   );
 }

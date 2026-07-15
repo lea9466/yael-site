@@ -23,18 +23,24 @@ export function SidebarItem({
   onNavigate,
 }: SidebarItemProps) {
   const itemClasses = cn(
-    "flex items-center rounded-[var(--radius-md)] text-sm transition-colors",
+    "admin-interactive flex items-center rounded-[var(--radius-md)] text-sm",
     collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
     enabled
       ? active
-        ? "bg-[var(--color-accent)] font-medium text-[var(--color-primary)] shadow-[var(--shadow-sm)]"
-        : "text-[var(--color-text-on-primary)]/90 hover:bg-[var(--color-secondary)]/70"
-      : "cursor-not-allowed text-[var(--color-text-on-primary)]/55"
+        ? "bg-gradient-to-l from-[var(--color-fresh-green-soft)] to-[var(--color-light-sage-soft)] font-medium text-[var(--color-primary)] shadow-[var(--shadow-sm)] ring-1 ring-[var(--color-fresh-green)]/15"
+        : "text-[var(--color-text-muted)] hover:bg-[var(--color-cream)] hover:text-[var(--color-primary)]"
+      : "cursor-not-allowed text-[var(--color-text-muted)]/50"
   );
 
   const content = (
     <>
-      <Icon aria-hidden="true" className="size-[18px] shrink-0" />
+      <Icon
+        aria-hidden="true"
+        className={cn(
+          "size-[18px] shrink-0",
+          active && enabled && "text-[var(--color-primary)]"
+        )}
+      />
       <span className={cn("truncate", collapsed && "sr-only")}>{label}</span>
     </>
   );

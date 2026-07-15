@@ -93,16 +93,12 @@ export function ServiceMediaPicker({
   return (
     <div
       id={fieldId}
-      className={cn(
-        "space-y-3",
-        error &&
-          "rounded-[var(--radius-lg)] border border-[var(--color-error)] bg-[var(--color-error-soft)]/35 p-3"
-      )}
+      className={cn("space-y-4", error && "rounded-[var(--radius-lg)] ring-1 ring-[var(--color-error)]/30 p-4")}
     >
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         <p className="text-sm font-medium text-[var(--color-text)]">
           {label}
-          {required ? <span className="text-[var(--color-error)]"> *</span> : null}
+          {required ? <span className="text-[var(--color-soft-accent)]"> *</span> : null}
         </p>
         {description ? (
           <p className="text-caption text-[var(--color-text-muted)]">
@@ -111,25 +107,19 @@ export function ServiceMediaPicker({
         ) : null}
       </div>
 
-      <div
-        className={cn(
-          variant === "default" &&
-            "rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-soft)]/40 p-4",
-          variant === "minimal" && "space-y-4"
-        )}
-      >
+      <div className={cn(variant === "minimal" && "space-y-4")}>
         {preview?.url ? (
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-            <div className="relative size-36 shrink-0 overflow-hidden rounded-[var(--radius-md)] bg-[var(--color-surface)]">
+          <div className="space-y-4">
+            <div className="relative aspect-[16/10] w-full max-w-2xl overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface-soft)]">
               <Image
                 src={preview.url}
                 alt={preview.alt}
                 fill
-                sizes="144px"
+                sizes="(max-width: 768px) 100vw, 672px"
                 className="object-cover"
               />
             </div>
-            <div className="flex flex-1 flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 type="button"
                 variant="outline"
@@ -148,22 +138,31 @@ export function ServiceMediaPicker({
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3 text-[var(--color-text-muted)]">
-              <ImageIcon aria-hidden="true" className="size-8" />
-              <p className="text-sm">לא נבחרה תמונה</p>
+          <div className="admin-interactive group flex w-full max-w-2xl flex-col items-center justify-center gap-4 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)] px-6 py-14 text-center hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-surface-soft)]/50">
+            <div className="flex size-14 items-center justify-center rounded-[var(--radius-full)] bg-[var(--color-primary)]/8 text-[var(--color-primary)] transition-transform group-hover:scale-105">
+              <ImageIcon aria-hidden="true" className="size-6" strokeWidth={1.5} />
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-[var(--color-text)]">
+                בחרו תמונת כיסוי
+              </p>
+              <p className="text-caption text-[var(--color-text-muted)]">
+                בחרו מספריית המדיה או העלו תמונה חדשה
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-2 pt-1">
               <Button type="button" onClick={() => setPickerOpen(true)}>
+                <ImageIcon aria-hidden="true" className="size-4" />
                 בחירת תמונה
               </Button>
               <Button
                 type="button"
                 variant="outline"
+                size="sm"
                 onClick={() => setUploadOpen(true)}
               >
                 <Upload aria-hidden="true" className="size-4" />
-                העלאת תמונה
+                העלאה
               </Button>
             </div>
           </div>
@@ -203,10 +202,10 @@ export function ServiceMediaPicker({
                 key={item.id}
                 type="button"
                 className={cn(
-                  "overflow-hidden rounded-[var(--radius-md)] border text-start transition-shadow hover:shadow-[var(--shadow-sm)]",
+                  "admin-interactive overflow-hidden rounded-[var(--radius-md)] text-start hover:shadow-[var(--shadow-sm)]",
                   value === item.id
-                    ? "border-[var(--color-primary)] ring-2 ring-[var(--color-primary)]/20"
-                    : "border-[var(--color-border)]"
+                    ? "ring-2 ring-[var(--color-primary)] ring-offset-2"
+                    : "ring-1 ring-[var(--color-border)]"
                 )}
                 onClick={() => handleSelect(item)}
               >
@@ -221,7 +220,7 @@ export function ServiceMediaPicker({
                     />
                   ) : null}
                 </div>
-                <p className="truncate px-3 py-2 text-sm">
+                <p className="truncate px-3 py-2.5 text-sm">
                   {item.original_file_name ?? item.file_name}
                 </p>
               </button>

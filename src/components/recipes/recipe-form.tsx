@@ -5,10 +5,13 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import {
   Archive,
+  ChefHat,
+  Clock,
   Eye,
-  MoreHorizontal,
-  Save,
-  Send,
+  FileText,
+  Image,
+  Leaf,
+  Sparkles,
   Trash2,
 } from "lucide-react";
 
@@ -21,10 +24,11 @@ import {
   restoreRecipeToDraftAction,
   updateRecipeAction,
 } from "@/actions/recipes";
+import { AdminSectionHeader } from "@/components/admin/admin-section-header";
+import { AdminFormActionBar } from "@/components/admin/admin-form-action-bar";
 import { AdminFormBody } from "@/components/admin/admin-form-section";
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
-import { AdminFormStickyBar } from "@/components/admin/admin-form-sticky-bar";
 import { AdminSeoSection } from "@/components/admin/admin-seo-section";
 import { RecipeArchiveDialog } from "@/components/recipes/recipe-archive-dialog";
 import { RecipeDeleteDialog } from "@/components/recipes/recipe-delete-dialog";
@@ -41,13 +45,9 @@ import {
   RepeaterTextareaField,
   RepeaterTextField,
 } from "@/components/services/service-repeater-field";
-import { Badge } from "@/components/ui/badge";
+import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import { FormField } from "@/components/ui/form-field";
 import { FormToast } from "@/components/ui/form-toast";
 import { Input } from "@/components/ui/input";
@@ -65,7 +65,6 @@ import {
   DIFFICULTY_LABELS,
   RECIPE_DESCRIPTION_MAX,
   RECIPE_REPEATER_LIMITS,
-  STATUS_LABELS,
 } from "@/lib/recipes/constants";
 import { RECIPE_ERRORS } from "@/lib/recipes/errors";
 import { slugifyTitle } from "@/lib/recipes/slug";
@@ -150,12 +149,7 @@ function toRepeaterContent(
 function toSubmitContent(content: FormContentState): RecipeDraftInput["content"] {
   return {
     ingredients: content.ingredients
-      .filter(
-        (item) =>
-          item.name.trim().length > 0 &&
-          item.quantity.trim().length > 0 &&
-          item.unit.trim().length > 0
-      )
+      .filter((item) => item.name.trim().length > 0)
       .map(({ name, quantity, unit }) => ({
         name: name.trim(),
         quantity: quantity.trim(),
@@ -472,117 +466,91 @@ export function RecipeForm({
   };
 
   const currentStatus = initialRecipe?.status ?? values.status;
+  const showPublish =
+    currentStatus !== "archived" && (mode === "create" || currentStatus === "draft");
+
+  const secondaryActions = (
+    <>
+      {mode === "edit" ? (
+        <Link
+          href={`/admin/recipes/${initialRecipe!.id}/preview`}
+          className="admin-btn-outline inline-flex h-9 items-center gap-2 rounded-[var(--radius-md)] px-3 text-sm font-medium"
+        >
+          <Eye aria-hidden="true" className="size-4" />
+          תצוגה מקדימה
+        </Link>
+      ) : null}
+      {mode === "edit" && currentStatus !== "archived" ? (
+        <Button
+          variant="ghost"
+          size="sm"
+          type="button"
+          onClick={() => setArchiveOpen(true)}
+          disabled={isPending}
+        >
+          <Archive aria-hidden="true" className="size-4" />
+          העברה לארכיון
+        </Button>
+      ) : null}
+      {mode === "edit" && currentStatus === "archived" ? (
+        <>
+          <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            disabled={isPending}
+            onClick={() => handleRestore(false)}
+          >
+            שחזור כטיוטה
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            disabled={isPending}
+            onClick={() => {
+              if (!hasCategories) {
+                showToast("error", RECIPE_ERRORS.categoryMissing);
+                return;
+              }
+              handleRestore(true);
+            }}
+          >
+            שחזור ופרסום
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            disabled={isPending}
+            onClick={() => setDeleteOpen(true)}
+          >
+            <Trash2 aria-hidden="true" className="size-4" />
+            מחיקה לצמיתות
+          </Button>
+        </>
+      ) : null}
+    </>
+  );
 
   return (
-    <AdminFormShell width="wide">
-      <AdminFormStickyBar>
-        <AdminFormHeader
-          breadcrumbs={[
-            { label: "מתכונים", href: ADMIN_LIST_PATHS.recipe },
-            {
-              label: mode === "create" ? "מתכון חדש" : "עריכת מתכון",
-            },
-          ]}
-          title={mode === "create" ? "מתכון חדש" : "עריכת מתכון"}
-          description="יצירה ועריכה של מתכון, כולל תמונות, רכיבים ושלבי הכנה"
-          meta={
-            mode === "edit" ? (
-              <Badge
-                variant={
-                  currentStatus === "published"
-                    ? "success"
-                    : currentStatus === "archived"
-                      ? "warning"
-                      : "neutral"
-                }
-              >
-                {STATUS_LABELS[currentStatus]}
-              </Badge>
-            ) : null
-          }
-          actions={
-            <>
-              <Link
-                href={ADMIN_LIST_PATHS.recipe}
-                className="inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-medium text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface-soft)]"
-              >
-                ביטול
-              </Link>
-              <Button
-                loading={isPending}
-                loadingText="שומר..."
-                disabled={isPending}
-                onClick={handleSaveDraft}
-              >
-                <Save aria-hidden="true" className="size-4" />
-                שמירה
-              </Button>
-              <Button
-                variant="secondary"
-                loading={isPending}
-                loadingText="מפרסם..."
-                disabled={!hasCategories || isPending}
-                onClick={handlePublish}
-              >
-                <Send aria-hidden="true" className="size-4" />
-                פרסום
-              </Button>
-              {mode === "edit" ? (
-                <Link
-                  href={`/admin/recipes/${initialRecipe!.id}/preview`}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-medium text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface-soft)]"
-                >
-                  <Eye aria-hidden="true" className="size-4" />
-                  תצוגה מקדימה
-                </Link>
-              ) : null}
-              {mode === "edit" ? (
-                <DropdownMenu
-                  triggerLabel="עוד"
-                  trigger={
-                    <Button variant="outline" type="button" disabled={isPending}>
-                      <MoreHorizontal aria-hidden="true" className="size-4" />
-                      עוד...
-                    </Button>
-                  }
-                >
-                  {currentStatus !== "archived" ? (
-                    <DropdownMenuItem onSelect={() => setArchiveOpen(true)}>
-                      <Archive aria-hidden="true" className="size-4" />
-                      העברה לארכיון
-                    </DropdownMenuItem>
-                  ) : null}
-                  {currentStatus === "archived" ? (
-                    <>
-                      <DropdownMenuItem onSelect={() => handleRestore(false)}>
-                        שחזור כטיוטה
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => {
-                          if (!hasCategories) {
-                            showToast("error", RECIPE_ERRORS.categoryMissing);
-                            return;
-                          }
-                          handleRestore(true);
-                        }}
-                      >
-                        שחזור ופרסום
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        destructive
-                        onSelect={() => setDeleteOpen(true)}
-                      >
-                        <Trash2 aria-hidden="true" className="size-4" />
-                        מחיקה לצמיתות
-                      </DropdownMenuItem>
-                    </>
-                  ) : null}
-                </DropdownMenu>
-              ) : null}
-            </>
-          }
-        />
-      </AdminFormStickyBar>
+    <AdminFormShell width="wide" withActionBar>
+      <AdminFormHeader
+        breadcrumbs={[
+          { label: "מתכונים", href: ADMIN_LIST_PATHS.recipe },
+          {
+            label: mode === "create" ? "מתכון חדש" : "עריכת מתכון",
+          },
+        ]}
+        title={mode === "create" ? "מתכון חדש" : "עריכת מתכון"}
+        description={
+          mode === "create"
+            ? "צרי מתכון חדש שיופיע באתר. אפשר לשמור כטיוטה או לפרסם בכל שלב."
+            : "ערכי את המתכון, הרכיבים והתמונות. שמרי כטיוטה או פרסמי בכל שלב."
+        }
+        meta={<AdminStatusBadge status={currentStatus} />}
+        secondaryActions={secondaryActions}
+      />
 
       <FormToast
         open={toast.open}
@@ -595,7 +563,13 @@ export function RecipeForm({
       <AdminFormBody>
         <div className="space-y-16">
         <section id="section-basic" className="space-y-5">
-          <h2 className="text-section-title">מידע בסיסי</h2>
+          <AdminSectionHeader
+            icon={FileText}
+            module="recipes"
+            emoji="📋"
+            title="מידע בסיסי"
+            description="שם, תיאור וקטגוריה — הבסיס לכל מתכון מוצלח."
+          />
 
           {!hasCategories ? (
             <div
@@ -716,7 +690,13 @@ export function RecipeForm({
         <hr className="border-[var(--color-border)]" />
 
         <section id="field-cover-media" className="space-y-5">
-          <h2 className="text-section-title">תמונה ראשית</h2>
+          <AdminSectionHeader
+            icon={Image}
+            module="recipes"
+            emoji="📸"
+            title="תמונה ראשית"
+            description="תמונת הכיסוי — הראשונה שהמבקרים רואים."
+          />
           <ServiceMediaPicker
             variant="minimal"
             label="תמונת כיסוי"
@@ -747,7 +727,13 @@ export function RecipeForm({
         <hr className="border-[var(--color-border)]" />
 
         <section id="section-details" className="space-y-5">
-          <h2 className="text-section-title">פרטי המתכון</h2>
+          <AdminSectionHeader
+            icon={Clock}
+            module="recipes"
+            emoji="⏱️"
+            title="פרטי המתכון"
+            description="זמן הכנה, מנות ורמת קושי."
+          />
 
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField
@@ -813,9 +799,17 @@ export function RecipeForm({
         <hr className="border-[var(--color-border)]" />
 
         <section id="section-ingredients">
+          <AdminSectionHeader
+            icon={Leaf}
+            module="recipes"
+            emoji="🥗"
+            title="רכיבים"
+            description="הוסיפי את כל רכיבי המתכון — טריים ובריאים."
+            className="mb-8"
+          />
           <RepeaterField
             label="רכיבים"
-            description="רשימת הרכיבים והכמויות"
+            description="שם הרכיב חובה. כמות ויחידת מידה אופציונליות."
             items={content.ingredients}
             minItems={RECIPE_REPEATER_LIMITS.ingredients.min}
             maxItems={RECIPE_REPEATER_LIMITS.ingredients.max}
@@ -832,22 +826,43 @@ export function RecipeForm({
               setContent((current) => ({ ...current, ingredients: items }))
             }
             renderFields={(item, _index, updateItem) => (
-              <div className="grid gap-3 sm:grid-cols-3">
-                <RepeaterTextField
-                  value={item.name}
-                  placeholder="שם הרכיב"
-                  onChange={(name) => updateItem({ ...item, name })}
-                />
-                <RepeaterTextField
-                  value={item.quantity}
-                  placeholder="כמות"
-                  onChange={(quantity) => updateItem({ ...item, quantity })}
-                />
-                <RepeaterTextField
-                  value={item.unit}
-                  placeholder="יחידת מידה"
-                  onChange={(unit) => updateItem({ ...item, unit })}
-                />
+              <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+                <FormField
+                  label="רכיב"
+                  htmlFor={`ingredient-name-${item.id}`}
+                  required
+                >
+                  <RepeaterTextField
+                    id={`ingredient-name-${item.id}`}
+                    value={item.name}
+                    placeholder="לדוגמה: עגבנייה"
+                    onChange={(name) => updateItem({ ...item, name })}
+                  />
+                </FormField>
+                <FormField
+                  label="כמות"
+                  htmlFor={`ingredient-quantity-${item.id}`}
+                  hint="אופציונלי"
+                >
+                  <RepeaterTextField
+                    id={`ingredient-quantity-${item.id}`}
+                    value={item.quantity}
+                    placeholder="לדוגמה: 2, חצי, לפי הטעם"
+                    onChange={(quantity) => updateItem({ ...item, quantity })}
+                  />
+                </FormField>
+                <FormField
+                  label="יחידת מידה"
+                  htmlFor={`ingredient-unit-${item.id}`}
+                  hint="אופציונלי"
+                >
+                  <RepeaterTextField
+                    id={`ingredient-unit-${item.id}`}
+                    value={item.unit}
+                    placeholder="לדוגמה: כוס, כפית"
+                    onChange={(unit) => updateItem({ ...item, unit })}
+                  />
+                </FormField>
               </div>
             )}
           />
@@ -856,8 +871,17 @@ export function RecipeForm({
         <hr className="border-[var(--color-border)]" />
 
         <section id="section-steps">
+          <AdminSectionHeader
+            icon={ChefHat}
+            module="recipes"
+            emoji="👩‍🍳"
+            title="שלבי הכנה"
+            description="כתבי את שלבי ההכנה בצורה ברורה — כמו במגזין."
+            className="mb-8"
+          />
           <RepeaterField
             label="שלבי הכנה"
+            variant="article"
             items={content.steps}
             minItems={RECIPE_REPEATER_LIMITS.steps.min}
             maxItems={RECIPE_REPEATER_LIMITS.steps.max}
@@ -871,17 +895,13 @@ export function RecipeForm({
             onChange={(items) =>
               setContent((current) => ({ ...current, steps: items }))
             }
-            renderFields={(item, index, updateItem) => (
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-[var(--color-text)]">
-                  שלב {index + 1}
-                </p>
-                <RepeaterTextareaField
-                  value={item.text}
-                  placeholder="תיאור השלב"
-                  onChange={(text) => updateItem({ ...item, text })}
-                />
-              </div>
+            renderFields={(item, _index, updateItem) => (
+              <RepeaterTextareaField
+                value={item.text}
+                placeholder="תארי את השלב — כמו שכותבים מאמר"
+                className="min-h-36"
+                onChange={(text) => updateItem({ ...item, text })}
+              />
             )}
           />
         </section>
@@ -889,7 +909,13 @@ export function RecipeForm({
         <hr className="border-[var(--color-border)]" />
 
         <section id="section-tip" className="space-y-4">
-          <h2 className="text-section-title">הטיפ של יעל</h2>
+          <AdminSectionHeader
+            icon={Sparkles}
+            module="recipes"
+            emoji="🌿"
+            title="הטיפ של יעל"
+            description="הוסיפי טיפ אישי שיעשיר את המתכון."
+          />
           <FormField
             label="טיפ אישי"
             htmlFor="recipe-yael-tip"
@@ -943,6 +969,16 @@ export function RecipeForm({
         />
         </div>
       </AdminFormBody>
+
+      <AdminFormActionBar
+        cancelHref={ADMIN_LIST_PATHS.recipe}
+        onSave={handleSaveDraft}
+        onPublish={handlePublish}
+        showPublish={showPublish}
+        isDirty={isDirty}
+        isPending={isPending}
+        publishDisabled={!hasCategories}
+      />
 
       <RecipeArchiveDialog
         open={archiveOpen}

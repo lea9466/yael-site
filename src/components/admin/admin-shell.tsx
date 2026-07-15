@@ -37,7 +37,7 @@ export function AdminShell({ fullName, email, children }: AdminShellProps) {
         aria-label="סגור תפריט ניווט"
         onClick={handleClose}
         className={cn(
-          "fixed inset-0 z-40 bg-[var(--color-primary)]/40 transition-opacity lg:hidden",
+          "fixed inset-0 z-40 bg-[var(--color-text)]/20 backdrop-blur-[2px] transition-opacity duration-300 lg:hidden",
           isMobileOpen ? "opacity-100" : "pointer-events-none opacity-0"
         )}
       />
@@ -57,7 +57,7 @@ export function AdminShell({ fullName, email, children }: AdminShellProps) {
           email={email}
           onMenuOpen={handleOpen}
         />
-        <main className="admin-content-area min-w-0 flex-1 px-4 py-6 sm:px-8 sm:py-10">
+        <main className="admin-content-area min-w-0 flex-1 px-5 py-8 sm:px-10 sm:py-12 lg:px-12">
           {children}
         </main>
       </div>

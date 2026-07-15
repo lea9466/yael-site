@@ -47,12 +47,10 @@ const ingredientSchema = z.object({
   quantity: z
     .string()
     .trim()
-    .min(1, "יש להזין כמות")
     .max(40, "הכמות ארוכה מדי"),
   unit: z
     .string()
     .trim()
-    .min(1, "יש להזין יחידת מידה")
     .max(40, "יחידת המידה ארוכה מדי"),
 });
 

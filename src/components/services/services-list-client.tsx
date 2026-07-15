@@ -3,11 +3,20 @@
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Plus, RefreshCw } from "lucide-react";
+import { CheckCircle2, HeartHandshake, Plus, RefreshCw, Star } from "lucide-react";
 
+import {
+  AdminListFilters,
+  AdminListItems,
+  AdminListPagination,
+  AdminListShell,
+  AdminListToolbar,
+} from "@/components/admin/admin-list-shell";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminEmptyState } from "@/components/admin/admin-empty-state";
+import { AdminStatCards } from "@/components/admin/admin-stat-cards";
 import { ServiceRow } from "@/components/services/service-row";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import type { ServicesListData } from "@/lib/services/types";
@@ -108,24 +117,54 @@ export function ServicesListClient({ data }: ServicesListClientProps) {
     data.query.featured !== "all";
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-page-title">שירותים</h1>
-          <p className="text-muted">ניהול השירותים המוצגים באתר</p>
-        </div>
-        <Link
-          href="/admin/services/new"
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 text-sm font-medium text-[var(--color-text-on-primary)] transition-colors hover:bg-[var(--color-secondary)]"
-        >
-          <Plus aria-hidden="true" className="size-4" />
-          שירות חדש
-        </Link>
-      </div>
+    <AdminListShell>
+      <AdminPageHeader
+        module="services"
+        title="שירותים"
+        description="נהלי את השירותים שמציגים את הגישה של יעל — רגוע, מקצועי ומלא אמון."
+        action={{
+          label: "שירות חדש",
+          href: "/admin/services/new",
+          icon: <Plus aria-hidden="true" className="size-4" />,
+        }}
+      />
 
-      <div className="grid gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-soft)] p-4 lg:grid-cols-4">
+      <AdminStatCards
+        stats={[
+          {
+            icon: HeartHandshake,
+            label: "שירותים",
+            value: data.pagination.totalCount,
+            module: "services",
+            emoji: "🌿",
+          },
+          {
+            icon: CheckCircle2,
+            label: "מפורסמים",
+            value: data.items.filter((item) => item.status === "published").length,
+            module: "services",
+            emoji: "✅",
+          },
+          {
+            icon: Star,
+            label: "מומלצים",
+            value: data.items.filter((item) => item.featured).length,
+            module: "services",
+            emoji: "⭐",
+          },
+          {
+            icon: HeartHandshake,
+            label: "טיוטות",
+            value: data.items.filter((item) => item.status === "draft").length,
+            module: "services",
+            emoji: "📝",
+          },
+        ]}
+      />
+
+      <AdminListFilters className="lg:grid-cols-4">
         <div className="space-y-2 lg:col-span-2">
-          <label htmlFor="services-search" className="text-sm font-medium">
+          <label htmlFor="services-search" className="text-caption font-medium text-[var(--color-text-muted)]">
             חיפוש
           </label>
           <Input
@@ -196,12 +235,9 @@ export function ServicesListClient({ data }: ServicesListClientProps) {
             </option>
           ))}
         </Select>
-      </div>
+      </AdminListFilters>
 
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-[var(--color-text-muted)]">
-          {data.pagination.totalCount} שירותים
-        </p>
+      <AdminListToolbar countLabel={`${data.pagination.totalCount} שירותים`}>
         <Button
           variant="outline"
           size="sm"
@@ -211,71 +247,61 @@ export function ServicesListClient({ data }: ServicesListClientProps) {
           <RefreshCw aria-hidden="true" className="size-4" />
           רענון
         </Button>
-      </div>
+      </AdminListToolbar>
 
       {data.items.length === 0 ? (
-        <div className="space-y-4">
-          <EmptyState
-            title={hasFilters ? "לא נמצאו תוצאות" : "אין שירותים עדיין"}
-            description={
-              hasFilters
-                ? "נסו לשנות את החיפוש או המסננים."
-                : "צרו את השירות הראשון שלכם."
-            }
-          />
-          {!hasFilters ? (
-            <Link
-              href="/admin/services/new"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 text-sm font-medium text-[var(--color-text-on-primary)]"
-            >
-              <Plus aria-hidden="true" className="size-4" />
-              שירות חדש
-            </Link>
-          ) : null}
-        </div>
+        <AdminEmptyState
+          module="services"
+          icon={HeartHandshake}
+          emoji="🌿"
+          title={hasFilters ? "לא נמצאו תוצאות" : "עדיין אין שירותים"}
+          description={
+            hasFilters
+              ? "נסי לשנות את החיפוש או המסננים."
+              : "בואי ניצור את השירות הראשון — שמספר את הסיפור שלך בצורה יפה ומרגיעה."
+          }
+          action={
+            !hasFilters ? (
+              <Link
+                href="/admin/services/new"
+                className="admin-btn-primary inline-flex h-11 items-center gap-2 rounded-[var(--radius-md)] px-4 text-sm font-medium"
+              >
+                <Plus aria-hidden="true" className="size-4" />
+                שירות חדש
+              </Link>
+            ) : undefined
+          }
+        />
       ) : (
-        <div className="space-y-4">
+        <AdminListItems>
           {data.items.map((item) => (
             <ServiceRow key={item.id} item={item} />
           ))}
-        </div>
+        </AdminListItems>
       )}
 
       {data.pagination.totalPages > 1 ? (
-        <div className="flex items-center justify-between gap-3">
-          <Button
-            variant="outline"
-            disabled={data.pagination.page <= 1}
-            onClick={() =>
-              router.push(
-                buildServicesUrl(pathname, {
-                  ...data.query,
-                  page: data.pagination.page - 1,
-                })
-              )
-            }
-          >
-            הקודם
-          </Button>
-          <p className="text-caption text-[var(--color-text-muted)]">
-            עמוד {data.pagination.page} מתוך {data.pagination.totalPages}
-          </p>
-          <Button
-            variant="outline"
-            disabled={data.pagination.page >= data.pagination.totalPages}
-            onClick={() =>
-              router.push(
-                buildServicesUrl(pathname, {
-                  ...data.query,
-                  page: data.pagination.page + 1,
-                })
-              )
-            }
-          >
-            הבא
-          </Button>
-        </div>
+        <AdminListPagination
+          page={data.pagination.page}
+          totalPages={data.pagination.totalPages}
+          onPrevious={() =>
+            router.push(
+              buildServicesUrl(pathname, {
+                ...data.query,
+                page: data.pagination.page - 1,
+              })
+            )
+          }
+          onNext={() =>
+            router.push(
+              buildServicesUrl(pathname, {
+                ...data.query,
+                page: data.pagination.page + 1,
+              })
+            )
+          }
+        />
       ) : null}
-    </div>
+    </AdminListShell>
   );
 }

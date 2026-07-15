@@ -126,18 +126,18 @@ export function AdminSidebar({
       aria-label="תפריט צד"
       aria-hidden={!isDesktop && !isMobileOpen}
       className={cn(
-        "admin-sidebar flex h-dvh w-[var(--sidebar-width)] shrink-0 flex-col overflow-hidden bg-[var(--color-primary)] text-[var(--color-text-on-primary)]",
-        "max-lg:fixed max-lg:top-0 max-lg:z-50 max-lg:inset-inline-start-0 max-lg:shadow-[var(--shadow-lg)] max-lg:transition-transform",
+        "admin-sidebar flex h-dvh w-[var(--sidebar-width)] shrink-0 flex-col overflow-hidden border-e border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)]",
+        "max-lg:fixed max-lg:top-0 max-lg:z-50 max-lg:inset-inline-start-0 max-lg:shadow-[var(--shadow-lg)] max-lg:transition-transform max-lg:duration-300",
         isMobileOpen
           ? "max-lg:translate-x-0"
           : "max-lg:pointer-events-none max-lg:translate-x-full",
-        "lg:fixed lg:top-0 lg:z-30 lg:inset-inline-start-0 lg:translate-x-0 lg:shadow-none"
+        "lg:fixed lg:top-0 lg:z-30 lg:inset-inline-start-0 lg:translate-x-0"
       )}
     >
       <div
         className={cn(
-          "shrink-0 border-b border-[var(--color-text-on-primary)]/10 py-[var(--spacing-lg)]",
-          showCollapsed ? "px-3" : "px-[var(--spacing-lg)]"
+          "shrink-0 border-b border-[var(--color-border)]/70 py-6",
+          showCollapsed ? "px-3" : "px-6"
         )}
       >
         <div
@@ -149,14 +149,14 @@ export function AdminSidebar({
           <div className={cn("min-w-0", showCollapsed && "text-center")}>
             <p
               className={cn(
-                "font-semibold",
-                showCollapsed ? "text-sm" : "text-lg"
+                "font-semibold text-[var(--color-primary)]",
+                showCollapsed ? "text-sm" : "text-lg tracking-tight"
               )}
             >
               {showCollapsed ? "יעל" : "יעל קנייבסקי"}
             </p>
             {!showCollapsed ? (
-              <p className="text-sm text-[var(--color-text-on-primary)]/75">
+              <p className="text-caption text-[var(--color-text-muted)]">
                 מערכת ניהול
               </p>
             ) : null}
@@ -165,7 +165,7 @@ export function AdminSidebar({
           <IconButton
             label={showCollapsed ? "הרחבת תפריט" : "כיווץ תפריט"}
             size="sm"
-            className="hidden text-[var(--color-text-on-primary)] hover:bg-[var(--color-secondary)]/60 lg:inline-flex"
+            className="hidden lg:inline-flex"
             onClick={onToggleCollapse}
           >
             {showCollapsed ? (
@@ -179,12 +179,12 @@ export function AdminSidebar({
 
       <nav
         aria-label="ניווט מערכת הניהול"
-        className="sidebar-nav px-3 py-4"
+        className="sidebar-nav px-3 py-5"
       >
         {ADMIN_NAV_SECTIONS.map((section) => (
-          <div key={section.title} className="mb-5 last:mb-0">
+          <div key={section.title} className="mb-6 last:mb-0">
             {!showCollapsed ? (
-              <p className="mb-2 px-3 text-caption font-medium text-[var(--color-text-on-primary)]/60">
+              <p className="mb-2.5 px-3 text-caption font-medium uppercase tracking-wider text-[var(--color-text-muted)]">
                 {section.title}
               </p>
             ) : null}
@@ -216,27 +216,27 @@ export function AdminSidebar({
 
       <div
         className={cn(
-          "shrink-0 border-t border-[var(--color-text-on-primary)]/10 py-[var(--spacing-md)]",
-          showCollapsed ? "px-3" : "px-[var(--spacing-lg)]"
+          "shrink-0 border-t border-[var(--color-border)]/70 py-5",
+          showCollapsed ? "px-3" : "px-6"
         )}
       >
         <div
           className={cn(
-            "mb-3 flex items-center gap-3",
+            "mb-4 flex items-center gap-3",
             showCollapsed && "justify-center"
           )}
         >
           <span
             aria-hidden="true"
             title={showCollapsed ? fullName : undefined}
-            className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-full)] bg-[var(--color-accent)] text-sm font-semibold text-[var(--color-primary)]"
+            className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-full)] bg-[var(--color-accent)]/30 text-sm font-semibold text-[var(--color-primary)]"
           >
             {getInitials(fullName)}
           </span>
           {!showCollapsed ? (
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">{fullName}</p>
-              <p className="text-caption text-[var(--color-text-on-primary)]/70">
+              <p className="text-caption text-[var(--color-text-muted)]">
                 מנהלת מערכת
               </p>
             </div>
@@ -247,19 +247,19 @@ export function AdminSidebar({
           <IconButton
             label="התנתקות"
             size="sm"
-            className="mx-auto w-full text-[var(--color-text-on-primary)] hover:bg-[var(--color-secondary)]/60"
+            className="mx-auto w-full"
             onClick={handleLogout}
           >
             <LogOut aria-hidden="true" className="size-4" />
           </IconButton>
         ) : (
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             loading={isPending}
             loadingText="מתנתק..."
             onClick={handleLogout}
-            className="w-full border-[var(--color-text-on-primary)]/20 bg-transparent text-[var(--color-text-on-primary)] hover:bg-[var(--color-secondary)]/60 hover:text-[var(--color-text-on-primary)]"
+            className="w-full justify-start text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
           >
             <LogOut aria-hidden="true" className="size-4" />
             התנתקות

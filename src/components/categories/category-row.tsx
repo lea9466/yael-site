@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 import { deleteCategoryAction } from "@/actions/categories";
+import { AdminListItem } from "@/components/admin/admin-empty-state";
 import { CategoryDeleteDialog } from "@/components/categories/category-delete-dialog";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -43,10 +44,10 @@ export function CategoryRow({ item }: CategoryRowProps) {
   };
 
   return (
-    <article className="surface-card overflow-visible p-0">
-      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 flex-1 space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
+    <AdminListItem>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0 flex-1 space-y-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
             <h3 className="truncate text-card-title" title={item.name}>
               {item.name}
             </h3>
@@ -55,7 +56,7 @@ export function CategoryRow({ item }: CategoryRowProps) {
           <p className="text-sm text-[var(--color-text-muted)]" dir="ltr">
             {item.slug}
           </p>
-          <div className="flex flex-wrap gap-3 text-caption text-[var(--color-text-muted)]">
+          <div className="flex flex-wrap gap-4 text-caption text-[var(--color-text-muted)]">
             <span>
               {item.usageCount === 0
                 ? "לא בשימוש"
@@ -81,7 +82,10 @@ export function CategoryRow({ item }: CategoryRowProps) {
             עריכה
           </DropdownMenuItem>
           {canDelete ? (
-            <DropdownMenuItem destructive onSelect={() => setDeleteOpen(true)}>
+            <DropdownMenuItem
+              destructive
+              onSelect={() => setDeleteOpen(true)}
+            >
               <Trash2 aria-hidden="true" className="size-4" />
               מחיקה
             </DropdownMenuItem>
@@ -96,6 +100,6 @@ export function CategoryRow({ item }: CategoryRowProps) {
         onClose={() => setDeleteOpen(false)}
         onConfirm={handleDelete}
       />
-    </article>
+    </AdminListItem>
   );
 }

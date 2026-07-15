@@ -61,7 +61,7 @@ export function FormToast({
       <div
         role={variant === "error" ? "alert" : "status"}
         className={cn(
-          "pointer-events-auto flex w-full max-w-xl items-start gap-3 rounded-[var(--radius-lg)] border px-4 py-4 shadow-[var(--shadow-lg)]",
+          "pointer-events-auto flex w-full max-w-xl items-start gap-3 rounded-[var(--radius-xl)] border px-5 py-4 shadow-[var(--shadow-lg)] admin-toast-enter",
           variantClasses[variant]
         )}
       >

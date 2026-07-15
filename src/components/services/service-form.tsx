@@ -6,8 +6,6 @@ import { useMemo, useState, useTransition } from "react";
 import {
   Archive,
   Eye,
-  Save,
-  Send,
   Trash2,
 } from "lucide-react";
 
@@ -19,10 +17,10 @@ import {
   restoreServiceAction,
   updateServiceAction,
 } from "@/actions/services";
+import { AdminFormActionBar } from "@/components/admin/admin-form-action-bar";
 import { AdminFormBody } from "@/components/admin/admin-form-section";
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
-import { AdminFormStickyBar } from "@/components/admin/admin-form-sticky-bar";
 import { AdminSeoSection } from "@/components/admin/admin-seo-section";
 import { ServiceArchiveDialog } from "@/components/services/service-archive-dialog";
 import { ServiceDeleteDialog } from "@/components/services/service-delete-dialog";
@@ -33,7 +31,7 @@ import {
   RepeaterTextareaField,
   RepeaterTextField,
 } from "@/components/services/service-repeater-field";
-import { Badge } from "@/components/ui/badge";
+import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/ui/form-field";
@@ -48,7 +46,6 @@ import {
   getFieldErrorMessage,
 } from "@/lib/forms/validation-feedback";
 import { SERVICE_REPEATER_LIMITS } from "@/lib/services/constants";
-import { STATUS_LABELS } from "@/lib/services/constants";
 import { slugifyTitle } from "@/lib/services/slug";
 import type { ServiceDetail } from "@/lib/services/types";
 import { useUnsavedChangesWarning } from "@/lib/hooks/use-unsaved-changes-warning";
@@ -432,114 +429,85 @@ export function ServiceForm({
   };
 
   const currentStatus = initialService?.status ?? values.status;
+  const showPublish =
+    currentStatus !== "archived" && (mode === "create" || currentStatus === "draft");
+
+  const secondaryActions = (
+    <>
+      {mode === "edit" ? (
+        <Link
+          href={`/admin/services/${initialService!.id}/preview`}
+          className="admin-btn-outline inline-flex h-9 items-center gap-2 rounded-[var(--radius-md)] px-3 text-sm font-medium"
+        >
+          <Eye aria-hidden="true" className="size-4" />
+          תצוגה מקדימה
+        </Link>
+      ) : null}
+      {mode === "edit" && currentStatus !== "archived" ? (
+        <Button
+          variant="ghost"
+          size="sm"
+          type="button"
+          onClick={() => setArchiveOpen(true)}
+          disabled={isPending}
+        >
+          <Archive aria-hidden="true" className="size-4" />
+          העברה לארכיון
+        </Button>
+      ) : null}
+      {mode === "edit" && currentStatus === "archived" ? (
+        <>
+          <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            disabled={isPending}
+            onClick={() => handleRestore(false)}
+          >
+            שחזור כטיוטה
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            disabled={isPending}
+            onClick={() => handleRestore(true)}
+          >
+            שחזור ופרסום
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            disabled={isPending}
+            onClick={() => setDeleteOpen(true)}
+          >
+            <Trash2 aria-hidden="true" className="size-4" />
+            מחיקה לצמיתות
+          </Button>
+        </>
+      ) : null}
+    </>
+  );
 
   return (
-    <AdminFormShell width="wide">
-      <AdminFormStickyBar>
-        <AdminFormHeader
-          breadcrumbs={[
-            { label: "שירותים", href: ADMIN_LIST_PATHS.service },
-            {
-              label: mode === "create" ? "שירות חדש" : "עריכת שירות",
-            },
-          ]}
-          title={mode === "create" ? "שירות חדש" : "עריכת שירות"}
-          description={
-            mode === "create"
-              ? "יצירת שירות חדש לאתר"
-              : "עדכון פרטי השירות והתוכן שלו"
-          }
-          meta={
-            mode === "edit" ? (
-              <Badge
-                variant={
-                  currentStatus === "published"
-                    ? "success"
-                    : currentStatus === "archived"
-                      ? "warning"
-                      : "neutral"
-                }
-              >
-                {STATUS_LABELS[currentStatus]}
-              </Badge>
-            ) : null
-          }
-          actions={
-            <>
-              <Link
-                href={ADMIN_LIST_PATHS.service}
-                className="inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-medium text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface-soft)]"
-              >
-                ביטול
-              </Link>
-              <Button
-                loading={isPending}
-                loadingText="שומר..."
-                disabled={isPending}
-                onClick={handleSaveDraft}
-              >
-                <Save aria-hidden="true" className="size-4" />
-                שמירה
-              </Button>
-              <Button
-                variant="secondary"
-                loading={isPending}
-                loadingText="מפרסם..."
-                disabled={isPending}
-                onClick={handlePublish}
-              >
-                <Send aria-hidden="true" className="size-4" />
-                פרסום
-              </Button>
-              {mode === "edit" ? (
-                <Link
-                  href={`/admin/services/${initialService!.id}/preview`}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-medium text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface-soft)]"
-                >
-                  <Eye aria-hidden="true" className="size-4" />
-                  תצוגה מקדימה
-                </Link>
-              ) : null}
-              {mode === "edit" && currentStatus !== "archived" ? (
-                <Button
-                  variant="outline"
-                  onClick={() => setArchiveOpen(true)}
-                  disabled={isPending}
-                >
-                  <Archive aria-hidden="true" className="size-4" />
-                  העברה לארכיון
-                </Button>
-              ) : null}
-              {mode === "edit" && currentStatus === "archived" ? (
-                <>
-                  <Button
-                    variant="outline"
-                    disabled={isPending}
-                    onClick={() => handleRestore(false)}
-                  >
-                    שחזור כטיוטה
-                  </Button>
-                  <Button
-                    variant="outline"
-                    disabled={isPending}
-                    onClick={() => handleRestore(true)}
-                  >
-                    שחזור ופרסום
-                  </Button>
-                  <Button
-                    variant="danger"
-                    disabled={isPending}
-                    onClick={() => setDeleteOpen(true)}
-                  >
-                    <Trash2 aria-hidden="true" className="size-4" />
-                    מחיקה לצמיתות
-                  </Button>
-                </>
-              ) : null}
-            </>
-          }
-        />
-      </AdminFormStickyBar>
+    <AdminFormShell width="wide" withActionBar>
+      <AdminFormHeader
+        breadcrumbs={[
+          { label: "שירותים", href: ADMIN_LIST_PATHS.service },
+          {
+            label: mode === "create" ? "שירות חדש" : "עריכת שירות",
+          },
+        ]}
+        title={mode === "create" ? "שירות חדש" : "עריכת שירות"}
+        description={
+          mode === "create"
+            ? "צרי שירות חדש שיופיע באתר. אפשר לשמור כטיוטה או לפרסם בכל שלב."
+            : "ערכי את השירות והתוכן שלו. שמרי כטיוטה או פרסמי בכל שלב."
+        }
+        meta={<AdminStatusBadge status={currentStatus} />}
+        secondaryActions={secondaryActions}
+      />
 
       <FormToast
         open={toast.open}
@@ -950,6 +918,15 @@ export function ServiceForm({
           />
         </div>
       </AdminFormBody>
+
+      <AdminFormActionBar
+        cancelHref={ADMIN_LIST_PATHS.service}
+        onSave={handleSaveDraft}
+        onPublish={handlePublish}
+        showPublish={showPublish}
+        isDirty={isDirty}
+        isPending={isPending}
+      />
 
       <ServiceArchiveDialog
         open={archiveOpen}

@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 
 import { RecipePreviewBanner } from "@/components/recipes/recipe-preview-banner";
 import { RecipePublicView } from "@/components/recipes/recipe-public-view";
-import { STATUS_LABELS } from "@/lib/recipes/constants";
 import { fetchRecipeById } from "@/lib/recipes/queries";
 import { requireAdmin } from "@/lib/auth/session";
 
@@ -26,11 +25,8 @@ export default async function RecipePreviewPage({
 
   return (
     <div className="mx-auto w-full max-w-7xl px-1 sm:px-0">
-      <RecipePreviewBanner
-        recipeId={recipe.id}
-        status={STATUS_LABELS[recipe.status]}
-      />
-      <RecipePublicView recipe={recipe} />
+      <RecipePreviewBanner recipeId={recipe.id} status={recipe.status} />
+      <RecipePublicView recipe={recipe} mode="preview" />
     </div>
   );
 }

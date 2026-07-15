@@ -1,7 +1,9 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 
+import { AdminIconCircle } from "@/components/admin/admin-icon-circle";
 import { Card } from "@/components/ui/card";
+import type { AdminModuleId } from "@/lib/admin/module-themes";
 import { cn } from "@/lib/utils/cn";
 
 type QuickActionCardProps = {
@@ -10,27 +12,27 @@ type QuickActionCardProps = {
   icon: LucideIcon;
   enabled: boolean;
   href?: string;
+  module?: AdminModuleId;
 };
 
 export function QuickActionCard({
   label,
   description,
-  icon: Icon,
+  icon,
   enabled,
   href,
+  module = "dashboard",
 }: QuickActionCardProps) {
   const content = (
     <>
-      <div className="w-fit rounded-[var(--radius-md)] bg-[var(--color-accent)]/35 p-2.5 text-[var(--color-primary)]">
-        <Icon aria-hidden="true" className="size-5" />
-      </div>
-      <div className="space-y-1">
+      <AdminIconCircle icon={icon} module={module} size="md" />
+      <div className="space-y-1.5">
         <h3 className="text-card-title">{label}</h3>
         <p className="text-muted">{description}</p>
       </div>
       {!enabled ? (
         <span className="text-caption text-[var(--color-text-muted)]">
-          יהיה זמין בהמשך
+          יהיה זמין בהמשך ✨
         </span>
       ) : null}
     </>
@@ -38,8 +40,8 @@ export function QuickActionCard({
 
   if (enabled && href) {
     return (
-      <Card hoverable className="flex h-full flex-col gap-3">
-        <Link href={href} className="flex h-full flex-col gap-3">
+      <Card hoverable accentModule={module} className="flex h-full flex-col gap-4">
+        <Link href={href} className="flex h-full flex-col gap-4">
           {content}
         </Link>
       </Card>
@@ -49,12 +51,13 @@ export function QuickActionCard({
   return (
     <Card
       hoverable={enabled}
-      className={cn("flex h-full flex-col gap-3", !enabled && "opacity-70")}
+      accentModule={module}
+      className={cn("flex h-full flex-col gap-4", !enabled && "opacity-60")}
     >
       <div
         aria-disabled={!enabled}
         className={cn(
-          "flex h-full flex-col gap-3",
+          "flex h-full flex-col gap-4",
           enabled ? "cursor-pointer" : "cursor-not-allowed"
         )}
       >

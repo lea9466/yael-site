@@ -3,11 +3,20 @@
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Plus, RefreshCw } from "lucide-react";
+import { Plus, RefreshCw, ChefHat, FolderTree, Star, Tags } from "lucide-react";
 
+import {
+  AdminListFilters,
+  AdminListItems,
+  AdminListPagination,
+  AdminListShell,
+  AdminListToolbar,
+} from "@/components/admin/admin-list-shell";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminEmptyState } from "@/components/admin/admin-empty-state";
+import { AdminStatCards } from "@/components/admin/admin-stat-cards";
 import { RecipeRow } from "@/components/recipes/recipe-row";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import type { RecipesListData } from "@/lib/recipes/types";
@@ -88,24 +97,54 @@ export function RecipesListClient({ data }: RecipesListClientProps) {
     data.query.tag !== "all";
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-page-title">מתכונים</h1>
-          <p className="text-muted">ניהול המתכונים המוצגים באתר</p>
-        </div>
-        <Link
-          href="/admin/recipes/new"
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 text-sm font-medium text-[var(--color-text-on-primary)] transition-colors hover:bg-[var(--color-secondary)]"
-        >
-          <Plus aria-hidden="true" className="size-4" />
-          מתכון חדש
-        </Link>
-      </div>
+    <AdminListShell>
+      <AdminPageHeader
+        module="recipes"
+        title="מתכונים"
+        description="נהלי את כל המתכונים שיופיעו באתר — בריאים, טעימים ומלאי השראה."
+        action={{
+          label: "מתכון חדש",
+          href: "/admin/recipes/new",
+          icon: <Plus aria-hidden="true" className="size-4" />,
+        }}
+      />
 
-      <div className="grid gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-soft)] p-4 lg:grid-cols-3 xl:grid-cols-6">
+      <AdminStatCards
+        stats={[
+          {
+            icon: ChefHat,
+            label: "מתכונים",
+            value: data.pagination.totalCount,
+            module: "recipes",
+            emoji: "🥗",
+          },
+          {
+            icon: FolderTree,
+            label: "קטגוריות",
+            value: data.categories.length,
+            module: "categories",
+            emoji: "🌿",
+          },
+          {
+            icon: Tags,
+            label: "תגיות",
+            value: data.tags.length,
+            module: "tags",
+            emoji: "🏷️",
+          },
+          {
+            icon: Star,
+            label: "מומלצים",
+            value: data.items.filter((item) => item.featured).length,
+            module: "recipes",
+            emoji: "⭐",
+          },
+        ]}
+      />
+
+      <AdminListFilters>
         <div className="space-y-2 xl:col-span-2">
-          <label htmlFor="recipes-search" className="text-sm font-medium">
+          <label htmlFor="recipes-search" className="text-caption font-medium text-[var(--color-text-muted)]">
             חיפוש
           </label>
           <Input
@@ -218,12 +257,9 @@ export function RecipesListClient({ data }: RecipesListClientProps) {
             </option>
           ))}
         </Select>
-      </div>
+      </AdminListFilters>
 
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-[var(--color-text-muted)]">
-          {data.pagination.totalCount} מתכונים
-        </p>
+      <AdminListToolbar countLabel={`${data.pagination.totalCount} מתכונים`}>
         <Button
           variant="outline"
           size="sm"
@@ -233,71 +269,61 @@ export function RecipesListClient({ data }: RecipesListClientProps) {
           <RefreshCw aria-hidden="true" className="size-4" />
           רענון
         </Button>
-      </div>
+      </AdminListToolbar>
 
       {data.items.length === 0 ? (
-        <div className="space-y-4">
-          <EmptyState
-            title={hasFilters ? "לא נמצאו תוצאות" : "אין מתכונים עדיין"}
-            description={
-              hasFilters
-                ? "נסו לשנות את החיפוש או המסננים."
-                : "צרו את המתכון הראשון שלכם."
-            }
-          />
-          {!hasFilters ? (
-            <Link
-              href="/admin/recipes/new"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 text-sm font-medium text-[var(--color-text-on-primary)]"
-            >
-              <Plus aria-hidden="true" className="size-4" />
-              מתכון חדש
-            </Link>
-          ) : null}
-        </div>
+        <AdminEmptyState
+          module="recipes"
+          icon={ChefHat}
+          emoji="🥗"
+          title={hasFilters ? "לא נמצאו תוצאות" : "עדיין אין מתכונים"}
+          description={
+            hasFilters
+              ? "נסי לשנות את החיפוש או המסננים — אולי המתכון הבא מחכה ממש מאחורי פינה."
+              : "בואי ניצור את המתכון הראשון שלך — בריא, טעים ומלא השראה."
+          }
+          action={
+            !hasFilters ? (
+              <Link
+                href="/admin/recipes/new"
+                className="admin-btn-primary inline-flex h-11 items-center gap-2 rounded-[var(--radius-md)] px-4 text-sm font-medium"
+              >
+                <Plus aria-hidden="true" className="size-4" />
+                מתכון חדש
+              </Link>
+            ) : undefined
+          }
+        />
       ) : (
-        <div className="space-y-4">
+        <AdminListItems>
           {data.items.map((item) => (
             <RecipeRow key={item.id} item={item} />
           ))}
-        </div>
+        </AdminListItems>
       )}
 
       {data.pagination.totalPages > 1 ? (
-        <div className="flex items-center justify-between gap-3">
-          <Button
-            variant="outline"
-            disabled={data.pagination.page <= 1}
-            onClick={() =>
-              router.push(
-                buildRecipesUrl(pathname, {
-                  ...data.query,
-                  page: data.pagination.page - 1,
-                })
-              )
-            }
-          >
-            הקודם
-          </Button>
-          <p className="text-caption text-[var(--color-text-muted)]">
-            עמוד {data.pagination.page} מתוך {data.pagination.totalPages}
-          </p>
-          <Button
-            variant="outline"
-            disabled={data.pagination.page >= data.pagination.totalPages}
-            onClick={() =>
-              router.push(
-                buildRecipesUrl(pathname, {
-                  ...data.query,
-                  page: data.pagination.page + 1,
-                })
-              )
-            }
-          >
-            הבא
-          </Button>
-        </div>
+        <AdminListPagination
+          page={data.pagination.page}
+          totalPages={data.pagination.totalPages}
+          onPrevious={() =>
+            router.push(
+              buildRecipesUrl(pathname, {
+                ...data.query,
+                page: data.pagination.page - 1,
+              })
+            )
+          }
+          onNext={() =>
+            router.push(
+              buildRecipesUrl(pathname, {
+                ...data.query,
+                page: data.pagination.page + 1,
+              })
+            )
+          }
+        />
       ) : null}
-    </div>
+    </AdminListShell>
   );
 }

@@ -67,7 +67,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         label: "המלצות",
         href: "/admin/testimonials",
         icon: MessageCircleHeart,
-        enabled: false,
+        enabled: true,
       },
       {
         label: "פניות",
@@ -171,4 +171,6 @@ export const ADMIN_ROUTE_LABELS: Record<string, string> = {
   "/admin/categories/new": "קטגוריה חדשה",
   "/admin/tags": "תגיות",
   "/admin/tags/new": "תגית חדשה",
+  "/admin/testimonials": "המלצות",
+  "/admin/testimonials/new": "המלצה חדשה",
 };

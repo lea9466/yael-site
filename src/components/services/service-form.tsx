@@ -25,6 +25,7 @@ import { AdminSeoSection } from "@/components/admin/admin-seo-section";
 import { ServiceArchiveDialog } from "@/components/services/service-archive-dialog";
 import { ServiceDeleteDialog } from "@/components/services/service-delete-dialog";
 import { ServiceMediaPicker } from "@/components/services/service-media-picker";
+import { ServiceTestimonialsSection } from "@/components/services/service-testimonials-section";
 import {
   createRepeaterItemId,
   RepeaterField,
@@ -48,6 +49,7 @@ import {
 import { SERVICE_REPEATER_LIMITS } from "@/lib/services/constants";
 import { slugifyTitle } from "@/lib/services/slug";
 import type { ServiceDetail } from "@/lib/services/types";
+import type { ServiceTestimonialItem } from "@/lib/testimonials/types";
 import { useUnsavedChangesWarning } from "@/lib/hooks/use-unsaved-changes-warning";
 import { ADMIN_LIST_PATHS } from "@/lib/forms/admin-list-paths";
 import { redirectAfterSave } from "@/lib/forms/redirect-after-save";
@@ -67,6 +69,7 @@ type ServiceFormProps = {
   mode: "create" | "edit";
   initialService?: ServiceDetail;
   initialValues: ServiceDraftInput;
+  linkedTestimonials?: ServiceTestimonialItem[];
 };
 
 type FormContentState = {
@@ -155,6 +158,7 @@ export function ServiceForm({
   mode,
   initialService,
   initialValues,
+  linkedTestimonials = [],
 }: ServiceFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -888,6 +892,14 @@ export function ServiceForm({
               />
             </FormField>
           </section>
+
+          {mode === "edit" && initialService ? (
+            <ServiceTestimonialsSection
+              serviceId={initialService.id}
+              serviceTitle={initialService.title}
+              testimonials={linkedTestimonials}
+            />
+          ) : null}
 
           <AdminSeoSection
             open={seoOpen}

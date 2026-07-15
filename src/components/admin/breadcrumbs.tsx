@@ -41,6 +41,10 @@ function resolvePathLabel(path: string): string {
     return "עריכת תגית";
   }
 
+  if (/^\/admin\/testimonials\/[^/]+$/.test(path)) {
+    return "עריכת המלצה";
+  }
+
   return "מערכת ניהול";
 }
 

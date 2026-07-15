@@ -99,3 +99,22 @@ export function resolveRecipeSeo(input: {
     buildCanonical: buildRecipeCanonicalUrl,
   });
 }
+
+export function buildArticleCanonicalUrl(slug: string): string {
+  return buildCanonicalUrl(buildContentPath("/articles", slug));
+}
+
+export function resolveArticleSeo(input: {
+  title: string;
+  body: string;
+  slug: string;
+  seo: StoredSeo;
+}): ResolvedSeo {
+  return resolveStoredSeo({
+    title: input.title,
+    description: input.body,
+    slug: input.slug,
+    seo: input.seo,
+    buildCanonical: buildArticleCanonicalUrl,
+  });
+}

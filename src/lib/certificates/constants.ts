@@ -1,0 +1,9 @@
+export const CERTIFICATES_SITE_CONTENT_KEY = "certificates" as const;
+
+export const CERTIFICATE_TITLE_MAX = 150;
+export const CERTIFICATE_ORGANIZATION_MAX = 150;
+export const CERTIFICATE_DESCRIPTION_MAX = 2000;
+export const CERTIFICATE_YEAR_MIN = 1950;
+export const CERTIFICATE_YEAR_MAX = 2100;
+
+export const CERTIFICATE_DUPLICATE_TITLE_SUFFIX = " (עותק)";

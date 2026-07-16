@@ -1,0 +1,397 @@
+import { z } from "zod";
+
+import { isValidArticleLinkUrl } from "@/lib/articles/link-validation";
+import {
+  HOMEPAGE_HERO_BUTTON_LABEL_MAX,
+  HOMEPAGE_HERO_BUTTON_URL_MAX,
+  HOMEPAGE_HERO_EXTERNAL_URL_MAX,
+  HOMEPAGE_HERO_MEDIA_TYPES,
+  HOMEPAGE_HERO_SUBTITLE_MAX,
+  HOMEPAGE_HERO_TITLE_MAX,
+} from "@/lib/homepage/constants";
+import { getDefaultHomepageData } from "@/lib/homepage/defaults";
+import { mapZodErrors } from "@/lib/validations/service";
+
+export { mapZodErrors };
+
+const uuidSchema = z.string().uuid("מזהה אינו תקין");
+
+const unsafeUrlProtocols = /^(javascript|data|file):/i;
+
+function isSafeExternalUrl(value: string): boolean {
+  const trimmed = value.trim();
+
+  if (unsafeUrlProtocols.test(trimmed)) {
+    return false;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+
+    return parsed.protocol === "https:" || parsed.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+const buttonUrlSchema = z
+  .string()
+  .trim()
+  .min(1, "יש להזין כתובת לכפתור")
+  .max(HOMEPAGE_HERO_BUTTON_URL_MAX, "כתובת הכפתור ארוכה מדי")
+  .refine((value) => isValidArticleLinkUrl(value), {
+    message: "כתובת הכפתור אינה תקינה",
+  });
+
+const externalMediaUrlSchema = z
+  .string()
+  .trim()
+  .min(1, "יש להזין כתובת")
+  .max(HOMEPAGE_HERO_EXTERNAL_URL_MAX, "הכתובת ארוכה מדי")
+  .refine((value) => isSafeExternalUrl(value), {
+    message: "כתובת חיצונית אינה תקינה",
+  });
+
+const homepageButtonSchema = z
+  .object({
+    label: z
+      .string()
+      .trim()
+      .min(1, "יש להזין תווית לכפתור")
+      .max(HOMEPAGE_HERO_BUTTON_LABEL_MAX, "תווית הכפתור ארוכה מדי"),
+    url: buttonUrlSchema,
+  })
+  .strict();
+
+const optionalSecondaryButtonSchema = z
+  .object({
+    label: z.string().trim().max(HOMEPAGE_HERO_BUTTON_LABEL_MAX, "תווית הכפתור ארוכה מדי"),
+    url: z.string().trim().max(HOMEPAGE_HERO_BUTTON_URL_MAX, "כתובת הכפתור ארוכה מדי"),
+  })
+  .strict()
+  .nullable()
+  .transform((value) => {
+    if (!value || value.label.length === 0) {
+      return null;
+    }
+
+    return value;
+  })
+  .superRefine((value, context) => {
+    if (!value) {
+      return;
+    }
+
+    if (value.label.length === 0) {
+      return;
+    }
+
+    if (!value.url || !isValidArticleLinkUrl(value.url)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "יש להזין כתובת תקינה לכפתור המשני",
+        path: ["url"],
+      });
+    }
+  });
+
+export const homepageHeroSchema = z
+  .object({
+    title: z
+      .string()
+      .trim()
+      .min(1, "יש להזין כותרת ראשית")
+      .max(HOMEPAGE_HERO_TITLE_MAX, "הכותרת ארוכה מדי"),
+    subtitle: z
+      .string()
+      .trim()
+      .min(1, "יש להזין כותרת משנה")
+      .max(HOMEPAGE_HERO_SUBTITLE_MAX, "כותרת המשנה ארוכה מדי"),
+    primary_button: homepageButtonSchema,
+    secondary_button: optionalSecondaryButtonSchema,
+    media_type: z.enum(HOMEPAGE_HERO_MEDIA_TYPES, {
+      message: "סוג מדיה לא תקין",
+    }),
+    media_id: z.union([uuidSchema, z.null()]),
+    video_url: z.union([externalMediaUrlSchema, z.null()]),
+    animation_url: z.union([externalMediaUrlSchema, z.null()]),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.media_type === "image") {
+      if (!value.media_id) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "יש לבחור תמונה מהספרייה",
+          path: ["media_id"],
+        });
+      }
+    }
+
+    if (value.media_type === "video_url" && !value.video_url) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "יש להזין כתובת וידאו חיצונית",
+        path: ["video_url"],
+      });
+    }
+
+    if (value.media_type === "animation_url" && !value.animation_url) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "יש להזין כתובת אנימציה חיצונית",
+        path: ["animation_url"],
+      });
+    }
+  });
+
+export type HomepageHeroData = z.infer<typeof homepageHeroSchema>;
+
+const titleTextSchema = z
+  .object({
+    title: z.string().trim().min(1, "יש להזין כותרת"),
+    text: z.string().trim().min(1, "יש להזין טקסט"),
+  })
+  .strict();
+
+const contactCtaSchema = z
+  .object({
+    title: z.string().trim().min(1, "יש להזין כותרת"),
+    text: z.string().trim().min(1, "יש להזין טקסט"),
+    button_label: z.string().trim().min(1, "יש להזין תווית לכפתור"),
+  })
+  .strict();
+
+export const homepageDataSchema = z
+  .object({
+    hero: homepageHeroSchema,
+    short_about: titleTextSchema,
+    approach: titleTextSchema,
+    contact_cta: contactCtaSchema,
+  })
+  .strict();
+
+export type HomepageData = z.infer<typeof homepageDataSchema>;
+
+export const saveHomepageHeroInputSchema = z.object({
+  hero: homepageHeroSchema,
+  homepageUpdatedAt: z.string().datetime({ offset: true }),
+});
+
+export type SaveHomepageHeroInput = z.infer<typeof saveHomepageHeroInputSchema>;
+
+export type HomepageHeroActionResult =
+  | {
+      success: true;
+      data: {
+        homepageUpdatedAt: string;
+      };
+    }
+  | {
+      success: false;
+      error: string;
+      fieldErrors?: Record<string, string>;
+    };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function normalizeHeroMediaType(value: unknown): HomepageHeroData["media_type"] {
+  if (value === "video") {
+    return "video_url";
+  }
+
+  if (
+    value === "image" ||
+    value === "video_url" ||
+    value === "animation_url"
+  ) {
+    return value;
+  }
+
+  return "image";
+}
+
+function normalizeHero(raw: unknown): HomepageHeroData {
+  const defaults = getDefaultHomepageData().hero;
+
+  if (!isRecord(raw)) {
+    return defaults;
+  }
+
+  const primaryButton = isRecord(raw.primary_button) ? raw.primary_button : {};
+  const secondaryButton = isRecord(raw.secondary_button)
+    ? raw.secondary_button
+    : null;
+
+  const merged = {
+    title: typeof raw.title === "string" ? raw.title : defaults.title,
+    subtitle: typeof raw.subtitle === "string" ? raw.subtitle : defaults.subtitle,
+    primary_button: {
+      label:
+        typeof primaryButton.label === "string"
+          ? primaryButton.label
+          : defaults.primary_button.label,
+      url:
+        typeof primaryButton.url === "string"
+          ? primaryButton.url
+          : defaults.primary_button.url,
+    },
+    secondary_button:
+      secondaryButton &&
+      typeof secondaryButton.label === "string" &&
+      secondaryButton.label.trim().length > 0
+        ? {
+            label: secondaryButton.label,
+            url:
+              typeof secondaryButton.url === "string"
+                ? secondaryButton.url
+                : "",
+          }
+        : null,
+    media_type: normalizeHeroMediaType(raw.media_type),
+    media_id:
+      typeof raw.media_id === "string"
+        ? raw.media_id
+        : raw.media_id === null
+          ? null
+          : defaults.media_id,
+    video_url:
+      typeof raw.video_url === "string"
+        ? raw.video_url
+        : raw.video_url === null
+          ? null
+          : defaults.video_url,
+    animation_url:
+      typeof raw.animation_url === "string"
+        ? raw.animation_url
+        : raw.animation_url === null
+          ? null
+          : (defaults.animation_url ?? null),
+  };
+
+  const parsed = homepageHeroSchema.safeParse(merged);
+
+  if (parsed.success) {
+    return parsed.data;
+  }
+
+  return defaults;
+}
+
+function normalizeTitleText(
+  raw: unknown,
+  fallback: { title: string; text: string }
+): { title: string; text: string } {
+  if (!isRecord(raw)) {
+    return fallback;
+  }
+
+  return {
+    title: typeof raw.title === "string" ? raw.title : fallback.title,
+    text: typeof raw.text === "string" ? raw.text : fallback.text,
+  };
+}
+
+export function normalizeHomepageData(raw: unknown): HomepageData {
+  const defaults = getDefaultHomepageData();
+
+  if (!isRecord(raw)) {
+    return defaults;
+  }
+
+  const contactCtaRaw = isRecord(raw.contact_cta) ? raw.contact_cta : null;
+
+  const merged: HomepageData = {
+    hero: normalizeHero(raw.hero),
+    short_about: normalizeTitleText(raw.short_about, defaults.short_about),
+    approach: normalizeTitleText(raw.approach, defaults.approach),
+    contact_cta: {
+      title:
+        contactCtaRaw && typeof contactCtaRaw.title === "string"
+          ? contactCtaRaw.title
+          : defaults.contact_cta.title,
+      text:
+        contactCtaRaw && typeof contactCtaRaw.text === "string"
+          ? contactCtaRaw.text
+          : defaults.contact_cta.text,
+      button_label:
+        contactCtaRaw && typeof contactCtaRaw.button_label === "string"
+          ? contactCtaRaw.button_label
+          : defaults.contact_cta.button_label,
+    },
+  };
+
+  const parsed = homepageDataSchema.safeParse(merged);
+
+  if (parsed.success) {
+    return parsed.data;
+  }
+
+  return defaults;
+}
+
+export type HomepageHeroFormState = {
+  heroTitle: string;
+  heroSubtitle: string;
+  heroPrimaryButtonLabel: string;
+  heroPrimaryButtonUrl: string;
+  heroSecondaryButtonLabel: string;
+  heroSecondaryButtonUrl: string;
+  heroMediaType: HomepageHeroData["media_type"];
+  heroMediaId: string | null;
+  heroVideoUrl: string;
+  heroAnimationUrl: string;
+};
+
+export function homepageHeroToFormState(hero: HomepageHeroData): HomepageHeroFormState {
+  return {
+    heroTitle: hero.title,
+    heroSubtitle: hero.subtitle,
+    heroPrimaryButtonLabel: hero.primary_button.label,
+    heroPrimaryButtonUrl: hero.primary_button.url,
+    heroSecondaryButtonLabel: hero.secondary_button?.label ?? "",
+    heroSecondaryButtonUrl: hero.secondary_button?.url ?? "",
+    heroMediaType: hero.media_type,
+    heroMediaId: hero.media_id,
+    heroVideoUrl: hero.video_url ?? "",
+    heroAnimationUrl: hero.animation_url ?? "",
+  };
+}
+
+export function formStateToHomepageHero(state: HomepageHeroFormState): HomepageHeroData {
+  return homepageHeroSchema.parse({
+    title: state.heroTitle,
+    subtitle: state.heroSubtitle,
+    primary_button: {
+      label: state.heroPrimaryButtonLabel,
+      url: state.heroPrimaryButtonUrl,
+    },
+    secondary_button:
+      state.heroSecondaryButtonLabel.trim().length > 0
+        ? {
+            label: state.heroSecondaryButtonLabel,
+            url: state.heroSecondaryButtonUrl,
+          }
+        : null,
+    media_type: state.heroMediaType,
+    media_id: state.heroMediaType === "image" ? state.heroMediaId : null,
+    video_url:
+      state.heroMediaType === "video_url" ? state.heroVideoUrl || null : null,
+    animation_url:
+      state.heroMediaType === "animation_url"
+        ? state.heroAnimationUrl || null
+        : null,
+  });
+}
+
+export function mergeHomepageHero(
+  existing: HomepageData,
+  hero: HomepageHeroData
+): HomepageData {
+  return homepageDataSchema.parse({
+    ...existing,
+    hero,
+  });
+}

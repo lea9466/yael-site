@@ -10,6 +10,7 @@ import {
   MessageCircleHeart,
   Settings,
   Tag,
+  UserRound,
   type LucideIcon,
 } from "lucide-react";
 
@@ -58,6 +59,12 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         icon: BookOpen,
         enabled: true,
       },
+      {
+        label: "אודות",
+        href: "/admin/about",
+        icon: UserRound,
+        enabled: true,
+      },
     ],
   },
   {
@@ -73,7 +80,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         label: "פניות",
         href: "/admin/contact-messages",
         icon: Mail,
-        enabled: false,
+        enabled: true,
       },
     ],
   },
@@ -96,7 +103,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         label: "תעודות",
         href: "/admin/certificates",
         icon: Award,
-        enabled: false,
+        enabled: true,
       },
       {
         label: "ספריית מדיה",
@@ -105,10 +112,10 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         enabled: true,
       },
       {
-        label: "הגדרות אתר",
-        href: "/admin/site-settings",
+        label: "הגדרות האתר",
+        href: "/admin/settings",
         icon: Settings,
-        enabled: false,
+        enabled: true,
       },
     ],
   },
@@ -148,13 +155,15 @@ export const DASHBOARD_QUICK_ACTIONS: QuickActionItem[] = [
     label: "פניות חדשות",
     description: "צפייה בפניות מהאתר",
     icon: Mail,
-    enabled: false,
+    enabled: true,
+    href: "/admin/contact-messages",
   },
   {
     label: "הגדרות האתר",
     description: "עדכון הגדרות כלליות",
     icon: Settings,
-    enabled: false,
+    enabled: true,
+    href: "/admin/settings",
   },
 ];
 
@@ -167,10 +176,15 @@ export const ADMIN_ROUTE_LABELS: Record<string, string> = {
   "/admin/recipes/new": "מתכון חדש",
   "/admin/articles": "פוסטים",
   "/admin/articles/new": "פוסט חדש",
+  "/admin/about": "אודות",
+  "/admin/about/preview": "תצוגה מקדימה",
   "/admin/categories": "קטגוריות",
   "/admin/categories/new": "קטגוריה חדשה",
   "/admin/tags": "תגיות",
   "/admin/tags/new": "תגית חדשה",
   "/admin/testimonials": "המלצות",
   "/admin/testimonials/new": "המלצה חדשה",
+  "/admin/contact-messages": "פניות",
+  "/admin/certificates": "תעודות והסמכות",
+  "/admin/settings": "הגדרות האתר",
 };

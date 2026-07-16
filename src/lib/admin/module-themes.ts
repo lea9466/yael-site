@@ -1,13 +1,16 @@
 import {
+  Award,
   BookOpen,
   ChefHat,
   FolderTree,
   HeartHandshake,
   Image,
   LayoutDashboard,
+  Mail,
   MessageCircleHeart,
   Settings,
   Tag,
+  UserRound,
   type LucideIcon,
 } from "lucide-react";
 
@@ -16,10 +19,13 @@ export type AdminModuleId =
   | "recipes"
   | "services"
   | "articles"
+  | "about"
   | "categories"
   | "tags"
   | "media"
   | "testimonials"
+  | "contact-messages"
+  | "certificates"
   | "settings";
 
 export type ModuleTheme = {
@@ -82,6 +88,18 @@ export const ADMIN_MODULE_THEMES: Record<AdminModuleId, ModuleTheme> = {
     iconGradient:
       "linear-gradient(135deg, var(--color-sky-blue) 0%, var(--color-primary) 100%)",
   },
+  about: {
+    id: "about",
+    icon: UserRound,
+    emoji: "🌱",
+    accent: "var(--color-secondary)",
+    accentSoft: "var(--color-light-sage-soft)",
+    accentRing: "var(--color-secondary)",
+    gradient:
+      "linear-gradient(135deg, var(--color-light-sage-soft) 0%, var(--color-cream) 100%)",
+    iconGradient:
+      "linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%)",
+  },
   categories: {
     id: "categories",
     icon: FolderTree,
@@ -129,6 +147,30 @@ export const ADMIN_MODULE_THEMES: Record<AdminModuleId, ModuleTheme> = {
       "linear-gradient(135deg, var(--color-coral-soft) 0%, var(--color-cream) 100%)",
     iconGradient:
       "linear-gradient(135deg, var(--color-soft-accent) 0%, var(--color-warm-gold) 100%)",
+  },
+  "contact-messages": {
+    id: "contact-messages",
+    icon: Mail,
+    emoji: "📬",
+    accent: "var(--color-sky-blue)",
+    accentSoft: "var(--color-sky-blue-soft)",
+    accentRing: "var(--color-sky-blue)",
+    gradient:
+      "linear-gradient(135deg, var(--color-sky-blue-soft) 0%, var(--color-coral-soft) 100%)",
+    iconGradient:
+      "linear-gradient(135deg, var(--color-sky-blue) 0%, var(--color-soft-accent) 100%)",
+  },
+  certificates: {
+    id: "certificates",
+    icon: Award,
+    emoji: "🎓",
+    accent: "var(--color-warm-gold)",
+    accentSoft: "var(--color-warm-gold-soft)",
+    accentRing: "var(--color-warm-gold)",
+    gradient:
+      "linear-gradient(135deg, var(--color-warm-gold-soft) 0%, var(--color-light-sage-soft) 100%)",
+    iconGradient:
+      "linear-gradient(135deg, var(--color-warm-gold) 0%, var(--color-primary) 100%)",
   },
   settings: {
     id: "settings",

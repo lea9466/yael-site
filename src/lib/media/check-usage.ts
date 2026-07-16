@@ -152,6 +152,19 @@ async function findArticleGalleryUsages(
   return usages;
 }
 
+function blocksContainMediaId(blocks: unknown, mediaId: string): boolean {
+  if (!Array.isArray(blocks)) {
+    return false;
+  }
+
+  return blocks.some(
+    (block) =>
+      isRecord(block) &&
+      block.type === "image" &&
+      block.media_id === mediaId
+  );
+}
+
 function siteContentContainsMediaId(
   key: string,
   data: unknown,
@@ -168,9 +181,17 @@ function siteContentContainsMediaId(
       return isRecord(hero) && hero.media_id === mediaId;
     }
     case "about":
-      return data.cover_media_id === mediaId;
+      return (
+        data.cover_media_id === mediaId ||
+        blocksContainMediaId(
+          isRecord(data.content) ? data.content.blocks : undefined,
+          mediaId
+        )
+      );
     case "business_profile":
-      return data.logo_media_id === mediaId;
+      return (
+        data.logo_media_id === mediaId || data.favicon_media_id === mediaId
+      );
     case "site_settings": {
       const defaultSeo = data.default_seo;
 
@@ -204,8 +225,8 @@ async function findSiteContentUsages(
 
   const labelByKey: Record<string, string> = {
     homepage: "דף הבית — hero.media_id",
-    about: "אודות — cover_media_id",
-    business_profile: "פרופיל עסקי — logo_media_id",
+    about: "אודות — cover_media_id / content.blocks[].media_id",
+    business_profile: "פרופיל עסקי — logo_media_id / favicon_media_id",
     site_settings: "הגדרות אתר — default_seo.og_media_id",
     certificates: "תעודות — items[].media_id",
   };

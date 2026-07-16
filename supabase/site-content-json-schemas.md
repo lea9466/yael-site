@@ -37,11 +37,14 @@ migration).
         "secondary_button": {
           "oneOf": [{ "$ref": "#/definitions/button" }, { "type": "null" }]
         },
-        "media_type": { "type": "string", "enum": ["image", "video"] },
+        "media_type": { "type": "string", "enum": ["image", "video_url", "animation_url"] },
         "media_id": {
           "oneOf": [{ "type": "string", "format": "uuid" }, { "type": "null" }]
         },
         "video_url": {
+          "oneOf": [{ "type": "string", "format": "uri" }, { "type": "null" }]
+        },
+        "animation_url": {
           "oneOf": [{ "type": "string", "format": "uri" }, { "type": "null" }]
         }
       },
@@ -51,8 +54,12 @@ migration).
           "then": { "required": ["media_id"] }
         },
         {
-          "if": { "properties": { "media_type": { "const": "video" } } },
+          "if": { "properties": { "media_type": { "const": "video_url" } } },
           "then": { "required": ["video_url"] }
+        },
+        {
+          "if": { "properties": { "media_type": { "const": "animation_url" } } },
+          "then": { "required": ["animation_url"] }
         }
       ]
     },
@@ -100,13 +107,47 @@ migration).
   "title": "site_content.data — about",
   "type": "object",
   "additionalProperties": false,
-  "required": ["title", "intro_text", "content"],
+  "required": ["title", "content", "cta"],
   "properties": {
     "title": { "type": "string", "minLength": 1 },
-    "intro_text": { "type": "string", "minLength": 1 },
-    "content": { "type": "string", "minLength": 1 },
+    "intro_text": {
+      "oneOf": [{ "type": "string" }, { "type": "null" }]
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blocks", "gallery"],
+      "properties": {
+        "blocks": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "gallery": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["media_id", "order"],
+            "properties": {
+              "media_id": { "type": "string", "format": "uuid" },
+              "order": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
     "cover_media_id": {
       "oneOf": [{ "type": "string", "format": "uuid" }, { "type": "null" }]
+    },
+    "cta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "text", "button_label", "button_url"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "text": { "type": "string", "minLength": 1 },
+        "button_label": { "type": "string", "minLength": 1 },
+        "button_url": { "type": "string", "minLength": 1 }
+      }
     },
     "seo": {
       "type": "object",
@@ -160,10 +201,19 @@ migration).
       "properties": {
         "instagram": { "oneOf": [{ "type": "string", "format": "uri" }, { "type": "null" }] },
         "facebook": { "oneOf": [{ "type": "string", "format": "uri" }, { "type": "null" }] },
-        "whatsapp": { "oneOf": [{ "type": "string" }, { "type": "null" }] }
+        "whatsapp": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
+        "youtube": { "oneOf": [{ "type": "string", "format": "uri" }, { "type": "null" }] },
+        "tiktok": { "oneOf": [{ "type": "string", "format": "uri" }, { "type": "null" }] },
+        "linkedin": { "oneOf": [{ "type": "string", "format": "uri" }, { "type": "null" }] },
+        "pinterest": { "oneOf": [{ "type": "string", "format": "uri" }, { "type": "null" }] }
       }
     },
+    "tagline": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
+    "short_description": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
     "logo_media_id": {
+      "oneOf": [{ "type": "string", "format": "uuid" }, { "type": "null" }]
+    },
+    "favicon_media_id": {
       "oneOf": [{ "type": "string", "format": "uuid" }, { "type": "null" }]
     }
   }
@@ -193,6 +243,8 @@ migration).
       }
     },
     "ga4_measurement_id": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
+    "gtm_container_id": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
+    "meta_pixel_id": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
     "google_site_verification": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
     "robots_indexing_enabled": { "type": "boolean" },
     "maintenance_mode": { "type": "boolean" }

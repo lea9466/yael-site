@@ -17,6 +17,7 @@ type AdminPageHeaderProps = {
     href: string;
     icon?: React.ReactNode;
   };
+  actionNode?: React.ReactNode;
   children?: React.ReactNode;
   className?: string;
 };
@@ -26,6 +27,7 @@ export function AdminPageHeader({
   description,
   module,
   action,
+  actionNode,
   children,
   className,
 }: AdminPageHeaderProps) {
@@ -60,7 +62,9 @@ export function AdminPageHeader({
             </div>
           </div>
 
-          {action ? (
+          {actionNode ? (
+            actionNode
+          ) : action ? (
             <Link
               href={action.href}
               className="admin-btn-primary inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 text-sm font-medium"

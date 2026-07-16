@@ -1,5 +1,5 @@
 import { AdminBreadcrumbNav } from "@/components/admin/breadcrumbs";
-import type { AdminBreadcrumbItem } from "@/components/admin/breadcrumbs";
+import type { AdminBreadcrumbItem } from "@/lib/admin/breadcrumbs";
 import { AdminBreadcrumbsRow } from "@/components/admin/admin-breadcrumbs-row";
 import { cn } from "@/lib/utils/cn";
 

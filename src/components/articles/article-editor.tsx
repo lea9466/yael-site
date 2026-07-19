@@ -337,16 +337,18 @@ export function articleBlocksToEditorBlocks(
   blocks: ArticleBlock[],
   blockMediaUrls?: Map<string, { url: string | null; alt: string | null }>
 ): EditorBlockUnion[] {
-  return blocks.map((block) => {
-    const id = createEditorBlockId();
+  // Use deterministic IDs so SSR HTML matches the client's first paint.
+  // Random UUIDs here cause hydration mismatches on admin edit forms.
+  return blocks.map((block, index) => {
+    const id = `editor-block-${index}`;
 
     if (block.type === "list") {
       return {
         id,
         type: "list",
         list_type: block.list_type,
-        items: block.items.map((item) => ({
-          id: createEditorBlockId(),
+        items: block.items.map((item, itemIndex) => ({
+          id: `editor-block-${index}-item-${itemIndex}`,
           text: item.text,
           marks: item.marks,
         })),

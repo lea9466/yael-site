@@ -16,6 +16,10 @@ function getSupabaseImageHostname(): string {
 
 const nextConfig: NextConfig = {
   experimental: {
+    // Media uploads accept up to 30MB sources. Next.js proxy/middleware
+    // buffers request bodies (default 10MB) and silently truncates larger
+    // multipart payloads, which breaks FormData parsing / image processing.
+    proxyClientMaxBodySize: "35mb",
     serverActions: {
       bodySizeLimit: "35mb",
     },

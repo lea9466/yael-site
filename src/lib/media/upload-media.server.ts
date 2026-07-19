@@ -123,15 +123,21 @@ async function persistProcessedMedia(
 ): Promise<UploadMediaResult> {
   const originalFileName = sanitizeOriginalFileName(originalName);
 
+  // Prefer Blob so storage-js uses multipart FormData (reliable in Node fetch).
+  const uploadBody = new Blob([Uint8Array.from(image.buffer)], {
+    type: image.mimeType,
+  });
+
   const { error: uploadError } = await supabase.storage
     .from(PUBLIC_MEDIA_BUCKET)
-    .upload(image.storagePath, image.buffer, {
+    .upload(image.storagePath, uploadBody, {
       contentType: image.mimeType,
       upsert: false,
       cacheControl: "31536000",
     });
 
   if (uploadError) {
+    console.error("[media/upload] storage upload failed", uploadError.message);
     return { success: false, error: MEDIA_ERRORS.generic };
   }
 
@@ -153,6 +159,11 @@ async function persistProcessedMedia(
     .single();
 
   if (insertError || !inserted) {
+    console.error(
+      "[media/upload] media_library insert failed",
+      insertError?.code,
+      insertError?.message
+    );
     await removeStorageObject(supabase, image.storagePath);
 
     return { success: false, error: MEDIA_ERRORS.generic };

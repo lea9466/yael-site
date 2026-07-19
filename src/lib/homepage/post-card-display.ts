@@ -16,6 +16,16 @@ const CATEGORY_VARIANTS: ShortAboutHighlightVariant[] = [
   "coral",
 ];
 
+function sortByPublishedDesc(
+  left: PublicPostSummary,
+  right: PublicPostSummary
+): number {
+  const leftTime = left.published_at ? Date.parse(left.published_at) : 0;
+  const rightTime = right.published_at ? Date.parse(right.published_at) : 0;
+
+  return rightTime - leftTime;
+}
+
 function isRecentlyPublished(publishedAt: string | null): boolean {
   if (!publishedAt) {
     return false;
@@ -40,13 +50,23 @@ function getCategoryVariant(categoryName: string): ShortAboutHighlightVariant {
   return CATEGORY_VARIANTS[hash % CATEGORY_VARIANTS.length] ?? "mint";
 }
 
-export function getPostCardPills(post: PublicPostSummary): PostCardPill[] {
+export function partitionHomepagePosts(posts: PublicPostSummary[]): {
+  featured: PublicPostSummary;
+  secondary: PublicPostSummary[];
+} {
+  const featured = posts.find((post) => post.featured) ?? posts[0];
+  const secondary = posts
+    .filter((post) => post.id !== featured.id)
+    .sort(sortByPublishedDesc);
+
+  return { featured, secondary };
+}
+
+export function getFeaturedPostPills(post: PublicPostSummary): PostCardPill[] {
   const pills: PostCardPill[] = [];
 
   if (post.featured) {
     pills.push({ label: "מומלץ", variant: "coral" });
-  } else if (isRecentlyPublished(post.published_at)) {
-    pills.push({ label: "חדש", variant: "teal" });
   }
 
   if (post.categoryName) {
@@ -56,18 +76,35 @@ export function getPostCardPills(post: PublicPostSummary): PostCardPill[] {
     });
   }
 
-  if (post.reading_time_minutes > 0) {
+  if (post.reading_time_minutes > 0 && pills.length < 3) {
     pills.push({
       label: formatReadingTimeLabel(post.reading_time_minutes),
       variant: "gold",
     });
   }
 
+  return pills.slice(0, 3);
+}
+
+export function getCompactPostPills(post: PublicPostSummary): PostCardPill[] {
+  const pills: PostCardPill[] = [];
+
+  if (!post.featured && isRecentlyPublished(post.published_at)) {
+    pills.push({ label: "חדש", variant: "teal" });
+  }
+
   return pills;
 }
 
-export function getPrimaryFeaturedPostId(
-  posts: PublicPostSummary[]
-): string | null {
-  return posts.find((post) => post.featured)?.id ?? null;
+export function getCompactPostMeta(post: PublicPostSummary): {
+  category: string | null;
+  readingTime: string | null;
+} {
+  return {
+    category: post.categoryName,
+    readingTime:
+      post.reading_time_minutes > 0
+        ? formatReadingTimeLabel(post.reading_time_minutes)
+        : null,
+  };
 }

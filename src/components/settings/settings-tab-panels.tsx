@@ -1,6 +1,7 @@
 "use client";
 
 import { SettingsHomepageHeroPanel } from "@/components/settings/settings-homepage-hero-panel";
+import { SettingsHomepageShortAboutPanel } from "@/components/settings/settings-homepage-short-about-panel";
 import { ServiceMediaPicker } from "@/components/services/service-media-picker";
 import { SettingsWorkingHoursEditor } from "@/components/settings/settings-working-hours-editor";
 import { FormField } from "@/components/ui/form-field";
@@ -182,18 +183,25 @@ export function SettingsTabPanels({
         id="homepage"
         activeTab={activeTab}
         tabId="homepage"
-        title="Hero — דף הבית"
-        description="עריכת הכותרת, הכפתורים והמדיה של אזור ה-Hero בלבד."
+        title="דף הבית"
+        description="עריכת אזור ה-Hero וסקציית האודות הקצרה בדף הבית."
       >
-        <SettingsHomepageHeroPanel
-          formState={formState}
-          fieldErrors={fieldErrors}
-          heroPreview={heroPreview}
-          heroMobilePreview={heroMobilePreview}
-          onChange={onChange}
-          onHeroImageChange={onHeroImageChange}
-          onHeroMobileImageChange={onHeroMobileImageChange}
-        />
+        <div className="space-y-8">
+          <SettingsHomepageHeroPanel
+            formState={formState}
+            fieldErrors={fieldErrors}
+            heroPreview={heroPreview}
+            heroMobilePreview={heroMobilePreview}
+            onChange={onChange}
+            onHeroImageChange={onHeroImageChange}
+            onHeroMobileImageChange={onHeroMobileImageChange}
+          />
+          <SettingsHomepageShortAboutPanel
+            formState={formState}
+            fieldErrors={fieldErrors}
+            onChange={onChange}
+          />
+        </div>
       </SettingsPanel>
 
       <SettingsPanel

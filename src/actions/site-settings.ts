@@ -13,7 +13,7 @@ import { HOMEPAGE_SITE_CONTENT_KEY } from "@/lib/homepage/constants";
 import { HOMEPAGE_ERRORS } from "@/lib/homepage/errors";
 import { fetchHomepageSiteContent } from "@/lib/homepage/queries";
 import {
-  mergeHomepageHero,
+  mergeHomepageHeroAndShortAbout,
   homepageDataSchema,
   type HomepageData,
 } from "@/lib/validations/homepage-hero";
@@ -39,6 +39,8 @@ async function getAdminSupabase(): Promise<{ supabase: SupabaseClient } | null> 
 
 function revalidateSettingsPaths() {
   revalidatePath("/admin/settings");
+  revalidatePath("/");
+  revalidatePath("/about");
 }
 
 async function validateMediaReference(
@@ -166,9 +168,10 @@ export async function saveSiteSettingsAction(
     return { success: false, error: HOMEPAGE_ERRORS.generic };
   }
 
-  const mergedHomepage = mergeHomepageHero(
+  const mergedHomepage = mergeHomepageHeroAndShortAbout(
     existingHomepage.data,
-    parsed.data.homepageHero
+    parsed.data.homepageHero,
+    parsed.data.homepageShortAbout
   );
   const homepageValidation = homepageDataSchema.safeParse(mergedHomepage);
 

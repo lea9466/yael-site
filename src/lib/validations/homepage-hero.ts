@@ -8,8 +8,11 @@ import {
   HOMEPAGE_HERO_MEDIA_TYPES,
   HOMEPAGE_HERO_SUBTITLE_MAX,
   HOMEPAGE_HERO_TITLE_MAX,
+  HOMEPAGE_SHORT_ABOUT_TEXT_MAX,
+  HOMEPAGE_SHORT_ABOUT_TITLE_MAX,
 } from "@/lib/homepage/constants";
 import { getDefaultHomepageData } from "@/lib/homepage/defaults";
+import { normalizeMultilineText } from "@/lib/text/multiline-text";
 import { mapZodErrors } from "@/lib/validations/service";
 
 export { mapZodErrors };
@@ -151,6 +154,27 @@ const titleTextSchema = z
   })
   .strict();
 
+export const shortAboutSchema = z
+  .object({
+    title: z
+      .string()
+      .trim()
+      .min(1, "יש להזין כותרת אודות לדף הבית")
+      .max(HOMEPAGE_SHORT_ABOUT_TITLE_MAX, "כותרת האודות בדף הבית ארוכה מדי"),
+    text: z
+      .string()
+      .transform((value) => normalizeMultilineText(value))
+      .pipe(
+        z
+          .string()
+          .min(1, "יש להזין טקסט אודות לדף הבית")
+          .max(HOMEPAGE_SHORT_ABOUT_TEXT_MAX, "טקסט האודות בדף הבית ארוך מדי")
+      ),
+  })
+  .strict();
+
+export type HomepageShortAbout = z.infer<typeof shortAboutSchema>;
+
 const contactCtaSchema = z
   .object({
     title: z.string().trim().min(1, "יש להזין כותרת"),
@@ -162,7 +186,7 @@ const contactCtaSchema = z
 export const homepageDataSchema = z
   .object({
     hero: homepageHeroSchema,
-    short_about: titleTextSchema,
+    short_about: shortAboutSchema,
     approach: titleTextSchema,
     contact_cta: contactCtaSchema,
   })
@@ -400,5 +424,40 @@ export function mergeHomepageHero(
   return homepageDataSchema.parse({
     ...existing,
     hero,
+  });
+}
+
+export function mergeHomepageHeroAndShortAbout(
+  existing: HomepageData,
+  hero: HomepageHeroData,
+  shortAbout: HomepageShortAbout
+): HomepageData {
+  return homepageDataSchema.parse({
+    ...existing,
+    hero,
+    short_about: shortAbout,
+  });
+}
+
+export type HomepageShortAboutFormState = {
+  shortAboutTitle: string;
+  shortAboutText: string;
+};
+
+export function homepageShortAboutToFormState(
+  shortAbout: HomepageShortAbout
+): HomepageShortAboutFormState {
+  return {
+    shortAboutTitle: shortAbout.title,
+    shortAboutText: shortAbout.text,
+  };
+}
+
+export function formStateToHomepageShortAbout(
+  state: HomepageShortAboutFormState
+): HomepageShortAbout {
+  return shortAboutSchema.parse({
+    title: state.shortAboutTitle,
+    text: state.shortAboutText,
   });
 }

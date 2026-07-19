@@ -1,7 +1,7 @@
 import { PostCard } from "@/components/homepage/post-card";
 import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { SectionCTA } from "@/components/homepage/section-cta";
-import { getPrimaryFeaturedPostId } from "@/lib/homepage/post-card-display";
+import { partitionHomepagePosts } from "@/lib/homepage/post-card-display";
 import type { PublicPostSummary } from "@/lib/public/types";
 import { cn } from "@/lib/utils/cn";
 
@@ -14,7 +14,8 @@ export function RecentPostsSection({ posts }: RecentPostsSectionProps) {
     return null;
   }
 
-  const primaryFeaturedId = getPrimaryFeaturedPostId(posts);
+  const { featured, secondary } = partitionHomepagePosts(posts);
+  const postCount = posts.length;
 
   return (
     <section
@@ -37,28 +38,32 @@ export function RecentPostsSection({ posts }: RecentPostsSectionProps) {
         <ul
           className={cn(
             "posts-section__grid",
-            primaryFeaturedId && "posts-section__grid--has-featured"
+            `posts-section__grid--count-${postCount}`,
           )}
         >
-          {posts.map((post, index) => (
+          <li className="posts-section__item posts-section__item--featured">
+            <HomepageReveal delayMs={80}>
+              <PostCard post={featured} variant="featured" />
+            </HomepageReveal>
+          </li>
+
+          {secondary.map((post, index) => (
             <li
               key={post.id}
               className={cn(
                 "posts-section__item",
-                post.id === primaryFeaturedId && "posts-section__item--featured"
+                "posts-section__item--compact",
+                `posts-section__item--compact-${index + 1}`,
               )}
             >
-              <HomepageReveal delayMs={80 + index * 90}>
-                <PostCard
-                  post={post}
-                  featured={post.id === primaryFeaturedId}
-                />
+              <HomepageReveal delayMs={120 + index * 70}>
+                <PostCard post={post} variant="compact" />
               </HomepageReveal>
             </li>
           ))}
         </ul>
 
-        <HomepageReveal delayMs={160}>
+        <HomepageReveal delayMs={180}>
           <div className="posts-section__footer">
             <SectionCTA label="כל המאמרים" href="/articles" variant="primary" />
           </div>

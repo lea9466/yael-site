@@ -102,25 +102,23 @@ function AboutVisualComposition({
 }
 
 function AboutBodyText({ text }: { text: string }) {
-  const paragraphs = text
-    .split(/\n{2,}/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
+  const normalized = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim();
 
-  if (paragraphs.length <= 1) {
-    return (
-      <p className="short-about-body">{paragraphs[0] ?? text}</p>
-    );
+  if (normalized.length === 0) {
+    return null;
   }
 
+  const lines = normalized.split("\n");
+
   return (
-    <div className="space-y-6">
-      {paragraphs.map((paragraph, index) => (
-        <p key={`${index}-${paragraph.slice(0, 24)}`} className="short-about-body">
-          {paragraph}
-        </p>
+    <p className="short-about-body">
+      {lines.map((line, index) => (
+        <span key={`${index}-${line.slice(0, 24)}`}>
+          {index > 0 ? <br /> : null}
+          {line}
+        </span>
       ))}
-    </div>
+    </p>
   );
 }
 

@@ -94,7 +94,8 @@ export async function POST(request: Request) {
     }
 
     return jsonResponse(result, 201);
-  } catch {
+  } catch (error) {
+    console.error("[media/upload] unexpected error", error);
     return jsonResponse(
       { success: false, error: MEDIA_ERRORS.generic },
       500

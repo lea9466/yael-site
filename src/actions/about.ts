@@ -30,6 +30,8 @@ async function getAdminSupabase(): Promise<{ supabase: SupabaseClient } | null> 
 function revalidateAboutPaths() {
   revalidatePath("/admin/about");
   revalidatePath("/admin/about/preview");
+  revalidatePath("/about");
+  revalidatePath("/");
 }
 
 async function validateMediaIds(

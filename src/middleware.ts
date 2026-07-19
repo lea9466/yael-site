@@ -106,6 +106,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Exclude media upload so large multipart bodies are not buffered/truncated
+    // by the Next.js proxy layer (see proxyClientMaxBodySize in next.config).
+    "/((?!_next/static|_next/image|favicon.ico|api/admin/media/upload|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

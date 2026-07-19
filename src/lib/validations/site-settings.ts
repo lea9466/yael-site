@@ -17,10 +17,14 @@ import {
   WEEKDAYS,
 } from "@/lib/settings/constants";
 import {
+  formStateToHomepageHero,
+  formStateToHomepageShortAbout,
   homepageHeroSchema,
   homepageHeroToFormState,
-  formStateToHomepageHero,
+  homepageShortAboutToFormState,
+  shortAboutSchema,
   type HomepageHeroData,
+  type HomepageShortAbout,
 } from "@/lib/validations/homepage-hero";
 import { mapZodErrors } from "@/lib/validations/service";
 import { normalizeOptionalMultilineText } from "@/lib/text/multiline-text";
@@ -198,6 +202,7 @@ export const saveSiteSettingsInputSchema = z.object({
   businessProfile: businessProfileDataSchema,
   siteSettings: siteSettingsDataSchema,
   homepageHero: homepageHeroSchema,
+  homepageShortAbout: shortAboutSchema,
   businessProfileUpdatedAt: z.string().datetime({ offset: true }),
   siteSettingsUpdatedAt: z.string().datetime({ offset: true }),
   homepageUpdatedAt: z.string().datetime({ offset: true }),
@@ -361,6 +366,7 @@ export type SettingsPageData = {
   businessProfile: BusinessProfileData;
   siteSettings: SiteSettingsData;
   homepageHero: HomepageHeroData;
+  homepageShortAbout: HomepageShortAbout;
   businessProfileUpdatedAt: string;
   siteSettingsUpdatedAt: string;
   homepageUpdatedAt: string;
@@ -411,11 +417,14 @@ export type SettingsFormState = {
   heroMobileMediaId: string | null;
   heroVideoUrl: string;
   heroAnimationUrl: string;
+  shortAboutTitle: string;
+  shortAboutText: string;
 };
 
 export function pageDataToFormState(data: SettingsPageData): SettingsFormState {
   const { businessProfile, siteSettings } = data;
   const heroState = homepageHeroToFormState(data.homepageHero);
+  const shortAboutState = homepageShortAboutToFormState(data.homepageShortAbout);
 
   return {
     businessName: businessProfile.business_name,
@@ -445,6 +454,7 @@ export function pageDataToFormState(data: SettingsPageData): SettingsFormState {
     metaPixelId: siteSettings.meta_pixel_id ?? "",
     googleSiteVerification: siteSettings.google_site_verification ?? "",
     ...heroState,
+    ...shortAboutState,
   };
 }
 
@@ -460,6 +470,7 @@ export function formStateToSavePayload(
     businessProfile: formStateToBusinessProfile(state),
     siteSettings: formStateToSiteSettings(state),
     homepageHero: formStateToHomepageHero(state),
+    homepageShortAbout: formStateToHomepageShortAbout(state),
     businessProfileUpdatedAt: timestamps.businessProfileUpdatedAt,
     siteSettingsUpdatedAt: timestamps.siteSettingsUpdatedAt,
     homepageUpdatedAt: timestamps.homepageUpdatedAt,

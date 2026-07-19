@@ -1,8 +1,8 @@
 import { RecipeCard } from "@/components/homepage/recipe-card";
-import { PublicSectionHeader } from "@/components/homepage/public-section-header";
-import { Container } from "@/components/public/layout/container";
-import { Section } from "@/components/public/layout/section";
+import { HomepageReveal } from "@/components/homepage/homepage-reveal";
+import { SectionCTA } from "@/components/homepage/section-cta";
 import type { PublicRecipeSummary } from "@/lib/public/types";
+import { cn } from "@/lib/utils/cn";
 
 type RecentRecipesSectionProps = {
   recipes: PublicRecipeSummary[];
@@ -14,24 +14,43 @@ export function RecentRecipesSection({ recipes }: RecentRecipesSectionProps) {
   }
 
   return (
-    <Section ariaLabelledBy="homepage-recipes-title">
-      <Container className="space-y-10">
-        <PublicSectionHeader
-          eyebrow="מתכונים"
-          title="מתכונים אחרונים"
-          description="אוכל טעים, צבעוני ומזין — מתכונים שמתאימים לחיים האמיתיים."
-          actionLabel="כל המתכונים"
-          actionHref="/recipes"
-          titleId="homepage-recipes-title"
-        />
-        <ul className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {recipes.map((recipe) => (
-            <li key={recipe.id}>
-              <RecipeCard recipe={recipe} />
+    <section
+      aria-labelledby="homepage-recipes-title"
+      className="recipes-section"
+    >
+      <div className="recipes-section__inner">
+        <HomepageReveal>
+          <header className="recipes-section__header">
+            <h2 id="homepage-recipes-title" className="recipes-section__title">
+              מהמתכונים האחרונים
+            </h2>
+            <p className="recipes-section__description">
+              טעימים, בריאים וקלים להכנה
+            </p>
+          </header>
+        </HomepageReveal>
+
+        <ul
+          className={cn(
+            "recipes-section__grid",
+            `recipes-section__grid--count-${recipes.length}`,
+          )}
+        >
+          {recipes.map((recipe, index) => (
+            <li key={recipe.id} className="recipes-section__item">
+              <HomepageReveal delayMs={80 + index * 90}>
+                <RecipeCard recipe={recipe} />
+              </HomepageReveal>
             </li>
           ))}
         </ul>
-      </Container>
-    </Section>
+
+        <HomepageReveal delayMs={160}>
+          <div className="recipes-section__footer">
+            <SectionCTA label="לכל המתכונים" href="/recipes" variant="primary" />
+          </div>
+        </HomepageReveal>
+      </div>
+    </section>
   );
 }

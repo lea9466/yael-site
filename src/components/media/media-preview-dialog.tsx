@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
-
+import { MediaPreviewRender } from "@/components/media/media-preview-render";
 import { Dialog } from "@/components/ui/dialog";
 import {
   formatDimensions,
   formatFileSize,
   formatMediaDate,
+  formatMimeType,
 } from "@/lib/media/format";
 import type { MediaListItem } from "@/lib/media/media-types";
 
@@ -37,20 +37,15 @@ export function MediaPreviewDialog({
     >
       <div className="space-y-5">
         <div className="relative mx-auto aspect-[4/3] max-h-[50dvh] w-full overflow-hidden rounded-[var(--radius-md)] bg-[var(--color-surface-soft)]">
-          {item.publicUrl ? (
-            <Image
-              src={item.publicUrl}
-              alt={item.alt_text ?? displayName}
-              fill
-              sizes="(max-width: 768px) 100vw, 720px"
-              className="object-contain"
-              priority
-            />
-          ) : (
-            <div className="flex size-full items-center justify-center text-sm text-[var(--color-text-muted)]">
-              לא ניתן להציג תצוגה מקדימה
-            </div>
-          )}
+          <MediaPreviewRender
+            url={item.publicUrl}
+            alt={item.alt_text ?? displayName}
+            mimeType={item.mime_type}
+            objectFit="contain"
+            sizes="(max-width: 768px) 100vw, 720px"
+            priority
+            emptyLabel="לא ניתן להציג תצוגה מקדימה"
+          />
         </div>
 
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
@@ -72,7 +67,7 @@ export function MediaPreviewDialog({
           </div>
           <div>
             <dt className="text-[var(--color-text-muted)]">סוג קובץ</dt>
-            <dd>{item.mime_type}</dd>
+            <dd>{formatMimeType(item.mime_type)}</dd>
           </div>
           <div>
             <dt className="text-[var(--color-text-muted)]">תאריך העלאה</dt>

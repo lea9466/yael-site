@@ -23,6 +23,7 @@ import {
   type HomepageHeroData,
 } from "@/lib/validations/homepage-hero";
 import { mapZodErrors } from "@/lib/validations/service";
+import { normalizeOptionalMultilineText } from "@/lib/text/multiline-text";
 
 export { mapZodErrors };
 
@@ -32,6 +33,18 @@ const weekdayValues = WEEKDAYS.map((day) => day.value) as [
   (typeof WEEKDAYS)[number]["value"],
   ...(typeof WEEKDAYS)[number]["value"][],
 ];
+
+const optionalMultilineNullableString = (max: number, message: string) =>
+  z
+    .union([z.string().max(max, message), z.null()])
+    .optional()
+    .transform((value) => {
+      if (value === undefined || value === null) {
+        return null;
+      }
+
+      return normalizeOptionalMultilineText(value);
+    });
 
 const optionalNullableString = (max: number, message: string) =>
   z
@@ -128,7 +141,7 @@ export const businessProfileDataSchema = z
     address: optionalNullableString(ADDRESS_MAX, "הכתובת ארוכה מדי"),
     city: optionalNullableString(CITY_MAX, "שם העיר ארוך מדי"),
     tagline: optionalNullableString(TAGLINE_MAX, "הסלוגן ארוך מדי"),
-    short_description: optionalNullableString(
+    short_description: optionalMultilineNullableString(
       SHORT_DESCRIPTION_MAX,
       "התיאור ארוך מדי"
     ),
@@ -340,6 +353,8 @@ export type SettingsMediaPreview = {
   id: string;
   url: string;
   alt: string;
+  mimeType?: string;
+  sizeBytes?: number;
 };
 
 export type SettingsPageData = {
@@ -354,6 +369,7 @@ export type SettingsPageData = {
     favicon: SettingsMediaPreview | null;
     ogImage: SettingsMediaPreview | null;
     heroImage: SettingsMediaPreview | null;
+    heroMobileImage: SettingsMediaPreview | null;
   };
 };
 
@@ -392,6 +408,7 @@ export type SettingsFormState = {
   heroSecondaryButtonUrl: string;
   heroMediaType: HomepageHeroData["media_type"];
   heroMediaId: string | null;
+  heroMobileMediaId: string | null;
   heroVideoUrl: string;
   heroAnimationUrl: string;
 };

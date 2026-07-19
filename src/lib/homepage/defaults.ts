@@ -12,6 +12,7 @@ export function getDefaultHomepageData(): HomepageData {
       secondary_button: null,
       media_type: "image",
       media_id: null,
+      mobile_media_id: null,
       video_url: null,
       animation_url: null,
     },

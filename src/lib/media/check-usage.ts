@@ -178,7 +178,10 @@ function siteContentContainsMediaId(
     case "homepage": {
       const hero = data.hero;
 
-      return isRecord(hero) && hero.media_id === mediaId;
+      return (
+        isRecord(hero) &&
+        (hero.media_id === mediaId || hero.mobile_media_id === mediaId)
+      );
     }
     case "about":
       return (

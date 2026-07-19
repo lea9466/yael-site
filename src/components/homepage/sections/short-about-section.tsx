@@ -1,9 +1,14 @@
 import Image from "next/image";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
+import { PublicHighlightPill } from "@/components/homepage/public-highlight-pill";
 import { OrganicDecoration } from "@/components/homepage/organic-decoration";
-import { SectionCTA } from "@/components/homepage/section-cta";
-import { Container } from "@/components/public/layout/container";
 import type { AboutMediaPreview } from "@/lib/about/queries";
+import {
+  HOMEPAGE_SHORT_ABOUT_HIGHLIGHTS,
+  type ShortAboutHighlightPosition,
+} from "@/lib/homepage/short-about-highlights";
 import type { HomepageData } from "@/lib/validations/homepage-hero";
 import { cn } from "@/lib/utils/cn";
 
@@ -12,30 +17,109 @@ type ShortAboutSectionProps = {
   coverPreview: AboutMediaPreview | null;
 };
 
-function AboutImageFallback() {
+const highlightPositionClasses: Record<ShortAboutHighlightPosition, string> = {
+  "top-start": "top-4 start-0 motion-safe:-translate-x-4",
+  "top-end": "top-8 end-0 motion-safe:translate-x-4",
+  "center-start": "top-1/2 start-0 -translate-y-1/2 motion-safe:-translate-x-8",
+  "bottom-start": "-bottom-4 start-1/4",
+  "bottom-end": "bottom-24 end-0 motion-safe:translate-x-4",
+};
+
+function AboutEditorialFallback() {
   return (
     <div
       aria-hidden="true"
-      className="relative flex min-h-[22rem] w-full items-center justify-center overflow-hidden rounded-[2rem_1.5rem_2rem_1.75rem] bg-[linear-gradient(145deg,var(--color-light-sage-soft)_0%,var(--color-cream)_55%,var(--color-coral-soft)_100%)] shadow-[var(--shadow-lg)] lg:min-h-[65vh]"
+      className="short-about-fallback relative mx-auto aspect-[4/5] w-[85%] overflow-hidden rounded-[3.75rem] border-4 border-white bg-[linear-gradient(145deg,var(--color-fresh-green-soft)_0%,var(--color-cream)_52%,var(--color-coral-soft)_100%)] shadow-[0_24px_60px_rgba(63,95,71,0.18)] motion-safe:-rotate-2"
     >
       <OrganicDecoration
         variant="mint"
-        className="absolute -start-16 top-12 size-56 opacity-80"
+        className="absolute -start-10 top-8 size-40 opacity-80"
       />
       <OrganicDecoration
         variant="coral"
-        className="absolute -end-10 bottom-10 size-44 opacity-70"
+        className="absolute -end-8 bottom-12 size-36 opacity-75"
       />
       <OrganicDecoration
         variant="section"
-        className="absolute start-1/3 top-1/2 size-36 -translate-y-1/2 opacity-60"
+        className="absolute start-1/3 top-1/2 size-32 -translate-y-1/2 opacity-65"
       />
-      <div className="relative z-[1] flex flex-col items-center gap-3 px-8 text-center">
-        <span className="text-[clamp(3rem,8vw,5rem)] font-semibold leading-none tracking-[-0.04em] text-[var(--color-primary)]/18">
-          יעל
-        </span>
-        <span className="h-1 w-16 rounded-full bg-[image:var(--gradient-warm)] opacity-90" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_24%,rgba(255,255,255,0.55),transparent_58%)]" />
+    </div>
+  );
+}
+
+function AboutVisualComposition({
+  coverPreview,
+}: {
+  coverPreview: AboutMediaPreview | null;
+}) {
+  return (
+    <div className="short-about-visual short-about-visual-enter relative mx-auto flex min-h-[28rem] w-full max-w-md items-center justify-center md:min-h-[37.5rem]">
+      <OrganicDecoration
+        variant="mint"
+        className="absolute size-[22rem] motion-safe:translate-x-10 motion-safe:translate-y-10 opacity-60"
+      />
+      <OrganicDecoration
+        variant="coral"
+        className="absolute size-[18rem] motion-safe:-translate-x-12 motion-safe:-translate-y-12 opacity-50"
+      />
+
+      <div className="relative z-[1] w-full">
+        {coverPreview?.url ? (
+          <div className="short-about-image-frame group relative mx-auto aspect-[4/5] w-[85%] overflow-hidden rounded-[3.75rem] border-4 border-white bg-[var(--color-surface-soft)] shadow-[0_24px_60px_rgba(63,95,71,0.18)] motion-safe:-rotate-2">
+            <Image
+              src={coverPreview.url}
+              alt={coverPreview.alt}
+              fill
+              sizes="(max-width: 1024px) 88vw, 36vw"
+              className="object-cover object-[center_22%] transition-transform duration-700 motion-safe:group-hover:scale-[1.03]"
+            />
+          </div>
+        ) : (
+          <AboutEditorialFallback />
+        )}
+
+        {HOMEPAGE_SHORT_ABOUT_HIGHLIGHTS.map((highlight, index) => (
+          <PublicHighlightPill
+            key={highlight.id}
+            label={highlight.label}
+            icon={highlight.icon}
+            variant={highlight.variant}
+            animationDuration={highlight.animationDuration}
+            className={cn(
+              "absolute z-[2]",
+              highlightPositionClasses[highlight.position],
+              "short-about-pill-enter"
+            )}
+            style={{
+              animationDelay: `${180 + index * 120}ms`,
+            }}
+          />
+        ))}
       </div>
+    </div>
+  );
+}
+
+function AboutBodyText({ text }: { text: string }) {
+  const paragraphs = text
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+  if (paragraphs.length <= 1) {
+    return (
+      <p className="short-about-body">{paragraphs[0] ?? text}</p>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {paragraphs.map((paragraph, index) => (
+        <p key={`${index}-${paragraph.slice(0, 24)}`} className="short-about-body">
+          {paragraph}
+        </p>
+      ))}
     </div>
   );
 }
@@ -47,78 +131,48 @@ export function ShortAboutSection({
   return (
     <section
       aria-labelledby="homepage-short-about-title"
-      className={cn(
-        "relative isolate -mt-6 overflow-hidden",
-        "min-h-[70vh] lg:min-h-[78vh]",
-        "bg-[linear-gradient(180deg,var(--color-cream)_0%,var(--color-surface-soft)_38%,var(--color-light-sage-soft)_100%)]",
-        "py-16 sm:py-20 lg:py-24"
-      )}
+      className="short-about relative overflow-hidden py-16 md:py-[var(--spacing-3xl)]"
     >
-      <OrganicDecoration
-        variant="section"
-        className="absolute -end-24 top-16 size-72 opacity-50"
-      />
-      <OrganicDecoration
-        variant="mint"
-        className="absolute -start-20 bottom-20 size-64 opacity-40"
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[linear-gradient(to_left,var(--color-cream)_0%,#e9f0ea_100%)]"
       />
 
-      <Container className="relative z-[1]">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-20">
-          <div className="order-2 flex flex-col items-start gap-6 text-start lg:order-1 lg:gap-7">
-            <div className="flex items-center gap-3">
-              <span
-                aria-hidden="true"
-                className="h-10 w-1 rounded-full bg-[var(--color-soft-accent)]"
-              />
-              <p className="text-caption font-semibold tracking-[0.08em] text-[var(--color-secondary)]">
-                אודות
-              </p>
+      <div className="relative z-[1] mx-auto w-full max-w-[90rem] px-5 md:px-20">
+        <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16 xl:gap-20">
+          <div className="order-2 space-y-8 text-start lg:order-1 lg:col-span-7 lg:pe-8">
+            <div className="short-about-copy-enter space-y-8">
+              <span className="short-about-eyebrow">אודות</span>
+
+              <h2
+                id="homepage-short-about-title"
+                className="short-about-title"
+              >
+                {content.title}
+              </h2>
+
+              <div className="max-w-2xl space-y-6">
+                <AboutBodyText text={content.text} />
+              </div>
+
+              <Link
+                href="/about"
+                className="public-focus-ring short-about-link group inline-flex items-center gap-2 pb-1"
+              >
+                <span>קראי עוד</span>
+                <ArrowLeft
+                  aria-hidden="true"
+                  className="size-4 transition-transform duration-[var(--transition-base)] motion-safe:group-hover:-translate-x-2"
+                />
+              </Link>
             </div>
-
-            <h2
-              id="homepage-short-about-title"
-              className="max-w-xl text-balance text-[clamp(2rem,3.5vw+0.5rem,3.25rem)] font-semibold leading-[1.12] tracking-[-0.03em] text-[var(--color-primary)]"
-            >
-              {content.title}
-            </h2>
-
-            <p className="max-w-xl text-[1.0625rem] leading-[1.85] text-[var(--color-text)] sm:text-lg sm:leading-[1.8]">
-              {content.text}
-            </p>
-
-            <SectionCTA
-              label="קראי עוד"
-              href="/about"
-              variant="primary"
-              className="min-h-12 px-7 text-[0.9375rem] shadow-[0_8px_24px_rgba(217,138,128,0.28)] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(217,138,128,0.36)] motion-reduce:hover:translate-y-0"
-            />
           </div>
 
-          <div className="order-1 lg:order-2">
-            <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-              <OrganicDecoration
-                variant="hero"
-                className="absolute -end-8 -top-8 size-40 opacity-60 lg:size-52"
-              />
-
-              {coverPreview?.url ? (
-                <div className="relative min-h-[22rem] overflow-hidden rounded-[2rem_1.5rem_2rem_1.75rem] bg-[var(--color-surface-soft)] shadow-[0_24px_60px_rgba(63,95,71,0.14)] lg:aspect-[4/5] lg:min-h-[65vh]">
-                  <Image
-                    src={coverPreview.url}
-                    alt={coverPreview.alt}
-                    fill
-                    sizes="(max-width: 1024px) 92vw, 44vw"
-                    className="object-cover object-[center_20%]"
-                  />
-                </div>
-              ) : (
-                <AboutImageFallback />
-              )}
-            </div>
+          <div className="order-1 lg:order-2 lg:col-span-5">
+            <AboutVisualComposition coverPreview={coverPreview} />
           </div>
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

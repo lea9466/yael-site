@@ -12,6 +12,7 @@ import {
 } from "@/components/admin/admin-form-section";
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
+import { SlugFormField } from "@/components/admin/slug-form-field";
 import { TagDeleteDialog } from "@/components/tags/tag-delete-dialog";
 import { TagPreviewPill } from "@/components/tags/tag-preview-pill";
 import { ContentTypeBadge } from "@/components/admin/content-type-badge";
@@ -89,6 +90,14 @@ export function TagForm({ mode, initialValues, tag }: TagFormProps) {
       ...current,
       name,
       slug: slugTouched ? current.slug : slugifyTagName(name),
+    }));
+  };
+
+  const handleSlugResetFromName = () => {
+    setSlugTouched(false);
+    setValues((current) => ({
+      ...current,
+      slug: slugifyTagName(current.name),
     }));
   };
 
@@ -237,26 +246,16 @@ export function TagForm({ mode, initialValues, tag }: TagFormProps) {
             />
           </FormField>
 
-          <FormField
+          <SlugFormField
             label="כתובת (slug)"
             htmlFor="tag-slug"
-            required
-            hint="נוצר אוטומטית מהשם. ניתן לעריכה ידנית, כולל בעברית."
+            value={values.slug}
+            hint="נוצר אוטומטית מהשם. ניתן לעריכה ידנית."
             error={fieldErrors.slug}
-          >
-            <Input
-              id="tag-slug"
-              value={values.slug}
-              dir="ltr"
-              className="text-left"
-              maxLength={120}
-              error={Boolean(fieldErrors.slug)}
-              onChange={(event) => {
-                setSlugTouched(true);
-                setField("slug", event.target.value);
-              }}
-            />
-          </FormField>
+            onChange={(slug) => setField("slug", slug)}
+            onManualEdit={() => setSlugTouched(true)}
+            onResetFromTitle={handleSlugResetFromName}
+          />
 
           <div className="space-y-2">
             <span className="block text-sm font-medium text-[var(--color-text)]">

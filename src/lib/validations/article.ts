@@ -116,7 +116,7 @@ const slugSchema = z
   .min(1, "יש להזין כתובת פוסט")
   .max(120, "כתובת הפוסט ארוכה מדי")
   .refine((value) => isValidArticleSlug(value), {
-    message: "כתובת הפוסט יכולה להכיל אותיות באנגלית, מספרים ומקפים בלבד",
+    message: "כתובת הפוסט יכולה להכיל אותיות בעברית או באנגלית, מספרים ומקפים בלבד",
   })
   .refine((value) => !isReservedArticleSlug(value), {
     message: "כתובת זו שמורה למערכת",

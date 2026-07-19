@@ -29,6 +29,7 @@ import { AdminFormActionBar } from "@/components/admin/admin-form-action-bar";
 import { AdminFormBody } from "@/components/admin/admin-form-section";
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
+import { SlugFormField } from "@/components/admin/slug-form-field";
 import { AdminSeoSection } from "@/components/admin/admin-seo-section";
 import { RecipeArchiveDialog } from "@/components/recipes/recipe-archive-dialog";
 import { RecipeDeleteDialog } from "@/components/recipes/recipe-delete-dialog";
@@ -301,6 +302,14 @@ export function RecipeForm({
       ...current,
       title,
       slug: slugTouched ? current.slug : slugifyTitle(title),
+    }));
+  };
+
+  const handleSlugResetFromTitle = () => {
+    setSlugTouched(false);
+    setValues((current) => ({
+      ...current,
+      slug: slugifyTitle(current.title),
     }));
   };
 
@@ -601,30 +610,20 @@ export function RecipeForm({
             />
           </FormField>
 
-          <FormField
+          <SlugFormField
             label="כתובת מתכון (slug)"
             htmlFor="recipe-slug"
-            required
-            hint="נוצר אוטומטית מהכותרת. ניתן לעריכה ידנית."
+            value={values.slug}
             error={fieldErrors.slug}
-          >
-            <Input
-              id="recipe-slug"
-              value={values.slug}
-              dir="ltr"
-              className="text-left"
-              error={Boolean(fieldErrors.slug)}
-              onChange={(event) => {
-                setSlugTouched(true);
-                setField("slug", event.target.value);
-              }}
-            />
-          </FormField>
+            onChange={(slug) => setField("slug", slug)}
+            onManualEdit={() => setSlugTouched(true)}
+            onResetFromTitle={handleSlugResetFromTitle}
+          />
 
           <FormField
             label="תיאור"
             htmlFor="recipe-description"
-            hint={`${values.description.length}/${RECIPE_DESCRIPTION_MAX}`}
+            hint={`${values.description.length}/${RECIPE_DESCRIPTION_MAX} · ניתן להוסיף שורות חדשות`}
             error={fieldErrors.description}
           >
             <Textarea
@@ -737,20 +736,20 @@ export function RecipeForm({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField
-              label="משך הכנה (דקות)"
-              htmlFor="recipe-duration"
+              label="משך הכנה"
+              htmlFor="recipe-prep-duration"
               required
-              error={fieldErrors.duration_minutes}
+              error={fieldErrors.prep_duration}
             >
               <Input
-                id="recipe-duration"
-                type="number"
-                min={1}
-                max={24 * 60}
-                value={values.duration_minutes}
-                error={Boolean(fieldErrors.duration_minutes)}
+                id="recipe-prep-duration"
+                type="text"
+                maxLength={120}
+                placeholder="לדוגמה: 20 דקות"
+                value={values.prep_duration}
+                error={Boolean(fieldErrors.prep_duration)}
                 onChange={(event) =>
-                  setField("duration_minutes", Number(event.target.value))
+                  setField("prep_duration", event.target.value)
                 }
               />
             </FormField>
@@ -763,13 +762,13 @@ export function RecipeForm({
             >
               <Input
                 id="recipe-servings"
-                type="number"
-                min={1}
-                max={100}
+                type="text"
+                maxLength={120}
+                placeholder="לדוגמה: 4–6 מנות"
                 value={values.servings}
                 error={Boolean(fieldErrors.servings)}
                 onChange={(event) =>
-                  setField("servings", Number(event.target.value))
+                  setField("servings", event.target.value)
                 }
               />
             </FormField>

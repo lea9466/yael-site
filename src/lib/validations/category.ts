@@ -33,7 +33,7 @@ const slugSchema = z
   .min(1, "יש להזין כתובת קטגוריה")
   .max(CATEGORY_SLUG_MAX, "כתובת הקטגוריה ארוכה מדי")
   .refine((value) => isValidCategorySlug(value), {
-    message: "כתובת הקטגוריה יכולה להכיל אותיות באנגלית, מספרים ומקפים בלבד",
+    message: "כתובת הקטגוריה יכולה להכיל אותיות בעברית או באנגלית, מספרים ומקפים בלבד",
   })
   .refine((value) => !isReservedCategorySlug(value), {
     message: "כתובת זו שמורה למערכת",

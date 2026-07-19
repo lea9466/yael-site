@@ -34,7 +34,7 @@ const SERVICE_PUBLIC_COLUMNS =
   "id, title, slug, short_description, cover_media_id, featured, published_at, updated_at";
 
 const RECIPE_PUBLIC_COLUMNS =
-  "id, title, slug, description, cover_media_id, category_id, duration_minutes, servings, difficulty, featured, published_at, updated_at";
+  "id, title, slug, description, cover_media_id, category_id, prep_duration, servings, difficulty, featured, published_at, updated_at";
 
 const ARTICLE_PUBLIC_COLUMNS =
   "id, title, slug, body, cover_media_id, category_id, reading_time_minutes, featured, published_at, updated_at";
@@ -307,7 +307,7 @@ export async function getPublishedRecipes(): Promise<PublicRecipeSummary[]> {
         coverUrl: cover?.url ?? null,
         coverAlt: cover?.alt ?? null,
         categoryName: categoryMap.get(row.category_id as string) ?? null,
-        duration_minutes: row.duration_minutes,
+        prep_duration: row.prep_duration,
         servings: row.servings,
         difficulty: row.difficulty,
         featured: row.featured,

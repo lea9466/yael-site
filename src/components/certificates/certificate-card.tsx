@@ -20,6 +20,7 @@ import {
   DropdownMenu,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { MultilineText } from "@/components/ui/multiline-text";
 import { formatCertificateYear } from "@/lib/certificates/format";
 import type { CertificateListItem } from "@/lib/certificates/types";
 import { cn } from "@/lib/utils/cn";
@@ -173,9 +174,12 @@ export function CertificateCard({
         </div>
 
         {item.description ? (
-          <p className="line-clamp-3 whitespace-pre-wrap text-sm text-[var(--color-text-muted)]">
+          <MultilineText
+            as="p"
+            className="line-clamp-3 text-sm text-[var(--color-text-muted)]"
+          >
             {item.description}
-          </p>
+          </MultilineText>
         ) : null}
 
         {actionError ? (

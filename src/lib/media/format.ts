@@ -24,6 +24,10 @@ export function formatMediaDate(isoDate: string): string {
 }
 
 export function formatDimensions(width: number, height: number): string {
+  if (width <= 0 || height <= 0) {
+    return "—";
+  }
+
   return `${width} × ${height}`;
 }
 
@@ -35,6 +39,10 @@ export function formatMimeType(mimeType: string): string {
       return "PNG";
     case "image/webp":
       return "WebP";
+    case "video/mp4":
+      return "MP4";
+    case "video/webm":
+      return "WebM";
     default:
       return "—";
   }

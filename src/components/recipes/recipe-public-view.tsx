@@ -2,9 +2,9 @@ import Image from "next/image";
 
 import { AdminFeaturedBadge } from "@/components/admin/admin-status-badge";
 import { Badge } from "@/components/ui/badge";
+import { MultilineText } from "@/components/ui/multiline-text";
 import { escapeHtml, sanitizePlainText } from "@/lib/services/sanitize";
 import { DIFFICULTY_LABELS } from "@/lib/recipes/constants";
-import { formatDurationMinutes } from "@/lib/recipes/format";
 import { formatIngredientLine } from "@/lib/recipes/format-ingredient";
 import type { RecipeDetail } from "@/lib/recipes/types";
 import { cn } from "@/lib/utils/cn";
@@ -73,9 +73,12 @@ export function RecipePublicView({
           </div>
 
           {description ? (
-            <p className="text-lg text-[var(--color-text-muted)]">
-              {escapeHtml(description)}
-            </p>
+            <MultilineText
+              as="p"
+              className="text-lg text-[var(--color-text-muted)]"
+            >
+              {description}
+            </MultilineText>
           ) : isPreview ? (
             <p className="text-sm text-[var(--color-text-muted)]">אין תיאור</p>
           ) : null}
@@ -86,8 +89,8 @@ export function RecipePublicView({
             ) : isPreview ? (
               <span>ללא קטגוריה</span>
             ) : null}
-            <span>זמן הכנה: {formatDurationMinutes(recipe.duration_minutes)}</span>
-            <span>{recipe.servings} מנות</span>
+            <span>זמן הכנה: {escapeHtml(recipe.prep_duration)}</span>
+            <span>{escapeHtml(recipe.servings)}</span>
             <span>רמת קושי: {DIFFICULTY_LABELS[recipe.difficulty]}</span>
           </div>
 

@@ -1,7 +1,8 @@
+import Link from "next/link";
+
+import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { ServiceCard } from "@/components/homepage/service-card";
-import { PublicSectionHeader } from "@/components/homepage/public-section-header";
-import { Container } from "@/components/public/layout/container";
-import { Section } from "@/components/public/layout/section";
+import { getServiceCardSurface } from "@/lib/homepage/service-card-display";
 import type { PublicServiceSummary } from "@/lib/public/types";
 
 type ServicesSectionProps = {
@@ -13,25 +14,41 @@ export function ServicesSection({ services }: ServicesSectionProps) {
     return null;
   }
 
+  const primaryFeaturedId =
+    services.find((service) => service.featured)?.id ?? null;
+
   return (
-    <Section ariaLabelledBy="homepage-services-title">
-      <Container className="space-y-10">
-        <PublicSectionHeader
-          eyebrow="שירותים"
-          title="איך אפשר ללוות אתכם"
-          description="ליווי תזונתי ואכילה מקושרת — בגישה אישית, חמה ומקצועית."
-          actionLabel="כל השירותים"
-          actionHref="/services"
-          titleId="homepage-services-title"
-        />
-        <ul className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {services.map((service) => (
-            <li key={service.id}>
-              <ServiceCard service={service} />
+    <section
+      aria-labelledby="homepage-services-title"
+      className="services-section"
+    >
+      <div className="services-section__inner">
+        <header className="services-section__header">
+          <h2 id="homepage-services-title" className="services-section__title">
+            איך אפשר ללוות אתכם
+          </h2>
+          <p className="services-section__description">
+            ליווי תזונתי ואכילה מקושרת — בגישה אישית, חמה ומקצועית.
+          </p>
+          <Link href="/services" className="services-section__action public-focus-ring">
+            כל השירותים
+          </Link>
+        </header>
+
+        <ul className="services-section__grid">
+          {services.map((service, index) => (
+            <li key={service.id} className="services-section__item">
+              <HomepageReveal delayMs={index * 90} className="h-full">
+                <ServiceCard
+                  service={service}
+                  surface={getServiceCardSurface(index)}
+                  isPrimaryFeatured={service.id === primaryFeaturedId}
+                />
+              </HomepageReveal>
             </li>
           ))}
         </ul>
-      </Container>
-    </Section>
+      </div>
+    </section>
   );
 }

@@ -64,7 +64,7 @@ export async function POST(request: Request) {
   }
 
   const altText = formData.get("altText")?.toString();
-  const uploadMode = formData.get("uploadMode")?.toString();
+  const uploadProfile = formData.get("uploadProfile")?.toString();
 
   try {
     const supabase = await createClient();
@@ -74,10 +74,10 @@ export async function POST(request: Request) {
       adminId: admin.id,
       file,
       altText,
-      uploadMode:
-        uploadMode === "optimized" || uploadMode === "original"
-          ? uploadMode
-          : "optimized",
+      uploadProfile:
+        uploadProfile === "normal" || uploadProfile === "hero"
+          ? uploadProfile
+          : undefined,
     });
 
     if (!result.success) {

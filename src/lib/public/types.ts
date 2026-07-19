@@ -36,8 +36,8 @@ export type PublicRecipeSummary = {
   coverUrl: string | null;
   coverAlt: string | null;
   categoryName: string | null;
-  duration_minutes: number;
-  servings: number;
+  prep_duration: string;
+  servings: string;
   difficulty: RecipeDifficulty;
   featured: boolean;
   published_at: string | null;

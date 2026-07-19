@@ -63,7 +63,7 @@ export async function uploadMediaAction(
 
   const parsedMeta = uploadMediaSchema.safeParse({
     altText: formData.get("altText")?.toString() ?? undefined,
-    uploadMode: formData.get("uploadMode")?.toString(),
+    uploadProfile: formData.get("uploadProfile")?.toString(),
   });
 
   if (!parsedMeta.success) {
@@ -80,7 +80,7 @@ export async function uploadMediaAction(
     adminId: session.adminId,
     file,
     altText: parsedMeta.data.altText,
-    uploadMode: parsedMeta.data.uploadMode,
+    uploadProfile: parsedMeta.data.uploadProfile,
   });
 }
 

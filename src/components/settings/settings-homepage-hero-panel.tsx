@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-
+import { MediaPreviewRender } from "@/components/media/media-preview-render";
 import { ServiceMediaPicker } from "@/components/services/service-media-picker";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,10 @@ import {
   HOMEPAGE_HERO_TITLE_MAX,
   HOMEPAGE_HERO_BUTTON_LABEL_MAX,
 } from "@/lib/homepage/constants";
+import {
+  getHeroVideoWeightHintMessage,
+  shouldShowHeroVideoWeightHint,
+} from "@/lib/homepage/hero-video-hint";
 import type { SettingsFormState, SettingsMediaPreview } from "@/lib/validations/site-settings";
 import { cn } from "@/lib/utils/cn";
 
@@ -19,11 +22,16 @@ type SettingsHomepageHeroPanelProps = {
   formState: SettingsFormState;
   fieldErrors: Record<string, string>;
   heroPreview: SettingsMediaPreview | null;
+  heroMobilePreview: SettingsMediaPreview | null;
   onChange: <K extends keyof SettingsFormState>(
     key: K,
     value: SettingsFormState[K]
   ) => void;
   onHeroImageChange: (
+    mediaId: string | null,
+    preview: SettingsMediaPreview | null
+  ) => void;
+  onHeroMobileImageChange: (
     mediaId: string | null,
     preview: SettingsMediaPreview | null
   ) => void;
@@ -37,6 +45,25 @@ const MEDIA_TYPE_LABELS: Record<
   video_url: "וידאו חיצוני",
   animation_url: "אנימציה חיצונית",
 };
+
+function HeroVideoWeightHint({
+  preview,
+}: {
+  preview: SettingsMediaPreview | null;
+}) {
+  if (!shouldShowHeroVideoWeightHint(preview)) {
+    return null;
+  }
+
+  return (
+    <p
+      className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-soft)] px-4 py-3 text-caption text-[var(--color-text-muted)]"
+      role="note"
+    >
+      {getHeroVideoWeightHintMessage(preview)}
+    </p>
+  );
+}
 
 function CharacterCount({
   value,
@@ -90,12 +117,11 @@ function HeroLivePreview({
 
         <div className="relative min-h-[220px] bg-[var(--color-surface-soft)] lg:min-h-[320px]">
           {formState.heroMediaType === "image" && heroPreview?.url ? (
-            <Image
-              src={heroPreview.url}
+            <MediaPreviewRender
+              url={heroPreview.url}
               alt={heroPreview.alt}
-              fill
+              mimeType={heroPreview.mimeType ?? "image/webp"}
               sizes="(max-width: 1024px) 100vw, 40vw"
-              className="object-cover"
             />
           ) : formState.heroMediaType === "video_url" &&
             formState.heroVideoUrl.trim() ? (
@@ -132,8 +158,10 @@ export function SettingsHomepageHeroPanel({
   formState,
   fieldErrors,
   heroPreview,
+  heroMobilePreview,
   onChange,
   onHeroImageChange,
+  onHeroMobileImageChange,
 }: SettingsHomepageHeroPanelProps) {
   return (
     <div className="space-y-8">
@@ -325,16 +353,32 @@ export function SettingsHomepageHeroPanel({
       </fieldset>
 
       {formState.heroMediaType === "image" ? (
-        <ServiceMediaPicker
-          fieldId="field-hero-media"
-          label="תמונת Hero"
-          description="בחרו תמונה מספריית המדיה או העלו תמונה חדשה"
-          value={formState.heroMediaId}
-          preview={heroPreview}
-          required
-          error={fieldErrors["hero.media_id"] ?? fieldErrors.heroMediaId}
-          onChange={onHeroImageChange}
-        />
+        <div className="space-y-8">
+          <ServiceMediaPicker
+            fieldId="field-hero-desktop-media"
+            label="Hero לדסקטופ"
+            description="בחרו תמונה או וידאו מספריית המדיה או העלו קובץ חדש"
+            value={formState.heroMediaId}
+            preview={heroPreview}
+            required
+            error={fieldErrors["hero.media_id"] ?? fieldErrors.heroMediaId}
+            onChange={onHeroImageChange}
+          />
+          <HeroVideoWeightHint preview={heroPreview} />
+
+          <ServiceMediaPicker
+            fieldId="field-hero-mobile-media"
+            label="Hero למובייל"
+            description="אופציונלי — אם לא נבחרה מדיה למובייל, יוצג הקובץ של הדסקטופ."
+            value={formState.heroMobileMediaId}
+            preview={heroMobilePreview}
+            error={
+              fieldErrors["hero.mobile_media_id"] ?? fieldErrors.heroMobileMediaId
+            }
+            onChange={onHeroMobileImageChange}
+          />
+          <HeroVideoWeightHint preview={heroMobilePreview} />
+        </div>
       ) : null}
 
       {formState.heroMediaType === "video_url" ? (

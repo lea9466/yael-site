@@ -1,9 +1,12 @@
 import {
   ALLOWED_INPUT_MIME_TYPES,
+  DEFAULT_UPLOAD_PROFILE,
+  HERO_VIDEO_MIME_TYPES,
   MAX_BATCH_UPLOAD_CONCURRENCY,
   MAX_SOURCE_UPLOAD_BYTES,
-  type UploadMode,
+  type UploadProfile,
 } from "@/lib/media/constants";
+import { isVideoMimeType } from "@/lib/media/mime";
 
 export type UploadQueueStatus = "pending" | "uploading" | "completed" | "failed";
 
@@ -29,21 +32,32 @@ export type UploadQueueItem = {
   file: File;
   previewUrl: string;
   altText: string;
-  uploadMode: UploadMode;
+  uploadProfile: UploadProfile;
   status: UploadQueueStatus;
   error?: string;
   uploadAttempted?: boolean;
 };
 
-export const UPLOAD_MODE_LABELS: Record<UploadMode, string> = {
-  optimized: "מותאם לאתר",
-  original: "איכות מלאה",
-};
+const ACCEPTED_IMAGE_MIME_SET = new Set<string>(ALLOWED_INPUT_MIME_TYPES);
+const HERO_VIDEO_MIME_SET = new Set<string>(HERO_VIDEO_MIME_TYPES);
 
-const ACCEPTED_MIME_SET = new Set<string>(ALLOWED_INPUT_MIME_TYPES);
+export function isVideoUploadFile(file: File): boolean {
+  return isVideoMimeType(file.type);
+}
 
-export function validateUploadFile(file: File): string | null {
-  if (!ACCEPTED_MIME_SET.has(file.type)) {
+export function validateUploadFile(
+  file: File,
+  uploadProfile: UploadProfile = DEFAULT_UPLOAD_PROFILE
+): string | null {
+  const isImage = ACCEPTED_IMAGE_MIME_SET.has(file.type);
+  const isHeroVideo =
+    uploadProfile === "hero" && HERO_VIDEO_MIME_SET.has(file.type);
+
+  if (!isImage && !isHeroVideo) {
+    if (HERO_VIDEO_MIME_SET.has(file.type)) {
+      return "סרטונים נתמכים רק בפרופיל תמונה ראשית.";
+    }
+
     return "הקובץ אינו תקין או אינו נתמך.";
   }
 
@@ -62,9 +76,30 @@ export function createUploadQueueItem(file: File): UploadQueueItem {
     file,
     previewUrl: URL.createObjectURL(file),
     altText: "",
-    uploadMode: "optimized",
+    uploadProfile: DEFAULT_UPLOAD_PROFILE,
     status: validationError ? "failed" : "pending",
     error: validationError ?? undefined,
+  };
+}
+
+export function revalidateQueueItemForProfile(
+  item: UploadQueueItem,
+  uploadProfile: UploadProfile
+): Pick<UploadQueueItem, "uploadProfile" | "status" | "error"> {
+  const validationError = validateUploadFile(item.file, uploadProfile);
+
+  if (validationError) {
+    return {
+      uploadProfile,
+      status: "failed",
+      error: validationError,
+    };
+  }
+
+  return {
+    uploadProfile,
+    status: item.uploadAttempted ? item.status : "pending",
+    error: undefined,
   };
 }
 
@@ -160,12 +195,12 @@ export function buildBatchSummary(completed: number, failed: number): string {
   }
 
   if (completed > 0 && failed === 0) {
-    return `הועלו בהצלחה ${completed} תמונות.`;
+    return `הועלו בהצלחה ${completed} קבצים.`;
   }
 
   if (completed === 0 && failed > 0) {
     return `כל ${failed} הקבצים נכשלו בהעלאה.`;
   }
 
-  return `הועלו בהצלחה ${completed} תמונות. ${failed} קבצים נכשלו.`;
+  return `הועלו בהצלחה ${completed} קבצים. ${failed} קבצים נכשלו.`;
 }

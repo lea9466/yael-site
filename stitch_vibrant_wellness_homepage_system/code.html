@@ -1,0 +1,566 @@
+<!DOCTYPE html><html dir="rtl" lang="he"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Wellness Bloom | לחיות בטוב, לאכול בנאה</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#284731",
+                    "on-secondary": "#ffffff",
+                    "surface-container": "#f0eee9",
+                    "on-secondary-container": "#4e6c4e",
+                    "tertiary-fixed": "#fbdebc",
+                    "on-tertiary-fixed-variant": "#57432a",
+                    "secondary-fixed": "#caecc6",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#f5f3ee",
+                    "on-error": "#ffffff",
+                    "on-background": "#1b1c19",
+                    "tertiary-fixed-dim": "#dec2a1",
+                    "on-surface-variant": "#424842",
+                    "surface-tint": "#45664d",
+                    "on-tertiary-container": "#e6caa8",
+                    "error": "#ba1a1a",
+                    "tertiary-container": "#69543a",
+                    "outline": "#727972",
+                    "surface-variant": "#e4e2dd",
+                    "on-secondary-fixed": "#05210a",
+                    "background": "#fbf9f4",
+                    "on-primary-container": "#b3d7b9",
+                    "on-tertiary": "#ffffff",
+                    "inverse-surface": "#30312e",
+                    "surface-container-high": "#eae8e3",
+                    "surface": "#fbf9f4",
+                    "error-container": "#ffdad6",
+                    "secondary": "#486548",
+                    "on-primary-fixed": "#01210e",
+                    "surface-bright": "#fbf9f4",
+                    "on-secondary-fixed-variant": "#314d32",
+                    "on-tertiary-fixed": "#271904",
+                    "surface-dim": "#dbdad5",
+                    "on-primary-fixed-variant": "#2e4e37",
+                    "secondary-container": "#caecc6",
+                    "outline-variant": "#c2c8c0",
+                    "inverse-primary": "#accfb1",
+                    "surface-container-highest": "#e4e2dd",
+                    "primary-container": "#3f5f47",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-surface": "#1b1c19",
+                    "tertiary": "#503d25",
+                    "on-primary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "primary-fixed": "#c7eccd",
+                    "primary-fixed-dim": "#accfb1",
+                    "secondary-fixed-dim": "#aecfab"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "stack-sm": "8px",
+                    "stack-xl": "64px",
+                    "margin-mobile": "20px",
+                    "margin-desktop": "80px",
+                    "container-max": "1440px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px"
+            },
+            "fontFamily": {
+                    "body-md": ["Rubik"],
+                    "label-sm": ["Rubik"],
+                    "hero-h1-mobile": ["Rubik"],
+                    "section-h2": ["Rubik"],
+                    "hero-h1": ["Rubik"],
+                    "body-lg": ["Rubik"],
+                    "section-h2-mobile": ["Rubik"],
+                    "card-title": ["Rubik"]
+            },
+            "fontSize": {
+                    "body-md": ["17px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["14px", {"lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "hero-h1-mobile": ["48px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "section-h2": ["48px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "hero-h1": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["20px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "section-h2-mobile": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "card-title": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Rubik', sans-serif; background-color: #fbf9f4; scroll-behavior: smooth; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .hero-gradient { background: linear-gradient(to left, rgba(251, 249, 244, 0.9) 30%, rgba(251, 249, 244, 0) 100%); }
+        .public-highlight-pill { 
+            @apply rounded-full px-4 py-1 font-label-sm text-label-sm border shadow-sm flex items-center gap-1 transition-all;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .pill-mint { @apply bg-[#e6f4ea] border-[#accfb1] text-[#284731]; }
+        .pill-teal { @apply bg-[#e0f2f1] border-[#80cbc4] text-[#00695c]; }
+        .pill-coral { @apply bg-[#fff5f5] border-[#ffcdd2] text-[#c62828]; }
+        .pill-yellow { @apply bg-[#fffde7] border-[#fff59d] text-[#fbc02d]; }
+    </style>
+<script src="https://netfree.link/card/card-injection.js"></script><style>#netfree-popup-window-main{position:fixed;background:#ffffff;padding:0;margin:0;transition:right 0.3s ease, left 0.3s ease;z-index:9999999999;direction:rtl;box-sizing:border-box;top:0;bottom:0;height:100%;right:-250px;width:250px;background-color:rgba(0,0,255,0);pointer-events:none}#netfree-popup-window-hand-pull{background-image:url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgd2lkdGg9IjAuMTc3MjEzaW4iIGhlaWdodD0iMC44MjYwNTFpbiIgdmVyc2lvbj0iMS4xIiBzaGFwZS1yZW5kZXJpbmc9Imdlb21ldHJpY1ByZWNpc2lvbiIgdGV4dC1yZW5kZXJpbmc9Imdlb21ldHJpY1ByZWNpc2lvbiIgaW1hZ2UtcmVuZGVyaW5nPSJvcHRpbWl6ZVF1YWxpdHkiIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIg0Kdmlld0JveD0iMCAwIDEwOTcxIDUxMTQxIg0KIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiA8ZyBpZD0iTGF5ZXJfeDAwMjBfMSI+IA0KICA8Y2lyY2xlIGZpbGw9IiMyNDNFNEMiIGN4PSIzOTAyIiBjeT0iMzkwMiIgcj0iMzkwMiIvPg0KICA8Y2lyY2xlIGZpbGw9IiMyNDNFNEMiIGN4PSIzOTAyIiBjeT0iMTgzNDciIHI9IjM5MDIiLz4NCiAgPGNpcmNsZSBmaWxsPSIjMjQzRTRDIiBjeD0iMzkwMiIgY3k9IjMyNzkzIiByPSIzOTAyIi8+DQogIDxjaXJjbGUgZmlsbD0iIzI0M0U0QyIgY3g9IjM5MDIiIGN5PSI0NzIzOSIgcj0iMzkwMiIvPg0KICA8cmVjdCBmaWxsPSJub25lIiB3aWR0aD0iMTA5NzEiIGhlaWdodD0iNTExNDEiLz4NCiA8L2c+DQo8L3N2Zz4NCg==);background-size:88%;background-repeat:no-repeat;width:15px;left:-15px;height:50px;position:absolute;top:10px;bottom:10px;margin:auto;cursor:pointer;pointer-events:all}#netfree-popup-window-iframe{width:100%;height:100%;border:0;margin:0;padding:0;position:relative;display:block;visibility:hidden;transition:visibility 0.3s}#netfree-popup-window-main.active #netfree-popup-window-iframe{visibility:visible;transition:visibility 0.3s}.netfree-popup-window-mouseenter{opacity:.7;-webkit-filter:blur(2px)}.netfree-popup-window-click{opacity:.2}#netfree-popup-window-main.active{right:0px;pointer-events:all}#netfree-popup-window-main.h-position-left{right:auto;left:-250px}#netfree-popup-window-main.h-position-left.active{right:auto;left:0px}#netfree-popup-window-main.h-position-left #netfree-popup-window-hand-pull{left:auto;right:-15px;background-position-x:200%}#netfree-popup-window-main.v-position-top #netfree-popup-window-hand-pull{margin:20px 0 auto 0}#netfree-popup-window-main.v-position-bottom #netfree-popup-window-hand-pull{margin:auto 0 20px 0}@media print{#netfree-popup-window-main{display:none}#netfree-popup-window{display:none}}@media only screen and (max-height: 750px){#netfree-popup-window-main{right:-309px;width:309px}#netfree-popup-window-main.h-position-left{left:-309px}}@media only screen and (max-device-width: 760px) and (orientation: landscape){#netfree-popup-window-main{right:-280px;width:280px}#netfree-popup-window-main.h-position-left{left:-280px}}@media only screen and (max-device-width: 1200px) and (min-width: 760px) and (orientation: landscape){#netfree-popup-window-main{right:-302px;width:302px}#netfree-popup-window-main.h-position-left{left:-302px}}@media only screen and (max-device-width: 1200px) and (min-device-width: 750px) and (orientation: portrait){#netfree-popup-window-main{right:-270px;width:270px}#netfree-popup-window-main.h-position-left{left:-270px}}@media only screen and (max-device-width: 700px) and (orientation: portrait){#netfree-popup-window-main{right:-222px;width:222px}#netfree-popup-window-main.h-position-left{left:-222px}}@media print{#netfree-popup-window-main{display:none}}
+</style></head>
+<body class="text-on-background">
+<header class="fixed top-0 w-full z-50 transition-all duration-300 bg-transparent" id="top-nav">
+<nav class="flex flex-row-reverse justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-gutter max-w-container-max mx-auto rtl">
+<div class="flex items-center gap-stack-lg">
+<span class="font-hero-h1-mobile text-section-h2-mobile text-on-primary md:text-primary transition-colors duration-300 logo-text">Wellness Bloom</span>
+</div>
+<div class="hidden md:flex items-center gap-stack-lg">
+<a class="font-body-md text-body-md text-primary-fixed font-bold border-b-2 border-primary-fixed pb-1" href="#">דף הבית</a>
+<a class="font-body-md text-body-md text-on-secondary-fixed-variant hover:text-tertiary-fixed transition-colors" href="#">מתכונים</a>
+<a class="font-body-md text-body-md text-on-secondary-fixed-variant hover:text-tertiary-fixed transition-colors" href="#">מאמרים</a>
+<a class="font-body-md text-body-md text-on-secondary-fixed-variant hover:text-tertiary-fixed transition-colors" href="#">שירותים</a>
+<a class="font-body-md text-body-md text-on-secondary-fixed-variant hover:text-tertiary-fixed transition-colors" href="#">אודות</a>
+<a class="font-body-md text-body-md text-on-secondary-fixed-variant hover:text-tertiary-fixed transition-colors" href="#">צור קשר</a>
+</div>
+<button class="bg-primary text-on-primary px-stack-lg py-stack-sm rounded-lg font-label-sm text-label-sm hover:scale-105 transition-transform">
+            הצטרפו עכשיו
+        </button>
+</nav>
+</header>
+<main>
+<section class="relative h-screen min-h-[800px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCn6tYk4RXjGxSDfysYj5zrf7vi2ZMSegn2QKMsoVQCt_7COuD1U10dy5vwIPleqcsApRTtUXTIZ-CeApjdlobnOf-yP29AceTSWLpz8AuJ3GxoWStg35ttdvrRsiSbEyhE1DF06JkBsT1ZfD04DT8cY2fs9XmEz-fUJEZi0dRdGGF0QAWbxNj4hbdY4xC2HoDJNe0N1d8t1x4JzSikh_iqFbyZbIPYCSjaGmBnUAUOzKK0eCtibcgStQ">
+<div class="absolute inset-0 hero-gradient"></div>
+</div>
+<div class="container mx-auto px-margin-mobile md:px-margin-desktop z-10 text-right max-w-container-max">
+<div class="max-w-2xl animate-fade-in-up">
+<h1 class="font-hero-h1 text-hero-h1 text-primary mb-stack-md leading-tight">
+                    לחיות בטוב,<br>לאכול בנאה
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-stack-xl max-w-md">
+                    ליווי אישי לבריאות טבעית המשלב קשיבות, תזונה נכונה והנאה מחומרי הגלם של הטבע.
+                </p>
+<div class="flex gap-stack-md justify-start">
+<button class="bg-primary text-on-primary px-stack-xl py-4 rounded-xl font-label-sm text-label-sm hover:bg-primary-container transition-all shadow-lg hover:shadow-xl">
+                        בואי נתחיל
+                    </button>
+<button class="border-2 border-primary text-primary px-stack-xl py-4 rounded-xl font-label-sm text-label-sm hover:bg-primary hover:text-on-primary transition-all">
+                        לסיור באתר
+                    </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Part 1: Redesigned Short About Section -->
+<section class="py-stack-xl bg-gradient-to-l from-[#fdfbf7] to-[#e9f0ea] overflow-hidden">
+<div class="container mx-auto px-margin-mobile md:px-margin-desktop max-w-container-max">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-stack-xl items-center">
+<!-- Left Column: Graphic Composition -->
+<div class="lg:col-span-5 relative flex justify-center items-center h-[500px] md:h-[600px]">
+<!-- Organic background shapes -->
+<div class="absolute w-[350px] h-[350px] bg-[#d7e9da] rounded-full blur-3xl opacity-60 -z-10 translate-x-10 translate-y-10"></div>
+<div class="absolute w-[300px] h-[300px] bg-[#f9e5e3] rounded-full blur-3xl opacity-50 -z-10 -translate-x-12 -translate-y-12"></div>
+<div class="relative z-10 w-full max-w-md">
+<!-- Main supporting image -->
+<div class="rounded-[60px] overflow-hidden shadow-2xl border-4 border-white rotate-[-2deg] w-4/5 mx-auto">
+<img alt="Wellness Herbs" class="w-full h-[400px] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCVsppyZD3NwvyBrj1hXVnfi-Qcw0BvSRynv91cSZsfh5xfr3-AwJl5YDuTA-yFwcw_HusQIiTWI80SmYZ7t3xfMx1gmLdAMHFcLAAJz8KPBpVoX8eQzBZu2s7QrZXAnlDviUZ90ZiRv-yQZJXSjFA6XdKKdMobnpiQ8mddAhIY56HzGZ9fPNGc-hX3J2l0aRwDYQlR05BOEIUuVLIlBltUT9mS5n7nSCcJ4rh2cJE8E9XMXTdg4Em4Q">
+</div>
+<!-- Floating Pills -->
+<div class="public-highlight-pill pill-mint absolute top-4 left-0 -translate-x-4 animate-bounce hover:animate-none cursor-default" style="animation-duration: 3s;">
+<span class="material-symbols-outlined text-sm">spa</span>
+                            ליווי אישי
+                        </div>
+<div class="public-highlight-pill pill-teal absolute bottom-24 right-0 translate-x-4 animate-bounce hover:animate-none cursor-default" style="animation-duration: 4s;">
+<span class="material-symbols-outlined text-sm">eco</span>
+                            גישה טבעית
+                        </div>
+<div class="public-highlight-pill pill-coral absolute top-1/2 -left-8 -translate-y-1/2 animate-bounce hover:animate-none cursor-default" style="animation-duration: 3.5s;">
+<span class="material-symbols-outlined text-sm">energy_savings_leaf</span>
+                            שינוי בר-קיימא
+                        </div>
+<div class="public-highlight-pill pill-yellow absolute -bottom-4 left-1/4 animate-bounce hover:animate-none cursor-default" style="animation-duration: 4.5s;">
+<span class="material-symbols-outlined text-sm">self_improvement</span>
+                            הקשבה לגוף
+                        </div>
+</div>
+</div>
+<!-- Right Column: Text Content -->
+<div class="lg:col-span-7 text-right pr-0 md:pr-stack-lg">
+<span class="inline-block py-1 px-4 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm mb-stack-md uppercase tracking-wider">אודות</span>
+<h2 class="font-section-h2 text-section-h2 text-primary mb-stack-lg leading-[1.1]">הדרך שלך לאיזון טבעי מתחילה כאן</h2>
+<div class="max-w-2xl">
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-lg leading-relaxed">
+                            נעים מאוד, אני מיכל. מתוך אהבה עמוקה לטבע ולאדם, הקמתי את Wellness Bloom כדי להעניק לך את הכלים לחיות חיים מלאי אנרגיה וחיוניות. 
+                            הגישה שלי משלבת ידע מדעי עדכני יחד עם רפואה טבעית מסורתית, תוך התאמה אישית לקצב ולצרכים הייחודיים שלך.
+                        </p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-xl leading-relaxed">
+                            כאן לא תמצאי דיאטות קיצוניות, אלא תהליך עומק שבו נלמד יחד איך להקשיב לגוף, לבחור בטוב ולהרגיש פשוט נפלא.
+                        </p>
+<a class="inline-flex items-center text-primary font-bold gap-2 group border-b-2 border-primary-fixed hover:border-primary transition-all pb-1" href="#">
+<span class="">קראי עוד על המסע שלי</span>
+<span class="material-symbols-outlined group-hover:-translate-x-2 transition-transform">arrow_back</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-stack-xl bg-[#e9f0ea]">
+<div class="container mx-auto px-margin-mobile md:px-margin-desktop max-w-container-max">
+<div class="text-center mb-stack-xl">
+<h2 class="font-section-h2 text-section-h2 text-primary mb-stack-sm">השירותים שלנו</h2>
+<p class="font-body-md text-body-md text-on-secondary-container max-w-xl mx-auto">מעטפת שלמה של ליווי והדרכה בדרך לשיפור איכות החיים שלך</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-stack-lg">
+<div class="bg-white p-stack-lg rounded-xl shadow-lg border border-outline-variant hover:shadow-2xl transition-all relative overflow-hidden group">
+<div class="absolute top-4 right-4 bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full font-label-sm text-label-sm z-10">הפופולרי ביותר</div>
+<div class="h-48 mb-stack-lg rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-icT6uvv8rbCaLg80CTFubkkInzZ-uKnD1DzXmTOxtjY23uD54KkS-a7cNfVRGG0pBxpi1QrdBzgBFqSgVyAKVr8asJJJAetEEsDqhKDobHMDINNYxRsI_Hqo8VAiBu8v0MmllCNOo_hY8A_1UuZGNf49-ozMpHrYfc4AFpOhS0e070ChyRIrufBgnnd7pCu0ZyyD2823_d3JChkXT1Zib3VK3WGPQWqLyIJY4dzpchgwycO42xrCRQ">
+</div>
+<h3 class="font-card-title text-card-title text-primary mb-stack-sm">ליווי תזונתי</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-md">תהליך אישי ומעמיק לבניית הרגלי אכילה בריאים המותאמים לסדר היום שלך.</p>
+<button class="w-full border border-primary text-primary py-3 rounded-lg hover:bg-primary hover:text-on-primary transition-colors">לפרטים והרשמה</button>
+</div>
+<div class="bg-white p-stack-lg rounded-xl shadow-lg border border-outline-variant hover:shadow-2xl transition-all group">
+<div class="h-48 mb-stack-lg rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC04xnrmA8DBAFyCVumjpDHo1BPykGNcOpR3-GliVFk2TlHR5olCSVrT_it_X2aEh4Gb5M4sotJx2zxFVRqK54ZzofG8Fzc_thYR8e1C5ea4YyCWd8OlYQ42C4VBJMwT18wJfnX2gvuzrd8oQVsTNP4krBzJ3f0PhVe3yhOe7t-8GkinheO32kpECzZKbipvQhruzrIDH4BKoa-E5RagbXvfgdCMD7NkYXAP5r_Ye3tC3qQXx6PSCpieg">
+</div>
+<h3 class="font-card-title text-card-title text-primary mb-stack-sm">סדנאות בישול</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-md">חוויה מעשית ומהנה במטבח, בה נלמד להכין מנות מזינות, טעימות ופשוטות להכנה.</p>
+<button class="w-full border border-primary text-primary py-3 rounded-lg hover:bg-primary hover:text-on-primary transition-colors">צפי בסדנאות הקרובות</button>
+</div>
+<div class="bg-white p-stack-lg rounded-xl shadow-lg border border-outline-variant hover:shadow-2xl transition-all group">
+<div class="h-48 mb-stack-lg rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiXOgKdOL1rHPdM_y3eN1AceccJw46udRgsDFC1y3ep-5jutHnvQl-WZgCnuAVEmEuyb5l1M9-p1-QqyVMqlscUXghI7iZx4jK7mM3ZCy01lBVN-JaVJ1Pi01nNvkWMLuAVEF4XHMuu7tRA3yfutfHPBf-U0z4dD0dpg0g4tZslutYvOvvLjfa-8EXAVYbP2XdIMpyC9QMSSKQfbf7b93wpw1MrJlO0ipA6j4KZQ90vw0v1J4g01n6Gg">
+</div>
+<h3 class="font-card-title text-card-title text-primary mb-stack-sm">הרצאות לארגונים</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-md">הדרכות וסדנאות לחברות המעוניינות להעניק לעובדים שלהן כלים לשיפור הריכוז והאנרגיה.</p>
+<button class="w-full border border-primary text-primary py-3 rounded-lg hover:bg-primary hover:text-on-primary transition-colors">לתיאום פגישה</button>
+</div>
+</div>
+</div>
+</section>
+<section class="py-stack-xl">
+<div class="container mx-auto px-margin-mobile md:px-margin-desktop max-w-container-max">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-stack-lg">
+<div class="text-center p-stack-lg bg-[#f0f7f1] rounded-2xl">
+<div class="w-16 h-16 bg-[#c1e2c7] rounded-full flex items-center justify-center mx-auto mb-stack-md text-primary">
+<span class="material-symbols-outlined text-4xl">eco</span>
+</div>
+<h3 class="font-card-title text-card-title text-primary mb-stack-sm">פשטות</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">כי דברים טובים לא חייבים להיות מסובכים. מתכונים פשוטים וכלים נגישים.</p>
+</div>
+<div class="text-center p-stack-lg bg-[#fff1f0] rounded-2xl">
+<div class="w-16 h-16 bg-[#ffd6d4] rounded-full flex items-center justify-center mx-auto mb-stack-md text-[#ba1a1a]">
+<span class="material-symbols-outlined text-4xl">favorite</span>
+</div>
+<h3 class="font-card-title text-card-title text-primary mb-stack-sm">הנאה</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">הדרך לבריאות עוברת דרך חיוך וטעם טוב. אנחנו כאן כדי ליהנות מהדרך.</p>
+</div>
+<div class="text-center p-stack-lg bg-[#fffbeb] rounded-2xl">
+<div class="w-16 h-16 bg-[#fde68a] rounded-full flex items-center justify-center mx-auto mb-stack-md text-[#b45309]">
+<span class="material-symbols-outlined text-4xl">self_improvement</span>
+</div>
+<h3 class="font-card-title text-card-title text-primary mb-stack-sm">קשיבות</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">למידה של הקשבה לגוף ולצרכיו האמיתיים ברגע הזה.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="py-stack-xl bg-[#f0fff4]">
+<div class="container mx-auto px-margin-mobile md:px-margin-desktop max-w-container-max">
+<div class="flex justify-between items-end mb-stack-xl">
+<div class="text-right">
+<h2 class="font-section-h2 text-section-h2 text-primary">מהמתכונים האחרונים</h2>
+<p class="font-body-md text-body-md text-secondary">טעימים, בריאים וקלים להכנה</p>
+</div>
+<a class="text-primary font-bold underline underline-offset-4" href="#">לכל המתכונים</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-lg">
+<div class="flex flex-col md:flex-row bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all">
+<div class="md:w-1/2 h-64 md:h-auto overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChMxeAAKLqcL8sQESbtCK9l4v7LFHMpaxo0Rv4llzjCA_pfsSfFTIB61Cbnt1ACAyO3YoC7dfO5jzC2ZL8dUvOEoHtpNIDaOsTqteoziLmtVF2BcknbjBOYBHixOj7FhSCuq2G0KFl-rv3h6oqbzbbmfg8yEuOkYVZ3J8XMUC-2D_Mr4k2W1jUnMMZF2KP71npvrJ9SZQpzMxMP6w-CoeR1SsclVo1pzu2E1rNXeSFBjLgMWEX3oOmYw">
+</div>
+<div class="md:w-1/2 p-stack-lg flex flex-col justify-between">
+<div>
+<div class="flex gap-2 mb-stack-sm">
+<span class="text-[12px] border border-primary px-2 py-0.5 rounded-full text-primary">טבעוני</span>
+<span class="text-[12px] border border-primary px-2 py-0.5 rounded-full text-primary">ללא גלוטן</span>
+</div>
+<h3 class="font-card-title text-card-title text-primary mb-stack-sm">שייק ירוק מרענן</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-md">הדרך המושלמת להתחיל את הבוקר עם בוסט של אנרגיה ורעננות.</p>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="">10 דקות</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">restaurant</span>
+<span class="">2 מנות</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col md:flex-row bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all">
+<div class="md:w-1/2 h-64 md:h-auto overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5-PzHvsL34IdkGLOPfL3KVzL3snyvTy2NdyxyFdqHi_oJC9IZOlygtcqHl8E-dibdpAwijCXmOXbJrpFpT4CdWtu_iswbGNMTl8tb4gjeyc6FKSSMRfvgBtDvx7vzEl3jYRP0yiVaR-tFTZ1MY7qrJZHLDxxfe6sWL6hPh5c-SxMGcLdv4NKeilhu-wPp3I1SlllvUnR4pkrgypGVCPLaPVPOOg6xKegrW2oao7IxGEqh9jDUKVaFbQ">
+</div>
+<div class="md:w-1/2 p-stack-lg flex flex-col justify-between">
+<div>
+<div class="flex gap-2 mb-stack-sm">
+<span class="text-[12px] border border-primary px-2 py-0.5 rounded-full text-primary">טבעוני</span>
+</div>
+<h3 class="font-card-title text-card-title text-primary mb-stack-sm">סלט קינואה צבעוני</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-md">ארוחה משביעה, מזינה ומלאה בכל טוב הארץ.</p>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="">20 דקות</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">restaurant</span>
+<span class="">4 מנות</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-stack-xl bg-[#fff2f2]">
+<div class="container mx-auto px-margin-mobile md:px-margin-desktop max-w-container-max text-center">
+<span class="material-symbols-outlined text-primary text-6xl mb-stack-md" style="font-variation-settings: 'FILL' 1;">format_quote</span>
+<div class="max-w-4xl mx-auto" id="testimonial-carousel">
+<div class="testimonial-item transition-opacity duration-500">
+<p class="font-hero-h1-mobile text-section-h2-mobile text-primary mb-stack-lg leading-snug">"התהליך עם מיכל שינה לי את התפיסה על אוכל. פתאום זה לא עונש, זה תענוג אמיתי לגוף ולנשמה."</p>
+<div class="flex flex-col items-center">
+
+<p class="font-bold text-primary">דנה כהן</p>
+<p class="text-on-surface-variant">משתתפת בסדנת "בישול בקשיבות"</p>
+</div>
+</div>
+</div>
+<div class="flex justify-center gap-4 mt-stack-xl">
+<button class="w-12 h-12 rounded-full border border-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+<button class="w-12 h-12 rounded-full border border-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Part 2: Redesigned Professional Training Section -->
+<section class="py-stack-xl bg-gradient-to-b from-[#e9f0ea] to-[#fbf9f4] relative overflow-hidden">
+<!-- Oversized background icon -->
+<span class="material-symbols-outlined absolute -bottom-10 -right-20 text-[300px] text-primary opacity-5 select-none pointer-events-none">award_star</span>
+<div class="container mx-auto px-margin-mobile md:px-margin-desktop max-w-container-max relative z-10">
+<div class="text-center mb-stack-xl">
+<h2 class="font-section-h2 text-section-h2 text-primary mb-stack-sm">הכשרה ומקצועיות</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">ידע מבוסס מחקר וניסיון של שנים המעניקים לך ביטחון מלא</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-stack-lg items-stretch">
+<!-- Featured Training Card -->
+<div class="lg:col-span-7 bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row group transition-transform hover:-translate-y-1">
+<div class="md:w-2/5 h-64 md:h-auto relative">
+<img alt="Professional Certification" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-icT6uvv8rbCaLg80CTFubkkInzZ-uKnD1DzXmTOxtjY23uD54KkS-a7cNfVRGG0pBxpi1QrdBzgBFqSgVyAKVr8asJJJAetEEsDqhKDobHMDINNYxRsI_Hqo8VAiBu8v0MmllCNOo_hY8A_1UuZGNf49-ozMpHrYfc4AFpOhS0e070ChyRIrufBgnnd7pCu0ZyyD2823_d3JChkXT1Zib3VK3WGPQWqLyIJY4dzpchgwycO42xrCRQ">
+<div class="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors"></div>
+</div>
+<div class="md:w-3/5 p-stack-lg flex flex-col justify-center text-right">
+<div class="public-highlight-pill pill-teal w-fit mb-stack-sm">
+<span class="material-symbols-outlined text-sm">verified_user</span>
+                            אימון לבריאות
+                        </div>
+<h3 class="text-[24px] font-bold text-primary mb-2">אימון לבריאות (Health Coach)</h3>
+<p class="text-[18px] font-medium text-tertiary-container mb-stack-md">Institute of Integrative Nutrition, NY</p>
+<p class="text-on-surface-variant text-body-md leading-relaxed">הסמכה בינלאומית המשלבת מעל 100 תיאוריות תזונתיות שונות עם שיטות אימון מתקדמות לשינוי הרגלים.</p>
+<div class="mt-stack-md flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined">award</span>
+<span class="">הסמכה בינלאומית מקיפה</span>
+</div>
+</div>
+</div>
+<!-- Secondary Training Cards Column -->
+<div class="lg:col-span-5 flex flex-col gap-stack-lg">
+<!-- Support Card 1 -->
+<div class="bg-white/80 backdrop-blur-sm p-stack-lg rounded-3xl border border-white shadow-md flex items-center gap-stack-lg hover:shadow-lg transition-all hover:bg-white group">
+<div class="bg-[#e6f4ea] p-4 rounded-2xl text-[#284731] group-hover:bg-[#284731] group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-4xl">school</span>
+</div>
+<div class="text-right">
+<div class="public-highlight-pill pill-mint w-fit mb-2">
+                                תזונה טבעית
+                            </div>
+<h3 class="text-[20px] font-bold text-primary">תזונה קלינית טבעית</h3>
+<p class="text-[16px] font-medium text-on-surface-variant">מכללת רידמן לרפואה משלימה</p>
+</div>
+</div>
+<!-- Support Card 2 -->
+<div class="bg-white/80 backdrop-blur-sm p-stack-lg rounded-3xl border border-white shadow-md flex items-center gap-stack-lg hover:shadow-lg transition-all hover:bg-white group">
+<div class="bg-[#fffde7] p-4 rounded-2xl text-[#fbc02d] group-hover:bg-[#fbc02d] group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-4xl">library_books</span>
+</div>
+<div class="text-right">
+<div class="public-highlight-pill pill-yellow w-fit mb-2">
+                                צמחי מרפא
+                            </div>
+<h3 class="text-[20px] font-bold text-primary">מומחית בצמחי מרפא (Herman)</h3>
+<p class="text-[16px] font-medium text-on-surface-variant">האגודה הישראלית להרבליזם</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-stack-xl bg-[#f0f9ff]">
+<div class="container mx-auto px-margin-mobile md:px-margin-desktop max-w-container-max">
+<div class="flex justify-between items-end mb-stack-xl">
+<div class="text-right">
+<h2 class="font-section-h2 text-section-h2 text-primary">מהבלוג שלנו</h2>
+<p class="font-body-md text-body-md text-secondary">טיפים, מחקרים והשראה ליומיום</p>
+</div>
+<a class="text-primary font-bold underline underline-offset-4" href="#">לכל המאמרים</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-stack-lg">
+<article class="bg-white rounded-2xl overflow-hidden shadow-md group cursor-pointer">
+<div class="h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtFoLjjTSgbDjWFrYcLyK2wU025EyQ8gzl6NFHdrHm6Q4weZt8mzTbnUHZbQJVmToDA8487Oqz_w42cd2la0cpTZT2QEsQ_lfqa_Q8OwOkxo3r_SIBtO1p13cag2qqTwwlju1UzkcoJ7R8XPGuDcgl2nsMKcoYIz6qVEjJCjVBvQ4bkktWHiWPlTUvW2kHgMgyCA3wK0ju3G5UYd6z81TVPz00oENz71u56ftCQOTudSNI4iPWQcFCew">
+</div>
+<div class="p-stack-lg">
+<div class="flex justify-between items-center mb-stack-sm">
+<span class="font-label-sm text-label-sm text-secondary">בריאות הנפש</span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">timer</span>
+                                5 דקות קריאה
+                            </span>
+</div>
+<h3 class="font-card-title text-card-title text-primary mb-stack-sm group-hover:text-primary-container transition-colors">איך לשפר את איכות השינה באופן טבעי</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-md line-clamp-2">השינה היא הבסיס לכל תהליך ריפוי בגוף. הנה 5 הרגלים קטנים שיעשו שינוי ענק...</p>
+</div>
+</article>
+<article class="bg-white rounded-2xl overflow-hidden shadow-md group cursor-pointer">
+<div class="h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCYych4DkCbqiBO7QSzgMYRdTDX_13JR4p0Ifn63pyoHTeFD8hkk1FewPieaFWMGbEIwGnKoU_l48dQzcpXMwSPTxGo2MfpsOJNvX9jC-avjwcHPe-xOOmzr8YDZyGlA67xny4GLVvKdYtO2A3ULrky1D24kRZc8M3vDSiR9Vb7UoFAHLN9fDTeegTCJi5TSUNw16oYWvjqr2YEwXxeTKbRIwWONKeFL0ZznZJOBTis0NuaAHRnhduzg">
+</div>
+<div class="p-stack-lg">
+<div class="flex justify-between items-center mb-stack-sm">
+<span class="font-label-sm text-label-sm text-secondary">תזונה</span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">timer</span>
+                                8 דקות קריאה
+                            </span>
+</div>
+<h3 class="font-card-title text-card-title text-primary mb-stack-sm group-hover:text-primary-container transition-colors">החשיבות של ויטמינים מהצומח</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-md line-clamp-2">למה כדאי להעדיף מזון שלם על פני תוספים, ואיך להשיג את המקסימום מכל ביס.</p>
+</div>
+</article>
+<article class="bg-white rounded-2xl overflow-hidden shadow-md group cursor-pointer hidden lg:block">
+
+<div class="p-stack-lg">
+<div class="flex justify-between items-center mb-stack-sm">
+<span class="font-label-sm text-label-sm text-secondary">אורח חיים</span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">timer</span>
+                                4 דקות קריאה
+                            </span>
+</div>
+<h3 class="font-card-title text-card-title text-primary mb-stack-sm group-hover:text-primary-container transition-colors">קשיבות בארוחה (Mindful Eating)</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-md line-clamp-2">איך להפוך כל ארוחה לרגע של שקט, נוכחות וחיבור פנימי לגוף שלך.</p>
+</div>
+</article>
+</div>
+</div>
+</section>
+<section class="py-stack-xl relative overflow-hidden">
+<div class="absolute inset-0 bg-primary z-0"></div>
+<div class="absolute top-0 right-0 w-1/3 h-full bg-primary-container opacity-20 -skew-x-12 transform origin-top-right"></div>
+<div class="container mx-auto px-margin-mobile md:px-margin-desktop max-w-container-max relative z-10 text-center">
+<h2 class="font-hero-h1-mobile text-hero-h1-mobile text-on-primary mb-stack-md">מוכנה לשינוי?</h2>
+<p class="font-body-lg text-body-lg text-on-primary-container mb-stack-xl max-w-2xl mx-auto">
+                אני כאן ללוות אותך יד ביד בדרך לגרסה הבריאה והחיונית ביותר שלך. בואי נקבע שיחת היכרות קצרה ונצא לדרך.
+            </p>
+<div class="flex flex-col md:flex-row gap-stack-md justify-center">
+<button class="bg-tertiary-fixed text-on-tertiary-fixed px-stack-xl py-4 rounded-xl font-bold hover:scale-105 transition-transform flex items-center justify-center gap-2">
+<span class="">קביעת שיחת היכרות</span>
+<span class="material-symbols-outlined">calendar_today</span>
+</button>
+<button class="bg-[#25D366] text-white px-stack-xl py-4 rounded-xl font-bold hover:scale-105 transition-transform flex items-center justify-center gap-2">
+<span class="">שלחי הודעה ב-WhatsApp</span>
+<span class="material-symbols-outlined">chat</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-primary dark:bg-on-primary-fixed w-full" id="main-footer">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-stack-lg px-margin-mobile md:px-margin-desktop py-stack-xl max-w-container-max mx-auto rtl">
+<div class="col-span-1 md:col-span-1">
+<span class="font-hero-h1-mobile text-section-h2-mobile text-tertiary-fixed block mb-stack-md">Wellness Bloom</span>
+<p class="text-surface-variant font-body-md text-body-md leading-relaxed">
+                ליווי תזונתי ואורח חיים בריא המשלב גוף ונפש. הצטרפי אלינו למסע של גילוי, בריאות והנאה.
+            </p>
+</div>
+<div class="text-on-primary flex flex-col gap-2">
+<h4 class="font-bold text-primary-fixed-dim mb-2">ניווט מהיר</h4>
+<a class="text-surface-variant hover:text-on-primary-container transition-colors hover:underline underline-offset-4" href="#">דף הבית</a>
+<a class="text-surface-variant hover:text-on-primary-container transition-colors hover:underline underline-offset-4" href="#">מתכונים</a>
+<a class="text-surface-variant hover:text-on-primary-container transition-colors hover:underline underline-offset-4" href="#">סדנאות</a>
+<a class="text-surface-variant hover:text-on-primary-container transition-colors hover:underline underline-offset-4" href="#">הבלוג שלנו</a>
+</div>
+<div class="text-on-primary flex flex-col gap-2">
+<h4 class="font-bold text-primary-fixed-dim mb-2">מידע נוסף</h4>
+<a class="text-surface-variant hover:text-on-primary-container transition-colors hover:underline underline-offset-4" href="#">מדיניות פרטיות</a>
+<a class="text-surface-variant hover:text-on-primary-container transition-colors hover:underline underline-offset-4" href="#">תנאי שימוש</a>
+<a class="text-surface-variant hover:text-on-primary-container transition-colors hover:underline underline-offset-4" href="#">שאלות נפוצות</a>
+<a class="text-surface-variant hover:text-on-primary-container transition-colors hover:underline underline-offset-4" href="#">נגישות</a>
+</div>
+<div class="text-on-primary">
+<h4 class="font-bold text-primary-fixed-dim mb-2">הרשמה לניוזלטר</h4>
+<p class="text-surface-variant mb-4 text-sm">קבלו טיפים ומתכונים ישירות למייל</p>
+<form class="flex flex-col gap-2">
+<input class="bg-primary-container border-none text-on-primary rounded-lg px-4 py-2 placeholder:text-on-primary-container" placeholder="כתובת אימייל" type="email">
+<button class="bg-tertiary-fixed text-on-tertiary-fixed py-2 rounded-lg font-bold">הרשמה</button>
+</form>
+</div>
+</div>
+<div class="border-t border-primary-container py-stack-md text-center">
+<p class="text-primary-fixed-dim text-body-md font-body-md">כל הזכויות שמורות © 2024 Wellness Bloom</p>
+</div>
+</footer>
+<script>
+    const header = document.getElementById('top-nav');
+    const logo = header.querySelector('.logo-text');
+    
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            header.classList.remove('bg-transparent');
+            header.classList.add('bg-primary', 'shadow-lg');
+            logo.classList.remove('text-primary');
+            logo.classList.add('text-on-primary');
+        } else {
+            header.classList.remove('bg-primary', 'shadow-lg');
+            header.classList.add('bg-transparent');
+            logo.classList.remove('text-on-primary');
+            logo.classList.add('text-primary');
+        }
+    });
+</script>
+
+
+
+
+<script src="//netfree.link/injection-script/go-payment.js" type="text/javascript" async=""></script>
+<script src="//netfree.link/injection-script/popup-card-init.js" type="text/javascript" async=""></script>
+</body><iframe src="//netfree.link/misc/go-payment.html?v=3" style="height: 0px; width: 0px; display: none;"></iframe></html>
+<!-- Injection By NetFree -->
+<script src="//netfree.link/injection-script/go-payment.js" type="text/javascript" async ></script>
+<script src="//netfree.link/injection-script/popup-card-init.js" type="text/javascript" async ></script>

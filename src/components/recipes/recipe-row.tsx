@@ -35,7 +35,6 @@ import {
 import { FormToast } from "@/components/ui/form-toast";
 import {
   formatDifficulty,
-  formatDurationMinutes,
   formatRecipeDate,
 } from "@/lib/recipes/format";
 import type { RecipeListItem } from "@/lib/recipes/types";
@@ -121,7 +120,7 @@ export function RecipeRow({ item }: RecipeRowProps) {
               </h3>
               <p className="text-sm text-[var(--color-text-muted)]">
                 {item.categoryName ?? "ללא קטגוריה"} ·{" "}
-                {formatDurationMinutes(item.duration_minutes)} ·{" "}
+                {item.prep_duration} ·{" "}
                 {formatDifficulty(item.difficulty)}
               </p>
               <div className="flex flex-wrap gap-2">

@@ -15,11 +15,12 @@ import {
   COMPLETED_ITEM_REMOVE_DELAY_REDUCED_MS,
   createUploadQueueItem,
   processUploadBatch,
+  revalidateQueueItemForProfile,
   revokeQueueItemPreview,
   type BatchProgressStats,
   type UploadQueueItem,
 } from "@/lib/media/upload-queue";
-import type { UploadMode } from "@/lib/media/constants";
+import type { UploadProfile } from "@/lib/media/constants";
 import { cn } from "@/lib/utils/cn";
 
 type MediaUploadDialogProps = {
@@ -28,7 +29,7 @@ type MediaUploadDialogProps = {
   onSuccess: () => void;
 };
 
-const ACCEPTED_EXTENSIONS = ".jpg,.jpeg,.png,.webp";
+const ACCEPTED_EXTENSIONS = ".jpg,.jpeg,.png,.webp,.mp4,.webm";
 const BATCH_LIMIT_MESSAGE = "ניתן להעלות עד 10 קבצים בכל פעם.";
 
 const UPLOAD_DIALOG_PANEL_CLASS =
@@ -154,10 +155,12 @@ export function MediaUploadDialog({
     });
   };
 
-  const handleUploadModeChange = (id: string, uploadMode: UploadMode) => {
+  const handleUploadProfileChange = (id: string, uploadProfile: UploadProfile) => {
     setQueue((current) =>
       current.map((item) =>
-        item.id === id ? { ...item, uploadMode } : item
+        item.id === id
+          ? { ...item, ...revalidateQueueItemForProfile(item, uploadProfile) }
+          : item
       )
     );
   };
@@ -212,7 +215,7 @@ export function MediaUploadDialog({
           const result = await uploadMediaViaApi(
             item.file,
             item.altText,
-            item.uploadMode,
+            item.uploadProfile,
             abortController.signal
           );
 
@@ -410,7 +413,7 @@ export function MediaUploadDialog({
             </Button>
 
             <div className="space-y-1 text-caption text-[var(--color-text-muted)]">
-              <p>פורמטים נתמכים: JPEG, PNG, WebP</p>
+              <p>פורמטים נתמכים: JPEG, PNG, WebP, MP4, WebM (סרטונים לתמונה ראשית)</p>
               <p>עד {MAX_BATCH_UPLOAD_FILES} קבצים · עד 30MB לקובץ</p>
             </div>
           </div>
@@ -458,7 +461,7 @@ export function MediaUploadDialog({
                   item={item}
                   disabled={isUploading}
                   onAltTextChange={handleAltTextChange}
-                  onUploadModeChange={handleUploadModeChange}
+                  onUploadProfileChange={handleUploadProfileChange}
                   onRemove={handleRemoveItem}
                 />
               ))}

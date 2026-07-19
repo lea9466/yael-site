@@ -8,6 +8,7 @@ import {
   CERTIFICATE_YEAR_MIN,
 } from "@/lib/certificates/constants";
 import { mapZodErrors } from "@/lib/validations/service";
+import { normalizeMultilineText } from "@/lib/text/multiline-text";
 
 export { mapZodErrors };
 
@@ -91,7 +92,8 @@ export const certificateFormInputSchema = z.object({
   media_id: uuidSchema,
   description: z
     .string()
-    .max(CERTIFICATE_DESCRIPTION_MAX, "התיאור ארוך מדי"),
+    .max(CERTIFICATE_DESCRIPTION_MAX, "התיאור ארוך מדי")
+    .transform(normalizeMultilineText),
 });
 
 export type CertificateFormInput = z.infer<typeof certificateFormInputSchema>;
@@ -130,12 +132,14 @@ export function formInputToCertificateFields(
 > {
   const trimmedYear = input.year.trim();
 
+  const normalizedDescription = normalizeMultilineText(input.description);
+
   return {
     title: input.title.trim(),
     organization: input.organization.trim(),
     year: trimmedYear.length > 0 ? Number.parseInt(trimmedYear, 10) : null,
     media_id: input.media_id,
     description:
-      input.description.trim().length > 0 ? input.description : null,
+      normalizedDescription.length > 0 ? normalizedDescription : null,
   };
 }

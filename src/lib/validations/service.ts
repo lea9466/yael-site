@@ -6,6 +6,7 @@ import {
   isReservedServiceSlug,
   isValidServiceSlug,
 } from "@/lib/services/slug";
+import { normalizeMultilineText } from "@/lib/text/multiline-text";
 
 export const SERVICES_PAGE_SIZE = 20;
 
@@ -69,7 +70,7 @@ const slugSchema = z
   .min(1, "יש להזין כתובת שירות")
   .max(120, "כתובת השירות ארוכה מדי")
   .refine((value) => isValidServiceSlug(value), {
-    message: "כתובת השירות יכולה להכיל אותיות באנגלית, מספרים ומקפים בלבד",
+    message: "כתובת השירות יכולה להכיל אותיות בעברית או באנגלית, מספרים ומקפים בלבד",
   })
   .refine((value) => !isReservedServiceSlug(value), {
     message: "כתובת זו שמורה למערכת",
@@ -149,9 +150,9 @@ const serviceBaseFieldsSchema = z.object({
   slug: slugSchema,
   short_description: z
     .string()
-    .trim()
-    .min(1, "יש להזין תיאור קצר")
-    .max(300, "התיאור הקצר ארוך מדי"),
+    .max(300, "התיאור הקצר ארוך מדי")
+    .transform(normalizeMultilineText)
+    .pipe(z.string().min(1, "יש להזין תיאור קצר")),
   full_introduction: z
     .string()
     .trim()

@@ -1,26 +1,58 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { SectionCTA } from "@/components/homepage/section-cta";
+import { PublicHighlightPill } from "@/components/homepage/public-highlight-pill";
+import { MultilineText } from "@/components/ui/multiline-text";
+import {
+  getServiceCardBadge,
+  type ServiceCardSurface,
+} from "@/lib/homepage/service-card-display";
 import type { PublicServiceSummary } from "@/lib/public/types";
 import { cn } from "@/lib/utils/cn";
 
 type ServiceCardProps = {
   service: PublicServiceSummary;
+  surface?: ServiceCardSurface;
+  isPrimaryFeatured?: boolean;
   className?: string;
 };
 
-export function ServiceCard({ service, className }: ServiceCardProps) {
+const surfaceClasses: Record<ServiceCardSurface, string> = {
+  white: "service-card--white",
+  sage: "service-card--sage",
+  cream: "service-card--cream",
+};
+
+export function ServiceCard({
+  service,
+  surface = "white",
+  isPrimaryFeatured = false,
+  className,
+}: ServiceCardProps) {
+  const badge = getServiceCardBadge(service, isPrimaryFeatured);
+  const href = `/services/${service.slug}`;
+
   return (
     <article
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-[var(--transition-base)] hover:-translate-y-1 hover:shadow-[var(--shadow-md)]",
+        "service-card group",
+        surfaceClasses[surface],
         className
       )}
     >
+      {badge ? (
+        <PublicHighlightPill
+          label={badge.label}
+          variant={badge.variant}
+          floating={false}
+          className="service-card__badge"
+        />
+      ) : null}
+
       <Link
-        href={`/services/${service.slug}`}
-        className="public-focus-ring relative block aspect-[4/3] overflow-hidden bg-[var(--color-surface-soft)]"
+        href={href}
+        className="service-card__media public-focus-ring"
+        aria-label={service.title}
       >
         {service.coverUrl ? (
           <Image
@@ -28,40 +60,28 @@ export function ServiceCard({ service, className }: ServiceCardProps) {
             alt={service.coverAlt ?? service.title}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-[var(--transition-slow)] group-hover:scale-[1.03]"
+            className="service-card__image"
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-[linear-gradient(135deg,var(--color-light-sage-soft)_0%,var(--color-cream)_100%)] px-4 text-center text-sm text-[var(--color-text-muted)]">
-            {service.title}
-          </div>
+          <div className="service-card__media-fallback">{service.title}</div>
         )}
-        {service.featured ? (
-          <span className="status-badge absolute start-3 top-3" data-size="sm" data-variant="featured">
-            <span className="status-badge-label">מומלץ</span>
-          </span>
-        ) : null}
       </Link>
 
-      <div className="flex flex-1 flex-col gap-3 p-5">
-        <div className="space-y-2">
-          <h3 className="text-card-title line-clamp-2">
-            <Link
-              href={`/services/${service.slug}`}
-              className="public-focus-ring rounded-[var(--radius-sm)] transition-colors hover:text-[var(--color-primary)]"
-            >
+      <div className="service-card__body">
+        <div className="service-card__copy">
+          <h3 className="service-card__title">
+            <Link href={href} className="public-focus-ring rounded-[var(--radius-sm)]">
               {service.title}
             </Link>
           </h3>
-          <p className="text-muted line-clamp-3 text-sm">{service.short_description}</p>
+          <MultilineText as="p" className="service-card__description">
+            {service.short_description}
+          </MultilineText>
         </div>
-        <div className="mt-auto pt-1">
-          <SectionCTA
-            label="לפרטים"
-            href={`/services/${service.slug}`}
-            variant="ghost"
-            className="min-h-0 px-0"
-          />
-        </div>
+
+        <Link href={href} className="hero-btn hero-btn--secondary service-card__cta public-focus-ring">
+          לפרטים
+        </Link>
       </div>
     </article>
   );

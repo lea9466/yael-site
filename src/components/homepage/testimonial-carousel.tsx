@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 
+import { MultilineText } from "@/components/ui/multiline-text";
+import { getTestimonialInitials } from "@/lib/testimonials/format";
 import type { PublicTestimonialSummary } from "@/lib/public/types";
 import { cn } from "@/lib/utils/cn";
 
@@ -19,38 +21,52 @@ function TestimonialSlide({
     expanded || !isLong
       ? testimonial.content
       : `${testimonial.content.slice(0, CONTENT_PREVIEW_LENGTH).trimEnd()}…`;
+  const initials = getTestimonialInitials(testimonial.name);
 
   return (
-    <blockquote className="mx-auto max-w-3xl space-y-5 text-center">
-      <p className="whitespace-pre-wrap text-lg leading-relaxed text-[var(--color-text)] sm:text-xl">
-        &ldquo;{displayContent}&rdquo;
-      </p>
+    <article className="testimonial-carousel__card">
+      <Quote
+        aria-hidden="true"
+        className="testimonial-carousel__quote-icon"
+        strokeWidth={1.5}
+      />
+
+      <blockquote className="testimonial-carousel__quote">
+        <MultilineText as="p" className="testimonial-carousel__text">
+          {displayContent}
+        </MultilineText>
+      </blockquote>
+
       {isLong ? (
         <button
           type="button"
           onClick={() => setExpanded((value) => !value)}
-          className="public-focus-ring rounded-[var(--radius-sm)] text-sm font-medium text-[var(--color-soft-accent)] transition-colors hover:text-[var(--color-primary)]"
+          className="testimonial-carousel__expand public-focus-ring"
           aria-expanded={expanded}
         >
           {expanded ? "הצג פחות" : "קראי עוד"}
         </button>
       ) : null}
-      <footer className="space-y-1">
-        <cite className="not-italic">
-          <span className="text-base font-semibold text-[var(--color-primary)]">
+
+      <footer className="testimonial-carousel__footer">
+        <span aria-hidden="true" className="testimonial-carousel__avatar">
+          {initials}
+        </span>
+        <div className="testimonial-carousel__meta">
+          <cite className="testimonial-carousel__name not-italic">
             {testimonial.name}
-          </span>
+          </cite>
           {testimonial.city ? (
-            <span className="text-muted text-sm"> · {testimonial.city}</span>
+            <p className="testimonial-carousel__subtitle">{testimonial.city}</p>
           ) : null}
-        </cite>
-        {testimonial.serviceTitle ? (
-          <p className="text-caption text-[var(--color-soft-accent)]">
-            {testimonial.serviceTitle}
-          </p>
-        ) : null}
+          {testimonial.serviceTitle ? (
+            <p className="testimonial-carousel__service">
+              {testimonial.serviceTitle}
+            </p>
+          ) : null}
+        </div>
       </footer>
-    </blockquote>
+    </article>
   );
 }
 
@@ -124,27 +140,33 @@ export function TestimonialCarousel({ testimonials }: TestimonialCarouselProps) 
       aria-roledescription="carousel"
       aria-label="המלצות"
       id={regionId}
-      className="public-focus-ring relative rounded-[var(--radius-xl)] outline-none"
+      className="testimonial-carousel public-focus-ring outline-none"
     >
-      <div className="relative min-h-[280px] px-2 py-4 sm:min-h-[240px]">
-        <TestimonialSlide
+      <div className="testimonial-carousel__stage">
+        <div
           key={activeTestimonial.id}
-          testimonial={activeTestimonial}
-        />
+          className="testimonial-carousel__slide"
+        >
+          <TestimonialSlide testimonial={activeTestimonial} />
+        </div>
       </div>
 
       {testimonials.length > 1 ? (
-        <div className="mt-6 flex items-center justify-center gap-4">
+        <div className="testimonial-carousel__controls">
           <button
             type="button"
             onClick={goPrevious}
             aria-label="המלצה קודמת"
-            className="public-focus-ring inline-flex size-11 items-center justify-center rounded-[var(--radius-full)] border border-[var(--color-soft-accent)]/40 bg-[var(--color-surface)] text-[var(--color-soft-accent)] transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-[var(--color-coral-soft)]"
+            className="testimonial-carousel__nav public-focus-ring"
           >
             <ChevronRight aria-hidden="true" className="size-5" />
           </button>
 
-          <div className="flex items-center gap-2" role="tablist" aria-label="בחירת המלצה">
+          <div
+            className="testimonial-carousel__dots"
+            role="tablist"
+            aria-label="בחירת המלצה"
+          >
             {testimonials.map((testimonial, index) => (
               <button
                 key={testimonial.id}
@@ -154,10 +176,8 @@ export function TestimonialCarousel({ testimonials }: TestimonialCarouselProps) 
                 aria-label={`המלצה ${index + 1} מתוך ${testimonials.length}`}
                 onClick={() => goTo(index)}
                 className={cn(
-                  "public-focus-ring size-2.5 rounded-[var(--radius-full)] transition-[transform,background-color] duration-[var(--transition-fast)]",
-                  index === activeIndex
-                    ? "scale-125 bg-[var(--color-soft-accent)]"
-                    : "bg-[var(--color-border-strong)] hover:bg-[var(--color-soft-accent)]/60"
+                  "testimonial-carousel__dot public-focus-ring",
+                  index === activeIndex && "testimonial-carousel__dot--active"
                 )}
               />
             ))}
@@ -167,7 +187,7 @@ export function TestimonialCarousel({ testimonials }: TestimonialCarouselProps) 
             type="button"
             onClick={goNext}
             aria-label="המלצה הבאה"
-            className="public-focus-ring inline-flex size-11 items-center justify-center rounded-[var(--radius-full)] border border-[var(--color-soft-accent)]/40 bg-[var(--color-surface)] text-[var(--color-soft-accent)] transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-[var(--color-coral-soft)]"
+            className="testimonial-carousel__nav public-focus-ring"
           >
             <ChevronLeft aria-hidden="true" className="size-5" />
           </button>

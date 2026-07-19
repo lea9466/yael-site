@@ -11,6 +11,7 @@ import {
   isValidRecipeSlug,
 } from "@/lib/recipes/slug";
 import { mapZodErrors } from "@/lib/validations/service";
+import { normalizeMultilineText } from "@/lib/text/multiline-text";
 
 export { mapZodErrors };
 
@@ -73,7 +74,7 @@ const slugSchema = z
   .min(1, "יש להזין כתובת מתכון")
   .max(120, "כתובת המתכון ארוכה מדי")
   .refine((value) => isValidRecipeSlug(value), {
-    message: "כתובת המתכון יכולה להכיל אותיות באנגלית, מספרים ומקפים בלבד",
+    message: "כתובת המתכון יכולה להכיל אותיות בעברית או באנגלית, מספרים ומקפים בלבד",
   })
   .refine((value) => !isReservedRecipeSlug(value), {
     message: "כתובת זו שמורה למערכת",
@@ -129,8 +130,8 @@ const recipeBaseFieldsSchema = z.object({
   slug: slugSchema,
   description: z
     .string()
-    .trim()
-    .max(RECIPE_DESCRIPTION_MAX, "התיאור ארוך מדי"),
+    .max(RECIPE_DESCRIPTION_MAX, "התיאור ארוך מדי")
+    .transform(normalizeMultilineText),
   cover_media_id: uuidSchema.nullable(),
   seo_og_media_id: uuidSchema.nullable(),
   category_id: z
@@ -138,16 +139,16 @@ const recipeBaseFieldsSchema = z.object({
     .trim()
     .min(1, "יש לבחור קטגוריה")
     .uuid("יש לבחור קטגוריה תקינה"),
-  duration_minutes: z.coerce
-    .number()
-    .int("משך ההכנה חייב להיות מספר שלם")
-    .min(1, "משך ההכנה חייב להיות לפחות דקה אחת")
-    .max(24 * 60, "משך ההכנה ארוך מדי"),
-  servings: z.coerce
-    .number()
-    .int("מספר המנות חייב להיות מספר שלם")
-    .min(1, "יש להזין לפחות מנה אחת")
-    .max(100, "מספר המנות גבוה מדי"),
+  prep_duration: z
+    .string()
+    .trim()
+    .min(1, "יש להזין משך הכנה")
+    .max(120, "משך ההכנה ארוך מדי"),
+  servings: z
+    .string()
+    .trim()
+    .min(1, "יש להזין מספר מנות")
+    .max(120, "תיאור המנות ארוך מדי"),
   difficulty: z.enum(RECIPE_DIFFICULTIES, {
     message: "יש לבחור רמת קושי",
   }),
@@ -165,9 +166,9 @@ export const recipePublishInputSchema = recipeBaseFieldsSchema.extend({
   status: z.literal("published"),
   description: z
     .string()
-    .trim()
-    .min(1, "יש להזין תיאור")
-    .max(RECIPE_DESCRIPTION_MAX, "התיאור ארוך מדי"),
+    .max(RECIPE_DESCRIPTION_MAX, "התיאור ארוך מדי")
+    .transform(normalizeMultilineText)
+    .pipe(z.string().min(1, "יש להזין תיאור")),
   cover_media_id: uuidSchema,
   content: recipeContentPublishSchema,
 });

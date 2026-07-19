@@ -1,4 +1,4 @@
-import type { UploadMode } from "@/lib/media/constants";
+import type { UploadProfile } from "@/lib/media/constants";
 import type { MediaSortValue } from "@/lib/validations/media";
 
 export type MediaRecord = {
@@ -12,7 +12,7 @@ export type MediaRecord = {
   size_bytes: number;
   alt_text: string | null;
   uploaded_by: string | null;
-  upload_mode: UploadMode;
+  upload_mode: UploadProfile;
   created_at: string;
 };
 

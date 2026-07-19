@@ -21,7 +21,8 @@ import type { HomepageData } from "@/lib/validations/homepage-hero";
 
 export type HomepageViewProps = {
   homepage: HomepageData;
-  heroMediaPreview: HomepageHeroMediaPreview | null;
+  heroDesktopMediaPreview: HomepageHeroMediaPreview | null;
+  heroMobileMediaPreview: HomepageHeroMediaPreview | null;
   aboutCoverPreview: AboutMediaPreview | null;
   settings: WebsiteSettingsPublic;
   services: PublicServiceSummary[];
@@ -33,7 +34,8 @@ export type HomepageViewProps = {
 
 export function HomepageView({
   homepage,
-  heroMediaPreview,
+  heroDesktopMediaPreview,
+  heroMobileMediaPreview,
   aboutCoverPreview,
   settings,
   services,
@@ -44,7 +46,11 @@ export function HomepageView({
 }: HomepageViewProps) {
   return (
     <div className="public-page-enter">
-      <HomepageHeroSection hero={homepage.hero} mediaPreview={heroMediaPreview} />
+      <HomepageHeroSection
+        hero={homepage.hero}
+        desktopMediaPreview={heroDesktopMediaPreview}
+        mobileMediaPreview={heroMobileMediaPreview}
+      />
       <ShortAboutSection
         content={homepage.short_about}
         coverPreview={aboutCoverPreview}

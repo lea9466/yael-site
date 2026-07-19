@@ -1,7 +1,7 @@
+import Link from "next/link";
+
+import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { TestimonialCarousel } from "@/components/homepage/testimonial-carousel";
-import { PublicSectionHeader } from "@/components/homepage/public-section-header";
-import { Container } from "@/components/public/layout/container";
-import { Section } from "@/components/public/layout/section";
 import type { PublicTestimonialSummary } from "@/lib/public/types";
 
 type TestimonialsSectionProps = {
@@ -14,19 +14,33 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
   }
 
   return (
-    <Section tone="soft" ariaLabelledBy="homepage-testimonials-title">
-      <Container className="space-y-10">
-        <PublicSectionHeader
-          eyebrow="המלצות"
-          title="מה אומרים על הליווי"
-          actionLabel="כל ההמלצות"
-          actionHref="/testimonials"
-          titleId="homepage-testimonials-title"
-        />
-        <div className="rounded-[var(--radius-xl)] border border-[var(--color-soft-accent)]/20 bg-[var(--color-surface)]/90 px-4 py-8 shadow-[var(--shadow-sm)] sm:px-8">
+    <section
+      aria-labelledby="homepage-testimonials-title"
+      className="testimonials-section"
+    >
+      <div className="testimonials-section__inner">
+        <HomepageReveal>
+          <header className="testimonials-section__header">
+            <p className="testimonials-section__eyebrow">המלצות</p>
+            <h2
+              id="homepage-testimonials-title"
+              className="testimonials-section__title"
+            >
+              מה אומרים על הליווי
+            </h2>
+            <Link
+              href="/testimonials"
+              className="testimonials-section__action public-focus-ring"
+            >
+              כל ההמלצות
+            </Link>
+          </header>
+        </HomepageReveal>
+
+        <HomepageReveal delayMs={120}>
           <TestimonialCarousel testimonials={testimonials} />
-        </div>
-      </Container>
-    </Section>
+        </HomepageReveal>
+      </div>
+    </section>
   );
 }

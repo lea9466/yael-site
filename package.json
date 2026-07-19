@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "migrate:slugs": "npx tsx scripts/migrate-slugs-to-hebrew.ts",
+    "migrate:slugs:apply": "npx tsx scripts/migrate-slugs-to-hebrew.ts --apply"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

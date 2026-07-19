@@ -6,6 +6,13 @@
       "headers": {
         "Authorization": "Bearer YOUR_SUPABASE_ACCESS_TOKEN"
       }
+    },
+    "stitch": {
+      "url": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": "AQ.Ab8RN6K7vPw0SLKObAfTBcWSEoL2UZOGyhh7PeNW80vLBXQV4Q"
+      }
     }
+    
   }
 }

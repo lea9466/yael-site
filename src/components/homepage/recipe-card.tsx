@@ -2,7 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { SectionCTA } from "@/components/homepage/section-cta";
-import { formatDifficulty, formatDurationMinutes } from "@/lib/recipes/format";
+import { MultilineText } from "@/components/ui/multiline-text";
+import { formatDifficulty } from "@/lib/recipes/format";
 import type { PublicRecipeSummary } from "@/lib/public/types";
 import { cn } from "@/lib/utils/cn";
 
@@ -51,7 +52,7 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
             </span>
           ) : null}
           <span className="text-caption text-[var(--color-text-muted)]">
-            {formatDurationMinutes(recipe.duration_minutes)}
+            {recipe.prep_duration}
           </span>
           <span className="text-caption text-[var(--color-text-muted)]">
             {formatDifficulty(recipe.difficulty)}
@@ -66,7 +67,9 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
               {recipe.title}
             </Link>
           </h3>
-          <p className="text-muted line-clamp-3 text-sm">{recipe.description}</p>
+          <MultilineText as="p" className="text-muted line-clamp-3 text-sm">
+            {recipe.description}
+          </MultilineText>
         </div>
         <div className="mt-auto pt-1">
           <SectionCTA

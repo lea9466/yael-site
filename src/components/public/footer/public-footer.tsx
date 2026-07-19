@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MultilineText } from "@/components/ui/multiline-text";
 import type { LucideIcon } from "lucide-react";
 import {
   Globe,
@@ -102,7 +103,9 @@ export function PublicFooter({ settings }: PublicFooterProps) {
           <div className="space-y-4">
             <PublicLogo settings={settings} />
             {businessProfile.short_description ? (
-              <p className="text-muted max-w-xs">{businessProfile.short_description}</p>
+              <MultilineText as="p" className="text-muted max-w-xs">
+                {businessProfile.short_description}
+              </MultilineText>
             ) : null}
           </div>
 

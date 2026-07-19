@@ -1,47 +1,71 @@
-import { OrganicDecoration, OrganicDivider } from "@/components/homepage/organic-decoration";
-import { Container } from "@/components/public/layout/container";
-import { Section } from "@/components/public/layout/section";
+import type { CSSProperties } from "react";
+
+import { HomepageReveal } from "@/components/homepage/homepage-reveal";
+import {
+  getApproachCardSurface,
+  getApproachDesktopColumns,
+  type ApproachCardSurface,
+} from "@/lib/homepage/approach-card-display";
 import { HOMEPAGE_APPROACH_POINTS } from "@/lib/homepage/approach-points";
 import type { HomepageData } from "@/lib/validations/homepage-hero";
+import { cn } from "@/lib/utils/cn";
 
 type ApproachSectionProps = {
   content: HomepageData["approach"];
 };
 
+const surfaceClasses: Record<ApproachCardSurface, string> = {
+  sage: "approach-card--sage",
+  coral: "approach-card--coral",
+  cream: "approach-card--cream",
+  sky: "approach-card--sky",
+};
+
 export function ApproachSection({ content }: ApproachSectionProps) {
+  const desktopColumns = getApproachDesktopColumns(HOMEPAGE_APPROACH_POINTS.length);
+  const sectionStyle = {
+    "--approach-desktop-columns": desktopColumns,
+  } as CSSProperties;
+
   return (
-    <Section tone="cream" ariaLabelledBy="homepage-approach-title" className="relative overflow-hidden">
-      <OrganicDecoration variant="mint" className="start-0 top-0 size-56" />
-      <OrganicDecoration variant="section" className="-bottom-10 end-0 size-64" />
+    <section
+      aria-labelledby="homepage-approach-title"
+      className="approach-section"
+      style={sectionStyle}
+    >
+      <div className="approach-section__inner">
+        <HomepageReveal>
+          <header className="approach-section__header">
+            <h2 id="homepage-approach-title" className="approach-section__title">
+              {content.title}
+            </h2>
+            <p className="approach-section__description">{content.text}</p>
+          </header>
+        </HomepageReveal>
 
-      <Container className="relative space-y-10">
-        <div className="mx-auto max-w-2xl space-y-4 text-center">
-          <h2 id="homepage-approach-title" className="text-section-title">
-            {content.title}
-          </h2>
-          <p className="text-muted text-base sm:text-lg">{content.text}</p>
-          <OrganicDivider className="mx-auto" />
-        </div>
-
-        <ul className="grid gap-6 md:grid-cols-3">
-          {HOMEPAGE_APPROACH_POINTS.map((point) => {
+        <ul className="approach-section__grid">
+          {HOMEPAGE_APPROACH_POINTS.map((point, index) => {
             const Icon = point.icon;
+            const surface = getApproachCardSurface(index);
 
             return (
-              <li
-                key={point.id}
-                className="rounded-[var(--radius-xl)] bg-[var(--color-surface)]/85 p-6 shadow-[var(--shadow-sm)] backdrop-blur-sm transition-[transform,box-shadow] duration-[var(--transition-base)] hover:-translate-y-1 hover:shadow-[var(--shadow-md)]"
-              >
-                <div className="mb-4 inline-flex size-12 items-center justify-center rounded-[var(--radius-full)] bg-[var(--color-light-sage-soft)] text-[var(--color-primary)]">
-                  <Icon aria-hidden="true" className="size-5" />
-                </div>
-                <h3 className="text-card-title mb-2">{point.title}</h3>
-                <p className="text-muted text-sm leading-relaxed">{point.description}</p>
+              <li key={point.id} className="approach-section__item">
+                <HomepageReveal delayMs={index * 100} className="h-full">
+                  <article
+                    className={cn("approach-card", surfaceClasses[surface])}
+                  >
+                    <div className="approach-card__icon" aria-hidden="true">
+                      <Icon className="approach-card__icon-svg" strokeWidth={1.75} />
+                    </div>
+                    <h3 className="approach-card__title">{point.title}</h3>
+                    <p className="approach-card__description">{point.description}</p>
+                  </article>
+                </HomepageReveal>
               </li>
             );
           })}
         </ul>
-      </Container>
-    </Section>
+      </div>
+    </section>
   );
 }

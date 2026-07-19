@@ -39,8 +39,8 @@ export type RecipeRecord = {
   cover_media_id: string;
   seo_og_media_id: string | null;
   category_id: string;
-  duration_minutes: number;
-  servings: number;
+  prep_duration: string;
+  servings: string;
   difficulty: RecipeDifficulty;
   content: RecipeContent;
   seo: RecipeSeo;

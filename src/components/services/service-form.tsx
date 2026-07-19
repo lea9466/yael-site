@@ -21,6 +21,7 @@ import { AdminFormActionBar } from "@/components/admin/admin-form-action-bar";
 import { AdminFormBody } from "@/components/admin/admin-form-section";
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
+import { SlugFormField } from "@/components/admin/slug-form-field";
 import { AdminSeoSection } from "@/components/admin/admin-seo-section";
 import { ServiceArchiveDialog } from "@/components/services/service-archive-dialog";
 import { ServiceDeleteDialog } from "@/components/services/service-delete-dialog";
@@ -271,6 +272,14 @@ export function ServiceForm({
       ...current,
       title,
       slug: slugTouched ? current.slug : slugifyTitle(title),
+    }));
+  };
+
+  const handleSlugResetFromTitle = () => {
+    setSlugTouched(false);
+    setValues((current) => ({
+      ...current,
+      slug: slugifyTitle(current.title),
     }));
   };
 
@@ -548,31 +557,21 @@ export function ServiceForm({
               />
             </FormField>
 
-            <FormField
+            <SlugFormField
               label="כתובת שירות (slug)"
               htmlFor="service-slug"
-              required
-              hint="נוצר אוטומטית מהכותרת. ניתן לעריכה ידנית."
+              value={values.slug}
               error={fieldErrors.slug}
-            >
-              <Input
-                id="service-slug"
-                value={values.slug}
-                dir="ltr"
-                className="text-left"
-                error={Boolean(fieldErrors.slug)}
-                onChange={(event) => {
-                  setSlugTouched(true);
-                  setField("slug", event.target.value);
-                }}
-              />
-            </FormField>
+              onChange={(slug) => setField("slug", slug)}
+              onManualEdit={() => setSlugTouched(true)}
+              onResetFromTitle={handleSlugResetFromTitle}
+            />
 
             <FormField
               label="תיאור קצר"
               htmlFor="service-short-description"
               required
-              hint={`${values.short_description.length}/300`}
+              hint={`${values.short_description.length}/300 · ניתן להוסיף שורות חדשות`}
               error={fieldErrors.short_description}
             >
               <Textarea

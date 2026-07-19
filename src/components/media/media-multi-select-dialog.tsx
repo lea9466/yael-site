@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import Image from "next/image";
+import { MediaPreviewRender } from "@/components/media/media-preview-render";
 import { Check } from "lucide-react";
 
 import { searchMediaPickerAction } from "@/actions/media";
@@ -16,6 +16,7 @@ export type MultiSelectMediaItem = {
   id: string;
   url: string;
   alt: string;
+  mimeType: string;
 };
 
 type MediaMultiSelectDialogProps = {
@@ -114,6 +115,7 @@ export function MediaMultiSelectDialog({
         id: item.id,
         url: item.publicUrl ?? "",
         alt: item.alt_text ?? item.original_file_name ?? item.file_name,
+        mimeType: item.mime_type,
       },
     }));
   };
@@ -204,15 +206,12 @@ export function MediaMultiSelectDialog({
                 </div>
 
                 <div className="relative aspect-[4/3] bg-[var(--color-surface-soft)]">
-                  {item.publicUrl ? (
-                    <Image
-                      src={item.publicUrl}
-                      alt={item.alt_text ?? item.file_name}
-                      fill
-                      sizes="(max-width: 1024px) 50vw, 33vw"
-                      className="object-cover"
-                    />
-                  ) : null}
+                  <MediaPreviewRender
+                    url={item.publicUrl}
+                    alt={item.alt_text ?? item.file_name}
+                    mimeType={item.mime_type}
+                    sizes="(max-width: 1024px) 50vw, 33vw"
+                  />
                 </div>
                 <p className="truncate px-3 py-2 text-sm">
                   {item.original_file_name ?? item.file_name}

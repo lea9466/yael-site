@@ -17,7 +17,7 @@ import {
 import type { ListRecipesQuery, RecipeSortValue } from "@/lib/validations/recipe";
 
 const RECIPE_SELECT_COLUMNS =
-  "id, title, slug, description, cover_media_id, seo_og_media_id, category_id, duration_minutes, servings, difficulty, content, seo, featured, status, published_at, created_at, updated_at";
+  "id, title, slug, description, cover_media_id, seo_og_media_id, category_id, prep_duration, servings, difficulty, content, seo, featured, status, published_at, created_at, updated_at";
 
 type SortConfig = {
   column: "created_at" | "updated_at" | "title";

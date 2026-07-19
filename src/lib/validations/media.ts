@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { UPLOAD_MODES } from "@/lib/media/constants";
+import { DEFAULT_UPLOAD_PROFILE, UPLOAD_PROFILES } from "@/lib/media/constants";
 
 const uuidSchema = z.string().uuid("מזהה הקובץ אינו תקין");
 
@@ -32,8 +32,8 @@ export const deleteMediaSchema = z.object({
   mediaId: uuidSchema,
 });
 
-export const uploadModeSchema = z.enum(UPLOAD_MODES, {
-  error: "מצב העלאה אינו תקין",
+export const uploadProfileSchema = z.enum(UPLOAD_PROFILES, {
+  error: "ייעוד התמונה אינו תקין",
 });
 
 export const uploadMediaSchema = z.object({
@@ -43,7 +43,7 @@ export const uploadMediaSchema = z.object({
     .max(200, "טקסט חלופי ארוך מדי")
     .optional()
     .transform((value) => (value && value.length > 0 ? value : undefined)),
-  uploadMode: uploadModeSchema.optional().default("optimized"),
+  uploadProfile: uploadProfileSchema.optional().default(DEFAULT_UPLOAD_PROFILE),
 });
 
 export const updateMediaAltTextSchema = z.object({

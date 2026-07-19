@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { escapeHtml, formatServiceParagraphs } from "@/lib/services/sanitize";
+import { MultilineText } from "@/components/ui/multiline-text";
 import type { ServiceDetail } from "@/lib/services/types";
 import { cn } from "@/lib/utils/cn";
 
@@ -42,9 +43,12 @@ export function ServicePublicView({
 
         <div className="space-y-3">
           <h1 className="text-page-title">{escapeHtml(service.title)}</h1>
-          <p className="text-lg text-[var(--color-text-muted)]">
-            {escapeHtml(service.short_description)}
-          </p>
+          <MultilineText
+            as="p"
+            className="text-lg text-[var(--color-text-muted)]"
+          >
+            {service.short_description}
+          </MultilineText>
         </div>
       </header>
 

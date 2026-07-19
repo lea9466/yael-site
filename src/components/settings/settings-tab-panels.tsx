@@ -14,11 +14,7 @@ import type {
 } from "@/lib/validations/site-settings";
 import { cn } from "@/lib/utils/cn";
 
-type SelectedMedia = {
-  id: string;
-  url: string;
-  alt: string;
-};
+type SelectedMedia = SettingsMediaPreview;
 
 type SettingsTabPanelsProps = {
   activeTab: SettingsTabId;
@@ -28,6 +24,7 @@ type SettingsTabPanelsProps = {
   faviconPreview: SelectedMedia | null;
   ogPreview: SelectedMedia | null;
   heroPreview: SelectedMedia | null;
+  heroMobilePreview: SelectedMedia | null;
   onChange: <K extends keyof SettingsFormState>(
     key: K,
     value: SettingsFormState[K]
@@ -39,6 +36,10 @@ type SettingsTabPanelsProps = {
   ) => void;
   onOgChange: (mediaId: string | null, preview: SettingsMediaPreview | null) => void;
   onHeroImageChange: (
+    mediaId: string | null,
+    preview: SettingsMediaPreview | null
+  ) => void;
+  onHeroMobileImageChange: (
     mediaId: string | null,
     preview: SettingsMediaPreview | null
   ) => void;
@@ -90,11 +91,13 @@ export function SettingsTabPanels({
   faviconPreview,
   ogPreview,
   heroPreview,
+  heroMobilePreview,
   onChange,
   onLogoChange,
   onFaviconChange,
   onOgChange,
   onHeroImageChange,
+  onHeroMobileImageChange,
 }: SettingsTabPanelsProps) {
   return (
     <div className="min-w-0 flex-1">
@@ -137,7 +140,7 @@ export function SettingsTabPanels({
         <FormField
           label="תיאור קצר"
           htmlFor="field-short-description"
-          hint="אופציונלי"
+          hint="אופציונלי · ניתן להוסיף שורות חדשות"
           error={fieldErrors.short_description}
         >
           <Textarea
@@ -186,8 +189,10 @@ export function SettingsTabPanels({
           formState={formState}
           fieldErrors={fieldErrors}
           heroPreview={heroPreview}
+          heroMobilePreview={heroMobilePreview}
           onChange={onChange}
           onHeroImageChange={onHeroImageChange}
+          onHeroMobileImageChange={onHeroMobileImageChange}
         />
       </SettingsPanel>
 

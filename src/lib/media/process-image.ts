@@ -4,13 +4,11 @@ import sharp from "sharp";
 
 import {
   ALLOWED_INPUT_MIME_TYPES,
-  MAX_IMAGE_WIDTH,
   MAX_SOURCE_UPLOAD_BYTES,
-  MIME_TO_EXTENSION,
   OUTPUT_EXTENSION,
   OUTPUT_MIME_TYPE,
-  WEBP_QUALITY,
-  type UploadMode,
+  UPLOAD_PROFILE_PROCESSING,
+  type UploadProfile,
 } from "@/lib/media/constants";
 import { MEDIA_ERRORS } from "@/lib/media/media-errors";
 import type { ProcessedImage } from "@/lib/media/media-types";
@@ -137,27 +135,18 @@ export function buildOptimizedStoragePath(): {
   return { fileName, storagePath };
 }
 
-export function buildOriginalStoragePath(mimeType: AllowedInputMimeType): {
-  fileName: string;
-  storagePath: string;
-} {
-  const extension = MIME_TO_EXTENSION[mimeType];
-  const fileName = `${randomUUID()}.${extension}`;
-  const year = new Date().getFullYear().toString();
-  const storagePath = `${year}/${fileName}`;
-
-  return { fileName, storagePath };
-}
-
-export async function processImageBuffer(
+export async function processImageByProfile(
   buffer: Buffer,
-  declaredMimeType: string
+  declaredMimeType: string,
+  profile: UploadProfile
 ): Promise<ProcessImageResult> {
   const sourceValidation = validateSourceBuffer(buffer, declaredMimeType);
 
   if (!sourceValidation.success) {
     return sourceValidation;
   }
+
+  const config = UPLOAD_PROFILE_PROCESSING[profile];
 
   try {
     const image = sharp(buffer, { failOn: "error" }).rotate();
@@ -175,16 +164,15 @@ export async function processImageBuffer(
       return { success: false, error: MEDIA_ERRORS.invalidFile };
     }
 
-    const resized = image.resize({
-      width: MAX_IMAGE_WIDTH,
-      height: MAX_IMAGE_WIDTH,
-      fit: "inside",
-      withoutEnlargement: true,
-    });
-
-    const outputBuffer = await resized
+    const outputBuffer = await image
+      .resize({
+        width: config.maxWidth,
+        height: config.maxHeight,
+        fit: "inside",
+        withoutEnlargement: true,
+      })
       .webp({
-        quality: WEBP_QUALITY,
+        quality: config.quality,
         effort: 4,
       })
       .toBuffer({ resolveWithObject: true });
@@ -206,63 +194,4 @@ export async function processImageBuffer(
   } catch {
     return { success: false, error: MEDIA_ERRORS.invalidFile };
   }
-}
-
-export async function validateOriginalImageBuffer(
-  buffer: Buffer,
-  declaredMimeType: string
-): Promise<ProcessImageResult> {
-  const sourceValidation = validateSourceBuffer(buffer, declaredMimeType);
-
-  if (!sourceValidation.success) {
-    return sourceValidation;
-  }
-
-  try {
-    const image = sharp(buffer, { failOn: "error" });
-    const metadata = await image.metadata();
-
-    if (!metadata.width || !metadata.height) {
-      return { success: false, error: MEDIA_ERRORS.invalidFile };
-    }
-
-    const decodedMimeType = metadata.format
-      ? SHARP_FORMAT_TO_MIME[metadata.format]
-      : undefined;
-
-    if (decodedMimeType !== sourceValidation.detectedMimeType) {
-      return { success: false, error: MEDIA_ERRORS.invalidFile };
-    }
-
-    const { fileName, storagePath } = buildOriginalStoragePath(
-      sourceValidation.detectedMimeType
-    );
-
-    return {
-      success: true,
-      image: {
-        buffer,
-        width: metadata.width,
-        height: metadata.height,
-        sizeBytes: buffer.byteLength,
-        mimeType: sourceValidation.detectedMimeType,
-        fileName,
-        storagePath,
-      },
-    };
-  } catch {
-    return { success: false, error: MEDIA_ERRORS.invalidFile };
-  }
-}
-
-export async function processImageByUploadMode(
-  buffer: Buffer,
-  declaredMimeType: string,
-  uploadMode: UploadMode
-): Promise<ProcessImageResult> {
-  if (uploadMode === "original") {
-    return validateOriginalImageBuffer(buffer, declaredMimeType);
-  }
-
-  return processImageBuffer(buffer, declaredMimeType);
 }

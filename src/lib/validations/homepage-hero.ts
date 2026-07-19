@@ -109,6 +109,7 @@ export const homepageHeroSchema = z
       message: "סוג מדיה לא תקין",
     }),
     media_id: z.union([uuidSchema, z.null()]),
+    mobile_media_id: z.union([uuidSchema, z.null()]),
     video_url: z.union([externalMediaUrlSchema, z.null()]),
     animation_url: z.union([externalMediaUrlSchema, z.null()]),
   })
@@ -252,6 +253,12 @@ function normalizeHero(raw: unknown): HomepageHeroData {
         : raw.media_id === null
           ? null
           : defaults.media_id,
+    mobile_media_id:
+      typeof raw.mobile_media_id === "string"
+        ? raw.mobile_media_id
+        : raw.mobile_media_id === null || raw.mobile_media_id === undefined
+          ? null
+          : defaults.mobile_media_id,
     video_url:
       typeof raw.video_url === "string"
         ? raw.video_url
@@ -336,6 +343,7 @@ export type HomepageHeroFormState = {
   heroSecondaryButtonUrl: string;
   heroMediaType: HomepageHeroData["media_type"];
   heroMediaId: string | null;
+  heroMobileMediaId: string | null;
   heroVideoUrl: string;
   heroAnimationUrl: string;
 };
@@ -350,6 +358,7 @@ export function homepageHeroToFormState(hero: HomepageHeroData): HomepageHeroFor
     heroSecondaryButtonUrl: hero.secondary_button?.url ?? "",
     heroMediaType: hero.media_type,
     heroMediaId: hero.media_id,
+    heroMobileMediaId: hero.mobile_media_id,
     heroVideoUrl: hero.video_url ?? "",
     heroAnimationUrl: hero.animation_url ?? "",
   };
@@ -373,6 +382,8 @@ export function formStateToHomepageHero(state: HomepageHeroFormState): HomepageH
         : null,
     media_type: state.heroMediaType,
     media_id: state.heroMediaType === "image" ? state.heroMediaId : null,
+    mobile_media_id:
+      state.heroMediaType === "image" ? state.heroMobileMediaId : null,
     video_url:
       state.heroMediaType === "video_url" ? state.heroVideoUrl || null : null,
     animation_url:

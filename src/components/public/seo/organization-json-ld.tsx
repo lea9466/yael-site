@@ -1,4 +1,5 @@
 import { SITE_ORIGIN } from "@/lib/site/constants";
+import { normalizeMultilineTextForSeo } from "@/lib/text/multiline-text";
 import type { WebsiteSettingsPublic } from "@/lib/public/types";
 
 type OrganizationJsonLdProps = {
@@ -34,7 +35,9 @@ export function OrganizationJsonLd({ settings }: OrganizationJsonLdProps) {
     name: businessProfile.business_name,
     url: SITE_ORIGIN,
     description:
-      businessProfile.short_description ??
+      (businessProfile.short_description
+        ? normalizeMultilineTextForSeo(businessProfile.short_description)
+        : null) ??
       businessProfile.tagline ??
       settings.siteSettings.default_seo.description,
     logo: settings.logo?.url ?? undefined,

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import {
   Copy,
   Eye,
@@ -10,6 +9,7 @@ import {
   Trash2,
 } from "lucide-react";
 
+import { MediaPreviewRender } from "@/components/media/media-preview-render";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -22,7 +22,10 @@ import {
   formatMediaDate,
   formatMimeType,
 } from "@/lib/media/format";
-import type { UploadMode } from "@/lib/media/constants";
+import {
+  UPLOAD_PROFILE_BADGE_LABELS,
+  type UploadProfile,
+} from "@/lib/media/constants";
 import type { MediaListItem } from "@/lib/media/media-types";
 import { cn } from "@/lib/utils/cn";
 
@@ -35,10 +38,11 @@ type MediaCardProps = {
   onDelete: (item: MediaListItem) => void;
 };
 
-const UPLOAD_MODE_LABELS: Record<UploadMode, string> = {
-  optimized: "מותאם לאתר",
-  original: "איכות מלאה",
-};
+function getProfileBadgeStatus(
+  profile: UploadProfile
+): "active" | "public" {
+  return profile === "hero" ? "public" : "active";
+}
 
 async function copyPublicUrl(url: string): Promise<boolean> {
   try {
@@ -129,19 +133,13 @@ export function MediaCard({
           onClick={() => onPreview(item)}
           aria-label={`תצוגה מקדימה של ${displayName}`}
         >
-          {item.publicUrl ? (
-            <Image
-              src={item.publicUrl}
-              alt={item.alt_text ?? displayName}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none"
-            />
-          ) : (
-            <div className="flex size-full items-center justify-center text-sm text-[var(--color-text-muted)]">
-              אין תצוגה מקדימה
-            </div>
-          )}
+          <MediaPreviewRender
+            url={item.publicUrl}
+            alt={item.alt_text ?? displayName}
+            mimeType={item.mime_type}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            imageClassName="transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none"
+          />
         </button>
       </div>
 
@@ -182,8 +180,8 @@ export function MediaCard({
         <div className="flex flex-wrap items-center gap-2">
           <StatusBadge
             size="sm"
-            status={item.upload_mode === "original" ? "public" : "active"}
-            label={UPLOAD_MODE_LABELS[item.upload_mode]}
+            status={getProfileBadgeStatus(item.upload_mode)}
+            label={UPLOAD_PROFILE_BADGE_LABELS[item.upload_mode]}
           />
         </div>
 

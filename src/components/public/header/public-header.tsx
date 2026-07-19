@@ -112,11 +112,17 @@ export function PublicHeader({ settings }: PublicHeaderProps) {
         className={cn(
           "public-header fixed inset-x-0 top-0 z-[var(--z-sticky)] transition-[background-color,box-shadow,border-color] duration-[var(--transition-base)]",
           isScrolled
-            ? "border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 shadow-[var(--shadow-sm)] backdrop-blur-md"
-            : "border-b border-transparent bg-transparent"
+            ? "public-header--scrolled border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 shadow-[var(--shadow-sm)] backdrop-blur-md"
+            : "public-header--transparent border-b border-transparent bg-transparent"
         )}
       >
-        <Container className="flex h-[var(--public-header-height)] items-center justify-between gap-4">
+        <Container
+          className={cn(
+            "flex h-[var(--public-header-height)] items-center justify-between gap-4",
+            !isScrolled &&
+              "max-w-[90rem] px-5 md:px-20 lg:max-w-[90rem] lg:px-20"
+          )}
+        >
           <PublicLogo settings={settings} priority />
 
           <div className="hidden items-center gap-2 lg:flex">

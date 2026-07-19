@@ -124,6 +124,12 @@ export async function saveSiteSettingsAction(
         : null,
       "hero.media_id"
     ),
+    validateMediaReference(
+      parsed.data.homepageHero.media_type === "image"
+        ? parsed.data.homepageHero.mobile_media_id
+        : null,
+      "hero.mobile_media_id"
+    ),
   ]);
 
   const mediaError = mediaChecks.find((result) => result !== null);

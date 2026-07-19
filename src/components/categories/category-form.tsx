@@ -17,6 +17,7 @@ import {
 } from "@/components/admin/admin-form-section";
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
+import { SlugFormField } from "@/components/admin/slug-form-field";
 import { CategoryDeleteDialog } from "@/components/categories/category-delete-dialog";
 import { ContentTypeBadge } from "@/components/admin/content-type-badge";
 import { ServiceMediaPicker } from "@/components/services/service-media-picker";
@@ -112,6 +113,14 @@ export function CategoryForm({
       ...current,
       name,
       slug: slugTouched ? current.slug : slugifyCategoryName(name),
+    }));
+  };
+
+  const handleSlugResetFromName = () => {
+    setSlugTouched(false);
+    setValues((current) => ({
+      ...current,
+      slug: slugifyCategoryName(current.name),
     }));
   };
 
@@ -268,26 +277,16 @@ export function CategoryForm({
             />
           </FormField>
 
-          <FormField
+          <SlugFormField
             label="כתובת (slug)"
             htmlFor="category-slug"
-            required
+            value={values.slug}
             hint="נוצר אוטומטית מהשם. ניתן לעריכה ידנית."
             error={fieldErrors.slug}
-          >
-            <Input
-              id="category-slug"
-              value={values.slug}
-              dir="ltr"
-              className="text-left"
-              maxLength={120}
-              error={Boolean(fieldErrors.slug)}
-              onChange={(event) => {
-                setSlugTouched(true);
-                setField("slug", event.target.value);
-              }}
-            />
-          </FormField>
+            onChange={(slug) => setField("slug", slug)}
+            onManualEdit={() => setSlugTouched(true)}
+            onResetFromTitle={handleSlugResetFromName}
+          />
         </AdminFormSection>
 
         <AdminFormDivider />

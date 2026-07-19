@@ -17,21 +17,6 @@ export function formatRecipeDate(value: string): string {
   }).format(date);
 }
 
-export function formatDurationMinutes(minutes: number): string {
-  if (minutes < 60) {
-    return `${minutes} דק׳`;
-  }
-
-  const hours = Math.floor(minutes / 60);
-  const remainder = minutes % 60;
-
-  if (remainder === 0) {
-    return `${hours} שע׳`;
-  }
-
-  return `${hours} שע׳ ו-${remainder} דק׳`;
-}
-
 export function formatDifficulty(difficulty: RecipeDifficulty): string {
   return DIFFICULTY_LABELS[difficulty];
 }

@@ -27,6 +27,7 @@ import { AdminFormActionBar } from "@/components/admin/admin-form-action-bar";
 import { AdminFormBody } from "@/components/admin/admin-form-section";
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
+import { SlugFormField } from "@/components/admin/slug-form-field";
 import { AdminSeoSection } from "@/components/admin/admin-seo-section";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import {
@@ -271,6 +272,14 @@ export function ArticleForm({
       ...current,
       title,
       slug: slugTouched ? current.slug : slugifyTitle(title),
+    }));
+  };
+
+  const handleSlugResetFromTitle = () => {
+    setSlugTouched(false);
+    setValues((current) => ({
+      ...current,
+      slug: slugifyTitle(current.title),
     }));
   };
 
@@ -574,25 +583,15 @@ export function ArticleForm({
               />
             </FormField>
 
-            <FormField
+            <SlugFormField
               label="כתובת פוסט (slug)"
               htmlFor="article-slug"
-              required
-              hint="נוצר אוטומטית מהכותרת. ניתן לעריכה ידנית."
+              value={values.slug}
               error={fieldErrors.slug}
-            >
-              <Input
-                id="article-slug"
-                value={values.slug}
-                dir="ltr"
-                className="text-left"
-                error={Boolean(fieldErrors.slug)}
-                onChange={(event) => {
-                  setSlugTouched(true);
-                  setField("slug", event.target.value);
-                }}
-              />
-            </FormField>
+              onChange={(slug) => setField("slug", slug)}
+              onManualEdit={() => setSlugTouched(true)}
+              onResetFromTitle={handleSlugResetFromTitle}
+            />
 
             {hasCategories ? (
               <Select

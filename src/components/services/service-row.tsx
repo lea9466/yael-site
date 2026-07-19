@@ -31,6 +31,7 @@ import {
   DropdownMenu,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { MultilineText } from "@/components/ui/multiline-text";
 import { formatServiceDate } from "@/lib/services/format";
 import type { ServiceListItem } from "@/lib/services/types";
 
@@ -94,9 +95,12 @@ export function ServiceRow({ item }: ServiceRowProps) {
               <h3 className="truncate text-card-title" title={item.title}>
                 {item.title}
               </h3>
-              <p className="line-clamp-2 text-sm text-[var(--color-text-muted)]">
+              <MultilineText
+                as="p"
+                className="line-clamp-2 text-sm text-[var(--color-text-muted)]"
+              >
                 {item.short_description}
-              </p>
+              </MultilineText>
               <div className="flex flex-wrap gap-2">
                 <AdminStatusBadge status={item.status} />
                 {item.featured ? <AdminFeaturedBadge /> : null}

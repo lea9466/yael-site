@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/auth/session";
 import { MEDIA_LIBRARY_SELECT_COLUMNS } from "@/lib/media/constants";
-import type { UploadMode } from "@/lib/media/constants";
+import type { UploadProfile } from "@/lib/media/constants";
 import type { MediaRecord } from "@/lib/media/media-types";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
 import { HOMEPAGE_SITE_CONTENT_KEY } from "@/lib/homepage/constants";
@@ -16,14 +16,16 @@ export type HomepageHeroMediaPreview = {
   alt: string;
   width: number;
   height: number;
-  uploadMode: UploadMode;
+  mimeType: string;
+  uploadProfile: UploadProfile;
 };
 
 export type HomepageHeroPageData = {
   homepage: HomepageData;
   hero: HomepageHeroData;
   homepageUpdatedAt: string;
-  heroMediaPreview: HomepageHeroMediaPreview | null;
+  heroDesktopMediaPreview: HomepageHeroMediaPreview | null;
+  heroMobileMediaPreview: HomepageHeroMediaPreview | null;
 };
 
 async function fetchHeroMediaPreview(
@@ -53,7 +55,8 @@ async function fetchHeroMediaPreview(
     alt: record.alt_text ?? record.original_file_name ?? record.file_name,
     width: record.width,
     height: record.height,
-    uploadMode: record.upload_mode,
+    mimeType: record.mime_type,
+    uploadProfile: record.upload_mode,
   };
 }
 
@@ -95,12 +98,16 @@ export async function fetchHomepageHeroPageData(): Promise<HomepageHeroPageData 
     return null;
   }
 
-  const heroMediaPreview = await fetchHeroMediaPreview(row.data.hero.media_id);
+  const [heroDesktopMediaPreview, heroMobileMediaPreview] = await Promise.all([
+    fetchHeroMediaPreview(row.data.hero.media_id),
+    fetchHeroMediaPreview(row.data.hero.mobile_media_id),
+  ]);
 
   return {
     homepage: row.data,
     hero: row.data.hero,
     homepageUpdatedAt: row.updatedAt,
-    heroMediaPreview,
+    heroDesktopMediaPreview,
+    heroMobileMediaPreview,
   };
 }

@@ -21,8 +21,10 @@ export function buildRecipeCanonicalUrl(slug: string): string {
   return buildCanonicalUrl(buildContentPath("/recipes", slug));
 }
 
+import { normalizeMultilineTextForSeo } from "@/lib/text/multiline-text";
+
 export function shortenForSeoDescription(text: string, maxLength = 160): string {
-  const normalized = text.trim().replace(/\s+/g, " ");
+  const normalized = normalizeMultilineTextForSeo(text);
 
   if (normalized.length <= maxLength) {
     return normalized;

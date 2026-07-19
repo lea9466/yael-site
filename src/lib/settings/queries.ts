@@ -19,7 +19,7 @@ type SiteContentRow = {
 };
 
 const MEDIA_SELECT_COLUMNS =
-  "id, storage_path, file_name, original_file_name, alt_text";
+  "id, storage_path, file_name, original_file_name, alt_text, mime_type, size_bytes";
 
 async function fetchMediaPreviewsByIds(
   mediaIds: Array<string | null>
@@ -49,6 +49,8 @@ async function fetchMediaPreviewsByIds(
       id: row.id,
       url: url ?? "",
       alt: row.alt_text ?? row.original_file_name ?? row.file_name,
+      mimeType: row.mime_type,
+      sizeBytes: row.size_bytes,
     });
   }
 
@@ -94,6 +96,7 @@ export async function fetchSettingsPageData(): Promise<SettingsPageData | null> 
       businessProfile.favicon_media_id,
       siteSettings.default_seo.og_media_id,
       homepage.hero.media_id,
+      homepage.hero.mobile_media_id,
     ]);
 
     return {
@@ -115,6 +118,9 @@ export async function fetchSettingsPageData(): Promise<SettingsPageData | null> 
           : null,
         heroImage: homepage.hero.media_id
           ? previews.get(homepage.hero.media_id) ?? null
+          : null,
+        heroMobileImage: homepage.hero.mobile_media_id
+          ? previews.get(homepage.hero.mobile_media_id) ?? null
           : null,
       },
     };

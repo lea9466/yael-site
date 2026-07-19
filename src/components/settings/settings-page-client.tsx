@@ -54,6 +54,8 @@ export function SettingsPageClient({ data }: SettingsPageClientProps) {
   const [heroPreview, setHeroPreview] = useState<SettingsMediaPreview | null>(
     data.mediaPreviews.heroImage
   );
+  const [heroMobilePreview, setHeroMobilePreview] =
+    useState<SettingsMediaPreview | null>(data.mediaPreviews.heroMobileImage);
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState("");
@@ -81,6 +83,7 @@ export function SettingsPageClient({ data }: SettingsPageClientProps) {
     setFaviconPreview(data.mediaPreviews.favicon);
     setOgPreview(data.mediaPreviews.ogImage);
     setHeroPreview(data.mediaPreviews.heroImage);
+    setHeroMobilePreview(data.mediaPreviews.heroMobileImage);
     setTimestamps({
       businessProfileUpdatedAt: data.businessProfileUpdatedAt,
       siteSettingsUpdatedAt: data.siteSettingsUpdatedAt,
@@ -148,6 +151,7 @@ export function SettingsPageClient({ data }: SettingsPageClientProps) {
             faviconPreview={faviconPreview}
             ogPreview={ogPreview}
             heroPreview={heroPreview}
+            heroMobilePreview={heroMobilePreview}
             onChange={handleChange}
             onLogoChange={(mediaId, preview) => {
               handleChange("logoMediaId", mediaId);
@@ -164,6 +168,10 @@ export function SettingsPageClient({ data }: SettingsPageClientProps) {
             onHeroImageChange={(mediaId, preview) => {
               handleChange("heroMediaId", mediaId);
               setHeroPreview(preview);
+            }}
+            onHeroMobileImageChange={(mediaId, preview) => {
+              handleChange("heroMobileMediaId", mediaId);
+              setHeroMobilePreview(preview);
             }}
           />
         </div>

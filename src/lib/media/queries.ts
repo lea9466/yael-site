@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/auth/session";
+import { MEDIA_LIBRARY_SELECT_COLUMNS } from "@/lib/media/constants";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
 import type { MediaLibraryData, MediaListItem, MediaRecord } from "@/lib/media/media-types";
 import {
@@ -7,8 +8,7 @@ import {
   type MediaSortValue,
 } from "@/lib/validations/media";
 
-const MEDIA_SELECT_COLUMNS =
-  "id, storage_path, file_name, original_file_name, mime_type, width, height, size_bytes, alt_text, uploaded_by, created_at";
+const MEDIA_SELECT_COLUMNS = MEDIA_LIBRARY_SELECT_COLUMNS;
 
 type SortConfig = {
   column: "created_at" | "original_file_name" | "size_bytes";

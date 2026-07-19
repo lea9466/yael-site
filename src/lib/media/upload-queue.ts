@@ -2,6 +2,7 @@ import {
   ALLOWED_INPUT_MIME_TYPES,
   MAX_BATCH_UPLOAD_CONCURRENCY,
   MAX_SOURCE_UPLOAD_BYTES,
+  type UploadMode,
 } from "@/lib/media/constants";
 
 export type UploadQueueStatus = "pending" | "uploading" | "completed" | "failed";
@@ -28,9 +29,15 @@ export type UploadQueueItem = {
   file: File;
   previewUrl: string;
   altText: string;
+  uploadMode: UploadMode;
   status: UploadQueueStatus;
   error?: string;
   uploadAttempted?: boolean;
+};
+
+export const UPLOAD_MODE_LABELS: Record<UploadMode, string> = {
+  optimized: "מותאם לאתר",
+  original: "איכות מלאה",
 };
 
 const ACCEPTED_MIME_SET = new Set<string>(ALLOWED_INPUT_MIME_TYPES);
@@ -55,6 +62,7 @@ export function createUploadQueueItem(file: File): UploadQueueItem {
     file,
     previewUrl: URL.createObjectURL(file),
     altText: "",
+    uploadMode: "optimized",
     status: validationError ? "failed" : "pending",
     error: validationError ?? undefined,
   };

@@ -19,6 +19,7 @@ import {
   type BatchProgressStats,
   type UploadQueueItem,
 } from "@/lib/media/upload-queue";
+import type { UploadMode } from "@/lib/media/constants";
 import { cn } from "@/lib/utils/cn";
 
 type MediaUploadDialogProps = {
@@ -153,6 +154,14 @@ export function MediaUploadDialog({
     });
   };
 
+  const handleUploadModeChange = (id: string, uploadMode: UploadMode) => {
+    setQueue((current) =>
+      current.map((item) =>
+        item.id === id ? { ...item, uploadMode } : item
+      )
+    );
+  };
+
   const handleAltTextChange = (id: string, altText: string) => {
     setQueue((current) =>
       current.map((item) => (item.id === id ? { ...item, altText } : item))
@@ -203,6 +212,7 @@ export function MediaUploadDialog({
           const result = await uploadMediaViaApi(
             item.file,
             item.altText,
+            item.uploadMode,
             abortController.signal
           );
 
@@ -448,6 +458,7 @@ export function MediaUploadDialog({
                   item={item}
                   disabled={isUploading}
                   onAltTextChange={handleAltTextChange}
+                  onUploadModeChange={handleUploadModeChange}
                   onRemove={handleRemoveItem}
                 />
               ))}

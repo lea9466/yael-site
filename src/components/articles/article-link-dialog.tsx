@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -21,29 +21,23 @@ type ArticleLinkDialogProps = {
   onRemove: () => void;
 };
 
-export function ArticleLinkDialog({
-  open,
-  mode,
+type ArticleLinkDialogFormProps = {
+  initialUrl: string;
+  initialText: string;
+  requiresText: boolean;
+  onSubmit: (url: string, text: string | undefined) => void;
+};
+
+function ArticleLinkDialogForm({
   initialUrl,
   initialText,
   requiresText,
-  onCancel,
   onSubmit,
-  onRemove,
-}: ArticleLinkDialogProps) {
+}: ArticleLinkDialogFormProps) {
   const [url, setUrl] = useState(initialUrl);
   const [text, setText] = useState(initialText);
   const [urlError, setUrlError] = useState<string | null>(null);
   const [textError, setTextError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (open) {
-      setUrl(initialUrl);
-      setText(initialText);
-      setUrlError(null);
-      setTextError(null);
-    }
-  }, [open, initialUrl, initialText]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -69,6 +63,66 @@ export function ArticleLinkDialog({
     setTextError(null);
     onSubmit(result.url, requiresText ? text.trim() : undefined);
   };
+
+  return (
+    <form
+      id={LINK_DIALOG_FORM_ID}
+      className="space-y-4"
+      onSubmit={handleSubmit}
+    >
+      {requiresText ? (
+        <FormField
+          label="טקסט הקישור"
+          htmlFor="article-link-dialog-text"
+          required
+          error={textError ?? undefined}
+        >
+          <Input
+            id="article-link-dialog-text"
+            value={text}
+            onChange={(event) => {
+              setText(event.target.value);
+              setTextError(null);
+            }}
+            placeholder="הטקסט שיוצג כקישור"
+          />
+        </FormField>
+      ) : null}
+
+      <FormField
+        label="כתובת הקישור"
+        htmlFor="article-link-dialog-url"
+        required
+        error={urlError ?? undefined}
+        hint="כתובות מותרות: https://, mailto:, tel: או נתיב פנימי המתחיל ב-/"
+      >
+        <Input
+          id="article-link-dialog-url"
+          value={url}
+          onChange={(event) => {
+            setUrl(event.target.value);
+            setUrlError(null);
+          }}
+          dir="ltr"
+          className="text-left"
+          placeholder="https://example.com"
+        />
+      </FormField>
+    </form>
+  );
+}
+
+export function ArticleLinkDialog({
+  open,
+  mode,
+  initialUrl,
+  initialText,
+  requiresText,
+  onCancel,
+  onSubmit,
+  onRemove,
+}: ArticleLinkDialogProps) {
+  const formSessionKey = `${mode}-${initialUrl}-${initialText}-${requiresText}`;
 
   return (
     <Dialog
@@ -102,50 +156,15 @@ export function ArticleLinkDialog({
         </div>
       }
     >
-      <form
-        id={LINK_DIALOG_FORM_ID}
-        className="space-y-4"
-        onSubmit={handleSubmit}
-      >
-        {requiresText ? (
-          <FormField
-            label="טקסט הקישור"
-            htmlFor="article-link-dialog-text"
-            required
-            error={textError ?? undefined}
-          >
-            <Input
-              id="article-link-dialog-text"
-              value={text}
-              onChange={(event) => {
-                setText(event.target.value);
-                setTextError(null);
-              }}
-              placeholder="הטקסט שיוצג כקישור"
-            />
-          </FormField>
-        ) : null}
-
-        <FormField
-          label="כתובת הקישור"
-          htmlFor="article-link-dialog-url"
-          required
-          error={urlError ?? undefined}
-          hint="כתובות מותרות: https://, mailto:, tel: או נתיב פנימי המתחיל ב-/"
-        >
-          <Input
-            id="article-link-dialog-url"
-            value={url}
-            onChange={(event) => {
-              setUrl(event.target.value);
-              setUrlError(null);
-            }}
-            dir="ltr"
-            className="text-left"
-            placeholder="https://example.com"
-          />
-        </FormField>
-      </form>
+      {open ? (
+        <ArticleLinkDialogForm
+          key={formSessionKey}
+          initialUrl={initialUrl}
+          initialText={initialText}
+          requiresText={requiresText}
+          onSubmit={onSubmit}
+        />
+      ) : null}
     </Dialog>
   );
 }

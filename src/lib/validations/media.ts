@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { UPLOAD_MODES } from "@/lib/media/constants";
+
 const uuidSchema = z.string().uuid("מזהה הקובץ אינו תקין");
 
 export const MEDIA_PAGE_SIZE = 24;
@@ -30,6 +32,10 @@ export const deleteMediaSchema = z.object({
   mediaId: uuidSchema,
 });
 
+export const uploadModeSchema = z.enum(UPLOAD_MODES, {
+  error: "מצב העלאה אינו תקין",
+});
+
 export const uploadMediaSchema = z.object({
   altText: z
     .string()
@@ -37,6 +43,7 @@ export const uploadMediaSchema = z.object({
     .max(200, "טקסט חלופי ארוך מדי")
     .optional()
     .transform((value) => (value && value.length > 0 ? value : undefined)),
+  uploadMode: uploadModeSchema.optional().default("optimized"),
 });
 
 export const updateMediaAltTextSchema = z.object({

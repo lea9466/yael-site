@@ -15,11 +15,14 @@ import {
   DropdownMenu,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { StatusBadge } from "@/components/ui/status-badge";
 import {
   formatDimensions,
   formatFileSize,
   formatMediaDate,
+  formatMimeType,
 } from "@/lib/media/format";
+import type { UploadMode } from "@/lib/media/constants";
 import type { MediaListItem } from "@/lib/media/media-types";
 import { cn } from "@/lib/utils/cn";
 
@@ -30,6 +33,11 @@ type MediaCardProps = {
   onPreview: (item: MediaListItem) => void;
   onEditAlt: (item: MediaListItem) => void;
   onDelete: (item: MediaListItem) => void;
+};
+
+const UPLOAD_MODE_LABELS: Record<UploadMode, string> = {
+  optimized: "מותאם לאתר",
+  original: "איכות מלאה",
 };
 
 async function copyPublicUrl(url: string): Promise<boolean> {
@@ -171,7 +179,19 @@ export function MediaCard({
           </DropdownMenu>
         </div>
 
+        <div className="flex flex-wrap items-center gap-2">
+          <StatusBadge
+            size="sm"
+            status={item.upload_mode === "original" ? "public" : "active"}
+            label={UPLOAD_MODE_LABELS[item.upload_mode]}
+          />
+        </div>
+
         <dl className="grid gap-1 text-caption text-[var(--color-text-muted)]">
+          <div className="flex justify-between gap-2">
+            <dt>פורמט</dt>
+            <dd>{formatMimeType(item.mime_type)}</dd>
+          </div>
           <div className="flex justify-between gap-2">
             <dt>מידות</dt>
             <dd>{formatDimensions(item.width, item.height)}</dd>

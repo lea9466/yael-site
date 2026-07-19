@@ -2,10 +2,14 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { PUBLIC_MEDIA_BUCKET } from "@/lib/media/constants";
+import {
+  MEDIA_LIBRARY_SELECT_COLUMNS,
+  PUBLIC_MEDIA_BUCKET,
+  type UploadMode,
+} from "@/lib/media/constants";
 import { MEDIA_ERRORS } from "@/lib/media/media-errors";
 import {
-  processImageBuffer,
+  processImageByUploadMode,
   sanitizeOriginalFileName,
 } from "@/lib/media/process-image";
 import type { MediaRecord, UploadMediaResult } from "@/lib/media/media-types";
@@ -27,6 +31,7 @@ type UploadMediaInput = {
   adminId: string;
   file: File;
   altText?: string;
+  uploadMode?: UploadMode;
 };
 
 export async function uploadMediaFromFile({
@@ -34,12 +39,13 @@ export async function uploadMediaFromFile({
   adminId,
   file,
   altText,
+  uploadMode = "optimized",
 }: UploadMediaInput): Promise<UploadMediaResult> {
   if (file.size === 0) {
     return { success: false, error: MEDIA_ERRORS.invalidFile };
   }
 
-  const parsedMeta = uploadMediaSchema.safeParse({ altText });
+  const parsedMeta = uploadMediaSchema.safeParse({ altText, uploadMode });
 
   if (!parsedMeta.success) {
     const firstIssue = parsedMeta.error.issues[0];
@@ -52,7 +58,11 @@ export async function uploadMediaFromFile({
 
   try {
     const inputBuffer = Buffer.from(await file.arrayBuffer());
-    const processed = await processImageBuffer(inputBuffer, file.type);
+    const processed = await processImageByUploadMode(
+      inputBuffer,
+      file.type,
+      parsedMeta.data.uploadMode
+    );
 
     if (!processed.success) {
       return { success: false, error: processed.error };
@@ -85,10 +95,9 @@ export async function uploadMediaFromFile({
         size_bytes: image.sizeBytes,
         alt_text: parsedMeta.data.altText ?? null,
         uploaded_by: adminId,
+        upload_mode: parsedMeta.data.uploadMode,
       })
-      .select(
-        "id, storage_path, file_name, original_file_name, mime_type, width, height, size_bytes, alt_text, uploaded_by, created_at"
-      )
+      .select(MEDIA_LIBRARY_SELECT_COLUMNS)
       .single();
 
     if (insertError || !inserted) {

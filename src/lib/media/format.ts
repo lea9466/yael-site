@@ -26,3 +26,16 @@ export function formatMediaDate(isoDate: string): string {
 export function formatDimensions(width: number, height: number): string {
   return `${width} × ${height}`;
 }
+
+export function formatMimeType(mimeType: string): string {
+  switch (mimeType) {
+    case "image/jpeg":
+      return "JPEG";
+    case "image/png":
+      return "PNG";
+    case "image/webp":
+      return "WebP";
+    default:
+      return "—";
+  }
+}

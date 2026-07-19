@@ -1,4 +1,7 @@
 import { createClient } from "@/lib/auth/session";
+import { MEDIA_LIBRARY_SELECT_COLUMNS } from "@/lib/media/constants";
+import type { UploadMode } from "@/lib/media/constants";
+import type { MediaRecord } from "@/lib/media/media-types";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
 import { HOMEPAGE_SITE_CONTENT_KEY } from "@/lib/homepage/constants";
 import {
@@ -11,6 +14,9 @@ export type HomepageHeroMediaPreview = {
   id: string;
   url: string;
   alt: string;
+  width: number;
+  height: number;
+  uploadMode: UploadMode;
 };
 
 export type HomepageHeroPageData = {
@@ -30,7 +36,7 @@ async function fetchHeroMediaPreview(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("media_library")
-    .select("id, storage_path, file_name, original_file_name, alt_text")
+    .select(MEDIA_LIBRARY_SELECT_COLUMNS)
     .eq("id", mediaId)
     .maybeSingle();
 
@@ -39,11 +45,15 @@ async function fetchHeroMediaPreview(
   }
 
   const url = getPublicMediaUrl(data.storage_path);
+  const record = data as MediaRecord;
 
   return {
-    id: data.id,
+    id: record.id,
     url: url ?? "",
-    alt: data.alt_text ?? data.original_file_name ?? data.file_name,
+    alt: record.alt_text ?? record.original_file_name ?? record.file_name,
+    width: record.width,
+    height: record.height,
+    uploadMode: record.upload_mode,
   };
 }
 

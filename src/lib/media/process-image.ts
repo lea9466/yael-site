@@ -6,8 +6,11 @@ import {
   ALLOWED_INPUT_MIME_TYPES,
   MAX_IMAGE_WIDTH,
   MAX_SOURCE_UPLOAD_BYTES,
+  MIME_TO_EXTENSION,
   OUTPUT_EXTENSION,
   OUTPUT_MIME_TYPE,
+  WEBP_QUALITY,
+  type UploadMode,
 } from "@/lib/media/constants";
 import { MEDIA_ERRORS } from "@/lib/media/media-errors";
 import type { ProcessedImage } from "@/lib/media/media-types";
@@ -24,7 +27,15 @@ type ProcessImageFailure = {
 
 export type ProcessImageResult = ProcessImageSuccess | ProcessImageFailure;
 
-function detectMimeType(buffer: Buffer): string | null {
+type AllowedInputMimeType = (typeof ALLOWED_INPUT_MIME_TYPES)[number];
+
+const SHARP_FORMAT_TO_MIME: Record<string, AllowedInputMimeType> = {
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+};
+
+function detectMimeType(buffer: Buffer): AllowedInputMimeType | null {
   if (buffer.length < 12) {
     return null;
   }
@@ -58,27 +69,22 @@ function detectMimeType(buffer: Buffer): string | null {
   return null;
 }
 
-export function sanitizeOriginalFileName(fileName: string): string {
-  const baseName = fileName.split(/[/\\]/).pop() ?? "image";
+type SourceValidationSuccess = {
+  success: true;
+  detectedMimeType: AllowedInputMimeType;
+};
 
-  return baseName
-    .replace(/[^\w.\-\u0590-\u05FF ]+/gu, "_")
-    .trim()
-    .slice(0, 200);
-}
+type SourceValidationFailure = {
+  success: false;
+  error: string;
+};
 
-export function buildStoragePath(): { fileName: string; storagePath: string } {
-  const fileName = `${randomUUID()}.${OUTPUT_EXTENSION}`;
-  const year = new Date().getFullYear().toString();
-  const storagePath = `${year}/${fileName}`;
+type SourceValidationResult = SourceValidationSuccess | SourceValidationFailure;
 
-  return { fileName, storagePath };
-}
-
-export async function processImageBuffer(
+function validateSourceBuffer(
   buffer: Buffer,
   declaredMimeType: string
-): Promise<ProcessImageResult> {
+): SourceValidationResult {
   if (buffer.byteLength === 0) {
     return { success: false, error: MEDIA_ERRORS.invalidFile };
   }
@@ -91,19 +97,66 @@ export async function processImageBuffer(
 
   if (
     !detectedMimeType ||
-    !ALLOWED_INPUT_MIME_TYPES.includes(
-      detectedMimeType as (typeof ALLOWED_INPUT_MIME_TYPES)[number]
-    )
+    !ALLOWED_INPUT_MIME_TYPES.includes(detectedMimeType)
   ) {
     return { success: false, error: MEDIA_ERRORS.invalidFile };
   }
 
   if (
     !ALLOWED_INPUT_MIME_TYPES.includes(
-      declaredMimeType as (typeof ALLOWED_INPUT_MIME_TYPES)[number]
+      declaredMimeType as AllowedInputMimeType
     )
   ) {
     return { success: false, error: MEDIA_ERRORS.invalidFile };
+  }
+
+  if (declaredMimeType !== detectedMimeType) {
+    return { success: false, error: MEDIA_ERRORS.invalidFile };
+  }
+
+  return { success: true, detectedMimeType };
+}
+
+export function sanitizeOriginalFileName(fileName: string): string {
+  const baseName = fileName.split(/[/\\]/).pop() ?? "image";
+
+  return baseName
+    .replace(/[^\w.\-\u0590-\u05FF ]+/gu, "_")
+    .trim()
+    .slice(0, 200);
+}
+
+export function buildOptimizedStoragePath(): {
+  fileName: string;
+  storagePath: string;
+} {
+  const fileName = `${randomUUID()}.${OUTPUT_EXTENSION}`;
+  const year = new Date().getFullYear().toString();
+  const storagePath = `${year}/${fileName}`;
+
+  return { fileName, storagePath };
+}
+
+export function buildOriginalStoragePath(mimeType: AllowedInputMimeType): {
+  fileName: string;
+  storagePath: string;
+} {
+  const extension = MIME_TO_EXTENSION[mimeType];
+  const fileName = `${randomUUID()}.${extension}`;
+  const year = new Date().getFullYear().toString();
+  const storagePath = `${year}/${fileName}`;
+
+  return { fileName, storagePath };
+}
+
+export async function processImageBuffer(
+  buffer: Buffer,
+  declaredMimeType: string
+): Promise<ProcessImageResult> {
+  const sourceValidation = validateSourceBuffer(buffer, declaredMimeType);
+
+  if (!sourceValidation.success) {
+    return sourceValidation;
   }
 
   try {
@@ -111,6 +164,14 @@ export async function processImageBuffer(
     const metadata = await image.metadata();
 
     if (!metadata.width || !metadata.height) {
+      return { success: false, error: MEDIA_ERRORS.invalidFile };
+    }
+
+    const decodedMimeType = metadata.format
+      ? SHARP_FORMAT_TO_MIME[metadata.format]
+      : undefined;
+
+    if (decodedMimeType !== sourceValidation.detectedMimeType) {
       return { success: false, error: MEDIA_ERRORS.invalidFile };
     }
 
@@ -123,12 +184,12 @@ export async function processImageBuffer(
 
     const outputBuffer = await resized
       .webp({
-        quality: 82,
+        quality: WEBP_QUALITY,
         effort: 4,
       })
       .toBuffer({ resolveWithObject: true });
 
-    const { fileName, storagePath } = buildStoragePath();
+    const { fileName, storagePath } = buildOptimizedStoragePath();
 
     return {
       success: true,
@@ -145,4 +206,63 @@ export async function processImageBuffer(
   } catch {
     return { success: false, error: MEDIA_ERRORS.invalidFile };
   }
+}
+
+export async function validateOriginalImageBuffer(
+  buffer: Buffer,
+  declaredMimeType: string
+): Promise<ProcessImageResult> {
+  const sourceValidation = validateSourceBuffer(buffer, declaredMimeType);
+
+  if (!sourceValidation.success) {
+    return sourceValidation;
+  }
+
+  try {
+    const image = sharp(buffer, { failOn: "error" });
+    const metadata = await image.metadata();
+
+    if (!metadata.width || !metadata.height) {
+      return { success: false, error: MEDIA_ERRORS.invalidFile };
+    }
+
+    const decodedMimeType = metadata.format
+      ? SHARP_FORMAT_TO_MIME[metadata.format]
+      : undefined;
+
+    if (decodedMimeType !== sourceValidation.detectedMimeType) {
+      return { success: false, error: MEDIA_ERRORS.invalidFile };
+    }
+
+    const { fileName, storagePath } = buildOriginalStoragePath(
+      sourceValidation.detectedMimeType
+    );
+
+    return {
+      success: true,
+      image: {
+        buffer,
+        width: metadata.width,
+        height: metadata.height,
+        sizeBytes: buffer.byteLength,
+        mimeType: sourceValidation.detectedMimeType,
+        fileName,
+        storagePath,
+      },
+    };
+  } catch {
+    return { success: false, error: MEDIA_ERRORS.invalidFile };
+  }
+}
+
+export async function processImageByUploadMode(
+  buffer: Buffer,
+  declaredMimeType: string,
+  uploadMode: UploadMode
+): Promise<ProcessImageResult> {
+  if (uploadMode === "original") {
+    return validateOriginalImageBuffer(buffer, declaredMimeType);
+  }
+
+  return processImageBuffer(buffer, declaredMimeType);
 }

@@ -237,7 +237,7 @@ export function SettingsHomepageHeroPanel({
           כפתור משני
         </h3>
         <p className="text-caption text-[var(--color-text-muted)]">
-          אופציונלי — אם התווית ריקה, הכפתור לא יוצג.
+          אופציונלי — הכפתור יוצג רק כשגם התווית וגם הקישור מלאים.
         </p>
         <div className="grid gap-6 lg:grid-cols-2">
           <FormField

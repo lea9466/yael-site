@@ -179,6 +179,8 @@
   --sidebar-width-expanded: 280px;
   --sidebar-width-collapsed: 80px;
 
+  --public-header-height: 4.5rem;
+
   --z-page: 0;
   --z-sticky: 20;
   --z-dropdown: 40;
@@ -889,5 +891,101 @@
 
   .article-editor-field em {
     font-style: italic;
+  }
+
+  .public-layout {
+    --text-page-title: 2.5rem;
+    --text-section-title: 1.75rem;
+    --spacing-section: 4.5rem;
+    background:
+      radial-gradient(
+        ellipse 70% 45% at 100% 0%,
+        var(--color-warm-gold-soft) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 55% 40% at 0% 100%,
+        var(--color-light-sage-soft) 0%,
+        transparent 50%
+      ),
+      var(--color-background);
+  }
+
+  .public-main {
+    min-height: calc(100vh - var(--public-header-height));
+  }
+
+  .public-focus-ring {
+    transition:
+      color var(--transition-fast),
+      background-color var(--transition-fast),
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast),
+      transform var(--transition-fast);
+  }
+
+  .public-focus-ring:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+
+  .skip-to-content {
+    position: fixed;
+    top: var(--spacing-md);
+    inset-inline-start: var(--spacing-md);
+    z-index: calc(var(--z-modal) + 1);
+    transform: translateY(-200%);
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: var(--color-text-on-primary);
+    padding: 0.625rem 1rem;
+    font-size: var(--text-small);
+    font-weight: var(--font-weight-medium);
+    box-shadow: var(--shadow-md);
+    transition: transform var(--transition-fast);
+  }
+
+  .skip-to-content:focus-visible {
+    transform: translateY(0);
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  @keyframes public-page-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes hero-ken-burns {
+    from {
+      transform: scale(1);
+    }
+
+    to {
+      transform: scale(1.06);
+    }
+  }
+
+  .public-page-enter {
+    animation: public-page-enter var(--transition-base) ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .public-page-enter {
+      animation: none;
+    }
+
+    .public-header,
+    .public-focus-ring,
+    .surface-card-hover {
+      transition: none;
+    }
   }
 }

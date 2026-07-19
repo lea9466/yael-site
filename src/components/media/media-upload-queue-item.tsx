@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Loader2, X } from "lucide-react";
 
 import { StatusBadge } from "@/components/ui/status-badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,13 +12,19 @@ import {
   getUploadQueueStatusLabel,
 } from "@/lib/admin/status-system";
 import { formatFileSize } from "@/lib/media/format";
-import type { UploadQueueItem } from "@/lib/media/upload-queue";
+import { MIN_FULL_QUALITY_HERO_SOURCE_WIDTH } from "@/lib/media/constants";
+import {
+  UPLOAD_MODE_LABELS,
+  type UploadQueueItem,
+} from "@/lib/media/upload-queue";
 import { cn } from "@/lib/utils/cn";
+import type { UploadMode } from "@/lib/media/constants";
 
 type MediaUploadQueueItemProps = {
   item: UploadQueueItem;
   disabled: boolean;
   onAltTextChange: (id: string, altText: string) => void;
+  onUploadModeChange: (id: string, uploadMode: UploadMode) => void;
   onRemove: (id: string) => void;
 };
 
@@ -24,6 +32,7 @@ export function MediaUploadQueueItem({
   item,
   disabled,
   onAltTextChange,
+  onUploadModeChange,
   onRemove,
 }: MediaUploadQueueItemProps) {
   const isLocked =
@@ -31,6 +40,15 @@ export function MediaUploadQueueItem({
   const canRemove = !isLocked;
   const isFailed = item.status === "failed";
   const canRetryHint = isFailed && item.uploadAttempted === true;
+  const isFullQuality = item.uploadMode === "original";
+  const [sourceDimensions, setSourceDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+  const isUndersizedForHero =
+    isFullQuality &&
+    sourceDimensions !== null &&
+    sourceDimensions.width < MIN_FULL_QUALITY_HERO_SOURCE_WIDTH;
 
   return (
     <li
@@ -48,6 +66,12 @@ export function MediaUploadQueueItem({
             src={item.previewUrl}
             alt={item.altText || item.file.name}
             className="size-full object-cover"
+            onLoad={(event) => {
+              setSourceDimensions({
+                width: event.currentTarget.naturalWidth,
+                height: event.currentTarget.naturalHeight,
+              });
+            }}
           />
         </div>
 
@@ -89,6 +113,11 @@ export function MediaUploadQueueItem({
                   : undefined
               }
             />
+            <StatusBadge
+              size="sm"
+              status={isFullQuality ? "public" : "active"}
+              label={UPLOAD_MODE_LABELS[item.uploadMode]}
+            />
           </div>
 
           {item.error ? (
@@ -102,6 +131,61 @@ export function MediaUploadQueueItem({
               ניתן לנסות שוב בלחיצה על &quot;העלאת תמונות&quot;.
             </p>
           ) : null}
+
+          <div className="space-y-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-soft)]/50 p-3">
+            <label
+              htmlFor={`queue-full-quality-${item.id}`}
+              className="flex cursor-pointer items-start gap-3"
+            >
+              <Checkbox
+                id={`queue-full-quality-${item.id}`}
+                checked={isFullQuality}
+                disabled={isLocked}
+                className="mt-0.5"
+                onChange={(event) => {
+                  onUploadModeChange(
+                    item.id,
+                    event.target.checked ? "original" : "optimized"
+                  );
+                }}
+              />
+              <span className="space-y-1">
+                <span className="block text-sm font-medium text-[var(--color-text)]">
+                  שמירה באיכות מלאה
+                </span>
+                <span className="block text-caption text-[var(--color-text-muted)]">
+                  מתאים לתמונות Hero ובאנרים גדולים. הקובץ יישמר בגודל ובאיכות
+                  המקוריים ועלול לתפוס יותר נפח אחסון.
+                </span>
+              </span>
+            </label>
+
+            {isFullQuality ? (
+              <p
+                role="note"
+                className="rounded-[var(--radius-sm)] bg-[var(--color-warning-soft)] px-3 py-2 text-caption text-[var(--color-warning)]"
+              >
+                הקובץ יישמר ללא הקטנת ממדים או כיווץ. מומלץ להשתמש באפשרות זו רק
+                לתמונות גדולות שדורשות חדות מרבית.
+              </p>
+            ) : (
+              <p className="text-caption text-[var(--color-text-muted)]">
+                התמונה תותאם אוטומטית לאתר ותישמר כ־WebP.
+              </p>
+            )}
+
+            {isUndersizedForHero ? (
+              <p
+                role="alert"
+                className="rounded-[var(--radius-sm)] bg-[var(--color-error-soft)] px-3 py-2 text-caption text-[var(--color-error)]"
+              >
+                מקור קטן מדי לבאנר Hero מלא: {sourceDimensions.width}×
+                {sourceDimensions.height} פיקסלים. לתצוגה חדה בדסקטופ מומלץ
+                מקור ברוחב של לפחות {MIN_FULL_QUALITY_HERO_SOURCE_WIDTH}{" "}
+                פיקסלים.
+              </p>
+            ) : null}
+          </div>
 
           <div className="space-y-2">
             <label

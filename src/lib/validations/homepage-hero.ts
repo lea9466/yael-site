@@ -71,7 +71,7 @@ const optionalSecondaryButtonSchema = z
   .strict()
   .nullable()
   .transform((value) => {
-    if (!value || value.label.length === 0) {
+    if (!value || value.label.length === 0 || value.url.length === 0) {
       return null;
     }
 
@@ -82,11 +82,7 @@ const optionalSecondaryButtonSchema = z
       return;
     }
 
-    if (value.label.length === 0) {
-      return;
-    }
-
-    if (!value.url || !isValidArticleLinkUrl(value.url)) {
+    if (!isValidArticleLinkUrl(value.url)) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message: "יש להזין כתובת תקינה לכפתור המשני",
@@ -241,13 +237,12 @@ function normalizeHero(raw: unknown): HomepageHeroData {
     secondary_button:
       secondaryButton &&
       typeof secondaryButton.label === "string" &&
-      secondaryButton.label.trim().length > 0
+      secondaryButton.label.trim().length > 0 &&
+      typeof secondaryButton.url === "string" &&
+      secondaryButton.url.trim().length > 0
         ? {
             label: secondaryButton.label,
-            url:
-              typeof secondaryButton.url === "string"
-                ? secondaryButton.url
-                : "",
+            url: secondaryButton.url,
           }
         : null,
     media_type: normalizeHeroMediaType(raw.media_type),
@@ -369,7 +364,8 @@ export function formStateToHomepageHero(state: HomepageHeroFormState): HomepageH
       url: state.heroPrimaryButtonUrl,
     },
     secondary_button:
-      state.heroSecondaryButtonLabel.trim().length > 0
+      state.heroSecondaryButtonLabel.trim().length > 0 &&
+      state.heroSecondaryButtonUrl.trim().length > 0
         ? {
             label: state.heroSecondaryButtonLabel,
             url: state.heroSecondaryButtonUrl,

@@ -15,7 +15,7 @@ import type {
 } from "@/lib/media/media-types";
 import { fetchMediaLibrary } from "@/lib/media/queries";
 import { getAuthenticatedAdmin, createClient } from "@/lib/auth/session";
-import { MAX_BATCH_UPLOAD_CONCURRENCY } from "@/lib/media/constants";
+import { MAX_BATCH_UPLOAD_CONCURRENCY, MEDIA_LIBRARY_SELECT_COLUMNS } from "@/lib/media/constants";
 import {
   bulkDeleteMediaSchema,
   deleteMediaSchema,
@@ -63,6 +63,7 @@ export async function uploadMediaAction(
 
   const parsedMeta = uploadMediaSchema.safeParse({
     altText: formData.get("altText")?.toString() ?? undefined,
+    uploadMode: formData.get("uploadMode")?.toString(),
   });
 
   if (!parsedMeta.success) {
@@ -79,6 +80,7 @@ export async function uploadMediaAction(
     adminId: session.adminId,
     file,
     altText: parsedMeta.data.altText,
+    uploadMode: parsedMeta.data.uploadMode,
   });
 }
 
@@ -216,9 +218,7 @@ export async function updateMediaAltTextAction(
       .from("media_library")
       .update({ alt_text: parsed.data.altText })
       .eq("id", parsed.data.mediaId)
-      .select(
-        "id, storage_path, file_name, original_file_name, mime_type, width, height, size_bytes, alt_text, uploaded_by, created_at"
-      )
+      .select(MEDIA_LIBRARY_SELECT_COLUMNS)
       .maybeSingle();
 
     if (error) {

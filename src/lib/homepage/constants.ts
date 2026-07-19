@@ -16,9 +16,9 @@ export const HOMEPAGE_SECTION_ORDER = [
 export type HomepageSectionId = (typeof HOMEPAGE_SECTION_ORDER)[number];
 
 export const HOMEPAGE_DISPLAY_LIMITS = {
-  services: 6,
+  services: 3,
   testimonials: 5,
-  certificates: 6,
+  certificates: 2,
   recentPosts: 3,
   recentRecipes: 3,
 } as const;

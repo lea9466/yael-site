@@ -1,6 +1,6 @@
 import { RecipeCard } from "@/components/homepage/recipe-card";
 import { HomepageReveal } from "@/components/homepage/homepage-reveal";
-import { SectionCTA } from "@/components/homepage/section-cta";
+import { PublicSectionHeader } from "@/components/homepage/public-section-header";
 import type { PublicRecipeSummary } from "@/lib/public/types";
 import { cn } from "@/lib/utils/cn";
 
@@ -20,14 +20,14 @@ export function RecentRecipesSection({ recipes }: RecentRecipesSectionProps) {
     >
       <div className="recipes-section__inner">
         <HomepageReveal>
-          <header className="recipes-section__header">
-            <h2 id="homepage-recipes-title" className="recipes-section__title">
-              מהמתכונים האחרונים
-            </h2>
-            <p className="recipes-section__description">
-              טעימים, בריאים וקלים להכנה
-            </p>
-          </header>
+          <PublicSectionHeader
+            className="recipes-section__header"
+            titleId="homepage-recipes-title"
+            title="מהמתכונים האחרונים"
+            description="טעימים, בריאים וקלים להכנה"
+            actionLabel="לכל המתכונים"
+            actionHref="/recipes"
+          />
         </HomepageReveal>
 
         <ul
@@ -44,12 +44,6 @@ export function RecentRecipesSection({ recipes }: RecentRecipesSectionProps) {
             </li>
           ))}
         </ul>
-
-        <HomepageReveal delayMs={160}>
-          <div className="recipes-section__footer">
-            <SectionCTA label="לכל המתכונים" href="/recipes" variant="primary" />
-          </div>
-        </HomepageReveal>
       </div>
     </section>
   );

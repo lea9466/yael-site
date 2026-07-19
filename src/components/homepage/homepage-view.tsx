@@ -1,5 +1,6 @@
 import { ApproachSection } from "@/components/homepage/sections/approach-section";
-import { CertificatesSection } from "@/components/homepage/sections/certificates-section";
+// Temporary: certificates section hidden on homepage
+// import { CertificatesSection } from "@/components/homepage/sections/certificates-section";
 import { ContactCtaSection } from "@/components/homepage/sections/contact-cta-section";
 import { HomepageHeroSection } from "@/components/homepage/sections/hero-section";
 import { RecentPostsSection } from "@/components/homepage/sections/recent-posts-section";
@@ -40,7 +41,7 @@ export function HomepageView({
   settings,
   services,
   testimonials,
-  certificates,
+  certificates: _certificates,
   posts,
   recipes,
 }: HomepageViewProps) {
@@ -58,7 +59,9 @@ export function HomepageView({
       <ServicesSection services={services} />
       <ApproachSection content={homepage.approach} />
       <TestimonialsSection testimonials={testimonials} />
+      {/* Temporary: certificates section hidden on homepage
       <CertificatesSection certificates={certificates} />
+      */}
       <RecentPostsSection posts={posts} />
       <RecentRecipesSection recipes={recipes} />
       <ContactCtaSection content={homepage.contact_cta} settings={settings} />

@@ -9,13 +9,6 @@ export type PostCardPill = {
 
 const NEW_POST_WINDOW_MS = 1000 * 60 * 60 * 24 * 45;
 
-const CATEGORY_VARIANTS: ShortAboutHighlightVariant[] = [
-  "mint",
-  "teal",
-  "gold",
-  "coral",
-];
-
 function sortByPublishedDesc(
   left: PublicPostSummary,
   right: PublicPostSummary
@@ -40,63 +33,31 @@ function isRecentlyPublished(publishedAt: string | null): boolean {
   return Date.now() - publishedTime <= NEW_POST_WINDOW_MS;
 }
 
-function getCategoryVariant(categoryName: string): ShortAboutHighlightVariant {
-  let hash = 0;
+/** Featured first, then newest — used for homepage card order. */
+export function orderHomepagePosts(posts: PublicPostSummary[]): PublicPostSummary[] {
+  return [...posts].sort((left, right) => {
+    if (left.featured !== right.featured) {
+      return left.featured ? -1 : 1;
+    }
 
-  for (let index = 0; index < categoryName.length; index += 1) {
-    hash = (hash + categoryName.charCodeAt(index) * (index + 1)) % 997;
-  }
-
-  return CATEGORY_VARIANTS[hash % CATEGORY_VARIANTS.length] ?? "mint";
+    return sortByPublishedDesc(left, right);
+  });
 }
 
-export function partitionHomepagePosts(posts: PublicPostSummary[]): {
-  featured: PublicPostSummary;
-  secondary: PublicPostSummary[];
-} {
-  const featured = posts.find((post) => post.featured) ?? posts[0];
-  const secondary = posts
-    .filter((post) => post.id !== featured.id)
-    .sort(sortByPublishedDesc);
-
-  return { featured, secondary };
-}
-
-export function getFeaturedPostPills(post: PublicPostSummary): PostCardPill[] {
+/** Glowing status pills only (מומלץ / חדש). */
+export function getPostStatusPills(post: PublicPostSummary): PostCardPill[] {
   const pills: PostCardPill[] = [];
 
   if (post.featured) {
     pills.push({ label: "מומלץ", variant: "coral" });
-  }
-
-  if (post.categoryName) {
-    pills.push({
-      label: post.categoryName,
-      variant: getCategoryVariant(post.categoryName),
-    });
-  }
-
-  if (post.reading_time_minutes > 0 && pills.length < 3) {
-    pills.push({
-      label: formatReadingTimeLabel(post.reading_time_minutes),
-      variant: "gold",
-    });
-  }
-
-  return pills.slice(0, 3);
-}
-
-export function getCompactPostPills(post: PublicPostSummary): PostCardPill[] {
-  const pills: PostCardPill[] = [];
-
-  if (!post.featured && isRecentlyPublished(post.published_at)) {
+  } else if (isRecentlyPublished(post.published_at)) {
     pills.push({ label: "חדש", variant: "teal" });
   }
 
   return pills;
 }
 
-export function getCompactPostMeta(post: PublicPostSummary): {
+export function getPostCardMeta(post: PublicPostSummary): {
   category: string | null;
   readingTime: string | null;
 } {

@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { SectionViewAllLink } from "@/components/homepage/section-view-all-link";
 import { cn } from "@/lib/utils/cn";
 
 type PublicSectionHeaderProps = {
@@ -21,35 +20,27 @@ export function PublicSectionHeader({
   className,
   titleId,
 }: PublicSectionHeaderProps) {
+  const showAction = Boolean(actionLabel && actionHref);
+
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between",
-        className
-      )}
-    >
-      <div className="max-w-2xl space-y-3">
+    <header className={cn("public-section-header", className)}>
+      <div className="public-section-header__copy">
         {eyebrow ? (
-          <p className="text-caption font-medium tracking-wide text-[var(--color-secondary)]">
-            {eyebrow}
-          </p>
+          <p className="public-section-header__eyebrow">{eyebrow}</p>
         ) : null}
-        <h2 id={titleId} className="text-section-title">
+        <h2 id={titleId} className="public-section-header__title">
           {title}
         </h2>
         {description ? (
-          <p className="text-muted text-base sm:text-lg">{description}</p>
+          <p className="public-section-header__description">{description}</p>
         ) : null}
       </div>
-      {actionLabel && actionHref ? (
-        <Link
-          href={actionHref}
-          className="public-focus-ring inline-flex shrink-0 items-center gap-1 text-sm font-medium text-[var(--color-primary)] transition-colors duration-[var(--transition-fast)] hover:text-[var(--color-secondary)]"
-        >
-          {actionLabel}
-          <span aria-hidden="true">←</span>
-        </Link>
+
+      {showAction && actionLabel && actionHref ? (
+        <div className="public-section-header__action">
+          <SectionViewAllLink href={actionHref} label={actionLabel} />
+        </div>
       ) : null}
-    </div>
+    </header>
   );
 }

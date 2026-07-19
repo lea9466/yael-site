@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import { HomepageReveal } from "@/components/homepage/homepage-reveal";
+import { PublicSectionHeader } from "@/components/homepage/public-section-header";
 import { ServiceCard } from "@/components/homepage/service-card";
 import { getServiceCardSurface } from "@/lib/homepage/service-card-display";
 import type { PublicServiceSummary } from "@/lib/public/types";
@@ -23,17 +22,16 @@ export function ServicesSection({ services }: ServicesSectionProps) {
       className="services-section"
     >
       <div className="services-section__inner">
-        <header className="services-section__header">
-          <h2 id="homepage-services-title" className="services-section__title">
-            איך אפשר ללוות אתכם
-          </h2>
-          <p className="services-section__description">
-            ליווי תזונתי ואכילה מקושרת — בגישה אישית, חמה ומקצועית.
-          </p>
-          <Link href="/services" className="services-section__action public-focus-ring">
-            כל השירותים
-          </Link>
-        </header>
+        <HomepageReveal>
+          <PublicSectionHeader
+            className="services-section__header"
+            titleId="homepage-services-title"
+            title="איך אפשר ללוות אתכם"
+            description="ליווי תזונתי ואכילה מקושרת — בגישה אישית, חמה ומקצועית."
+            actionLabel="לכל השירותים"
+            actionHref="/services"
+          />
+        </HomepageReveal>
 
         <ul className="services-section__grid">
           {services.map((service, index) => (

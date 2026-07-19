@@ -9,7 +9,7 @@ export type CertificateCardBadge = {
 };
 
 export type CertificateCardLayout = "featured" | "compact";
-export type CertificateCardSurface = "cream" | "sage";
+export type CertificateCardSurface = "cream" | "sage" | "ivory";
 
 const BADGE_VARIANTS: ShortAboutHighlightVariant[] = [
   "mint",
@@ -57,27 +57,11 @@ export function getCertificateCardBadge(
   const year = certificate.year;
   const currentYear = new Date().getFullYear();
 
-  if (
-    year !== null &&
-    year !== undefined &&
-    year >= currentYear - 1
-  ) {
+  if (year !== null && year !== undefined && year >= currentYear - 1) {
     return { label: "חדש", variant: "teal" };
   }
 
   return null;
-}
-
-export function getCertificateCardExcerpt(
-  certificate: CertificateListItem
-): string | null {
-  const description = certificate.description?.trim() ?? "";
-
-  if (description.length === 0 || isShortBadgeDescription(description)) {
-    return null;
-  }
-
-  return description;
 }
 
 export function getCertificateCardLayout(index: number): CertificateCardLayout {
@@ -87,7 +71,29 @@ export function getCertificateCardLayout(index: number): CertificateCardLayout {
 export function getCertificateCardSurface(
   index: number
 ): CertificateCardSurface {
-  const surfaces: CertificateCardSurface[] = ["cream", "sage"];
+  const surfaces: CertificateCardSurface[] = ["ivory", "sage", "cream"];
 
-  return surfaces[index % surfaces.length] ?? "cream";
+  return surfaces[index % surfaces.length] ?? "ivory";
+}
+
+/**
+ * Homepage certificates use CMS display order (no featured flag in schema).
+ * The first item is treated as the visual featured certificate.
+ */
+export function partitionHomepageCertificates(
+  certificates: CertificateListItem[]
+): {
+  featured: CertificateListItem;
+  secondary: CertificateListItem[];
+} {
+  const featured = certificates[0];
+
+  if (!featured) {
+    throw new Error("Expected at least one homepage certificate.");
+  }
+
+  return {
+    featured,
+    secondary: certificates.slice(1),
+  };
 }

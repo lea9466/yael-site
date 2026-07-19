@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import { HomepageReveal } from "@/components/homepage/homepage-reveal";
+import { PublicSectionHeader } from "@/components/homepage/public-section-header";
 import { TestimonialCarousel } from "@/components/homepage/testimonial-carousel";
 import type { PublicTestimonialSummary } from "@/lib/public/types";
 
@@ -20,21 +19,14 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
     >
       <div className="testimonials-section__inner">
         <HomepageReveal>
-          <header className="testimonials-section__header">
-            <p className="testimonials-section__eyebrow">המלצות</p>
-            <h2
-              id="homepage-testimonials-title"
-              className="testimonials-section__title"
-            >
-              מה אומרים על הליווי
-            </h2>
-            <Link
-              href="/testimonials"
-              className="testimonials-section__action public-focus-ring"
-            >
-              כל ההמלצות
-            </Link>
-          </header>
+          <PublicSectionHeader
+            className="testimonials-section__header"
+            titleId="homepage-testimonials-title"
+            eyebrow="המלצות"
+            title="מה אומרים על הליווי"
+            actionLabel="לכל ההמלצות"
+            actionHref="/testimonials"
+          />
         </HomepageReveal>
 
         <HomepageReveal delayMs={120}>

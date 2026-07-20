@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { escapeHtml } from "@/lib/services/sanitize";
 import type { ServiceProcessStep } from "@/lib/services/types";
 import { cn } from "@/lib/utils/cn";
@@ -89,9 +90,11 @@ export function ServiceProcessTimeline({ steps }: ServiceProcessTimelineProps) {
       className="service-process"
       aria-labelledby="service-process-heading"
     >
-      <h2 id="service-process-heading" className="service-process__title">
-        איך התהליך עובד
-      </h2>
+      <HomepageReveal>
+        <h2 id="service-process-heading" className="service-process__title">
+          איך התהליך עובד
+        </h2>
+      </HomepageReveal>
 
       <ol className="service-process__timeline">
         {steps.map((step, index) => (

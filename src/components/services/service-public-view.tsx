@@ -85,7 +85,7 @@ export function ServicePublicView({
         </div>
 
         <div className="service-page__hero-inner">
-          <div className="service-page__hero-copy">
+          <HomepageReveal className="service-page__hero-copy">
             <p className="service-page__eyebrow">
               <Sparkles aria-hidden="true" className="service-page__eyebrow-icon" />
               שירות אישי
@@ -102,9 +102,9 @@ export function ServicePublicView({
               <span>{escapeHtml(heroCtaLabel)}</span>
               <ArrowLeft aria-hidden="true" className="service-page__cta-arrow" />
             </ServiceCtaLink>
-          </div>
+          </HomepageReveal>
 
-          <div className="service-page__hero-media-wrap">
+          <HomepageReveal className="service-page__hero-media-wrap" delayMs={140}>
             <div className="service-page__hero-media-glow" aria-hidden="true" />
             <div className="service-page__hero-media relative overflow-hidden">
               {service.coverUrl ? (
@@ -127,7 +127,7 @@ export function ServicePublicView({
               className="service-page__hero-orbit"
               aria-hidden="true"
             />
-          </div>
+          </HomepageReveal>
         </div>
       </header>
 

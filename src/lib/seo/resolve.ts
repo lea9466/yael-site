@@ -17,7 +17,14 @@ export function buildServiceCanonicalUrl(slug: string): string {
   return buildCanonicalUrl(buildContentPath("/services", slug));
 }
 
-export function buildRecipeCanonicalUrl(slug: string): string {
+export function buildRecipeCanonicalUrl(
+  slug: string,
+  categorySlug?: string | null
+): string {
+  if (categorySlug) {
+    return buildCanonicalUrl(`/recipes/${categorySlug}/${slug}`);
+  }
+
   return buildCanonicalUrl(buildContentPath("/recipes", slug));
 }
 

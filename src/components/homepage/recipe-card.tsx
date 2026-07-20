@@ -8,6 +8,7 @@ import {
   getRecipeCardMeta,
   getRecipeCardTags,
 } from "@/lib/homepage/recipe-card-display";
+import { buildRecipePath } from "@/lib/public/recipe-paths";
 import type { PublicRecipeSummary } from "@/lib/public/types";
 import { cn } from "@/lib/utils/cn";
 
@@ -17,7 +18,7 @@ type RecipeCardProps = {
 };
 
 export function RecipeCard({ recipe, className }: RecipeCardProps) {
-  const href = `/recipes/${recipe.slug}`;
+  const href = buildRecipePath(recipe.categorySlug, recipe.slug);
   const tags = getRecipeCardTags(recipe);
   const { prepDuration, servings, difficulty } = getRecipeCardMeta(recipe);
 

@@ -28,12 +28,13 @@ export type RecipeDifficulty = (typeof RECIPE_DIFFICULTIES)[number];
 export const DIFFICULTY_LABELS: Record<RecipeDifficulty, string> = {
   easy: "קל",
   medium: "בינוני",
-  hard: "קשה",
+  hard: "מאתגר",
 };
 
 export const RECIPE_REPEATER_LIMITS = {
-  ingredients: { min: 1, max: 100 },
-  steps: { min: 1, max: 50 },
+  sections: { min: 1, max: 20 },
+  ingredients: { min: 0, max: 100 },
+  steps: { min: 0, max: 50 },
   gallery: { min: 0, max: 6 },
 } as const;
 
@@ -57,8 +58,7 @@ export const STATUS_BADGE_VARIANT: Record<
 export const RECIPE_FORM_SECTIONS = [
   { id: "basic", label: "מידע בסיסי" },
   { id: "details", label: "פרטי המתכון" },
-  { id: "ingredients", label: "רכיבים" },
-  { id: "steps", label: "שלבי הכנה" },
+  { id: "sections", label: "חלקי המתכון" },
   { id: "tip", label: "הטיפ של יעל" },
   { id: "gallery", label: "גלריה" },
 ] as const;

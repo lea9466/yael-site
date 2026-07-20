@@ -1,9 +1,8 @@
 import { createClient } from "@/lib/auth/session";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
-import { createDefaultRecipeContent } from "@/lib/recipes/content";
+import { normalizeRecipeContent } from "@/lib/recipes/content";
 import { RECIPES_PAGE_SIZE } from "@/lib/recipes/constants";
 import type {
-  RecipeContent,
   RecipeDetail,
   RecipeListItem,
   RecipeRecord,
@@ -38,28 +37,6 @@ type MediaJoinRow = {
 
 function escapeIlikePattern(value: string): string {
   return value.replace(/[%_\\]/g, "\\$&");
-}
-
-function normalizeRecipeContent(content: unknown): RecipeContent {
-  if (
-    typeof content !== "object" ||
-    content === null ||
-    Array.isArray(content)
-  ) {
-    return createDefaultRecipeContent();
-  }
-
-  const record = content as Partial<RecipeContent>;
-
-  return {
-    ingredients: Array.isArray(record.ingredients) ? record.ingredients : [],
-    steps: Array.isArray(record.steps) ? record.steps : [],
-    yael_tip:
-      typeof record.yael_tip === "string" && record.yael_tip.trim().length > 0
-        ? record.yael_tip
-        : null,
-    gallery: Array.isArray(record.gallery) ? record.gallery : [],
-  };
 }
 
 async function fetchMediaMap(
@@ -347,7 +324,7 @@ export async function fetchRecipeById(id: string): Promise<RecipeDetail | null> 
     const mediaIds = [
       record.cover_media_id,
       record.seo_og_media_id,
-      ...record.content.gallery.map((item) => item.media_id),
+      ...(record.content.gallery ?? []).map((item) => item.media_id),
     ].filter((value): value is string => Boolean(value));
 
     const mediaMap = await fetchMediaMap(mediaIds);
@@ -358,7 +335,7 @@ export async function fetchRecipeById(id: string): Promise<RecipeDetail | null> 
 
     const { data: categoryData } = await supabase
       .from("categories")
-      .select("id, name, type")
+      .select("id, name, slug, type")
       .eq("id", record.category_id)
       .maybeSingle();
 
@@ -384,10 +361,14 @@ export async function fetchRecipeById(id: string): Promise<RecipeDetail | null> 
       ogAlt: og?.alt_text ?? null,
       category:
         categoryData && categoryData.type === "recipe"
-          ? { id: categoryData.id, name: categoryData.name }
+          ? {
+              id: categoryData.id,
+              name: categoryData.name,
+              slug: categoryData.slug,
+            }
           : null,
       tags,
-      galleryUrls: record.content.gallery
+      galleryUrls: (record.content.gallery ?? [])
         .slice()
         .sort((left, right) => left.order - right.order)
         .map((item) => {

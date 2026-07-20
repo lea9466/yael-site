@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="he"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumina Nutrition | מתכון פרימיום</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;600;700&amp;family=Heebo:wght@300;400;500;700&amp;family=Rubik:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#e8e8e4",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#accfb1",
+                    "inverse-surface": "#2f312e",
+                    "on-tertiary-container": "#e6caa8",
+                    "surface-variant": "#e3e3df",
+                    "tertiary-fixed": "#fbdebc",
+                    "on-primary-fixed-variant": "#2e4e37",
+                    "surface-bright": "#faf9f5",
+                    "outline-variant": "#c2c8c0",
+                    "on-surface": "#1a1c1a",
+                    "on-primary": "#ffffff",
+                    "secondary-container": "#caecc6",
+                    "surface-container-low": "#f4f4f0",
+                    "inverse-on-surface": "#f1f1ed",
+                    "tertiary": "#503d25",
+                    "on-primary-fixed": "#01210e",
+                    "primary": "#284731",
+                    "on-surface-variant": "#424842",
+                    "secondary-fixed": "#caecc6",
+                    "secondary": "#486548",
+                    "secondary-fixed-dim": "#aecfab",
+                    "on-primary-container": "#b3d7b9",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed": "#05210a",
+                    "surface-dim": "#dadad6",
+                    "on-background": "#1a1c1a",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#271904",
+                    "on-tertiary-fixed-variant": "#57432a",
+                    "surface-container-highest": "#e3e3df",
+                    "background": "#faf9f5",
+                    "primary-fixed-dim": "#accfb1",
+                    "primary-fixed": "#c7eccd",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#faf9f5",
+                    "on-secondary-container": "#4e6c4e",
+                    "surface-tint": "#45664d",
+                    "primary-container": "#3f5f47",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#dec2a1",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed-variant": "#314d32",
+                    "error-container": "#ffdad6",
+                    "surface-container": "#eeeeea",
+                    "outline": "#727972",
+                    "tertiary-container": "#69543a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "2xl": "1.5rem",
+                    "3xl": "2rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "12px",
+                    "xs": "4px",
+                    "gutter": "24px",
+                    "lg": "48px",
+                    "base": "8px",
+                    "container-max": "1280px",
+                    "md": "24px",
+                    "xl": "80px",
+                    "section": "120px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Noto Serif"],
+                    "display-lg-mobile": ["Noto Serif"],
+                    "label-sm": ["Heebo"],
+                    "display-lg": ["Noto Serif"],
+                    "headline-md": ["Noto Serif"],
+                    "body-lg": ["Heebo"],
+                    "label-md": ["Heebo"],
+                    "body-md": ["Heebo"],
+                    "heebo": ["Heebo", "sans-serif"],
+                    "rubik": ["Rubik", "sans-serif"]
+            },
+            "fontSize": {
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "display-lg-mobile": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #FBF8F3;
+            color: #1a1c1a;
+            scroll-behavior: smooth;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .zoom-hover:hover img {
+            transform: scale(1.05);
+        }
+        .tip-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background-color: #accfb1;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body class="font-heebo">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-transparent backdrop-blur-md flex flex-row-reverse justify-between items-center px-gutter py-sm w-full max-w-container-max mx-auto">
+<div class="font-headline-md text-headline-md font-bold text-primary tracking-tight">Lumina Nutrition</div>
+<div class="hidden md:flex flex-row gap-md">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">אודות</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">יומן</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">תוכניות</a>
+<a class="font-label-md text-label-md text-primary border-b border-primary pb-1" href="#">מתכונים</a>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary cursor-pointer hover:opacity-80 transition-opacity">person</span>
+<button class="bg-primary text-on-primary px-gutter py-xs rounded-full font-label-md hover:opacity-90 transition-opacity">הצטרפות</button>
+</div>
+</nav>
+<main class="pt-32">
+<!-- Hero Section -->
+<section class="max-w-container-max mx-auto px-gutter mb-section">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-xl items-center">
+<!-- Right: Image -->
+<div class="order-1 lg:order-2 reveal">
+<div class="relative rounded-3xl overflow-hidden shadow-2xl transition-transform duration-700 hover:scale-[1.02]">
+<img class="w-full h-[600px] object-cover rounded-3xl" data-alt="A high-end editorial food photograph of a vibrant Mediterranean salad bowl. The dish features fresh greens, roasted chickpeas, sliced avocado, and a creamy tahini drizzle, all presented on a textured ceramic plate. The lighting is soft, natural morning light coming from a window, highlighting the organic textures and rich colors of the ingredients. The background is a minimalist, warm ivory surface that complements the Lumina Nutrition brand aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_lajyQjzsjQi2JdJVsmzlaBPsGu-bNGAOs3ILb7dOGk0e0NChQ9obsgGSxIRRmgfDPdV6hXumRFf8hWmdzTvsvudXYSOlZdD-nbrp7PvS8nVXOjUNwyK9RheTP7Uh0Wzq8e715j22o4GpOHubovnxfHgPch2yLAvrrzyuYx2jxmeeE1V-Uk14E6OZGIVsW_t1ZZdnq8UfcM9bbuh_W-3BPrYLpDU5lcvxd4T1RlcUeLKluHaUhYfYJA"/>
+<div class="absolute top-6 right-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">
+<span class="font-label-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+                                פורסם ע"י צוות לומינה
+                            </span>
+</div>
+</div>
+</div>
+<!-- Left: Content -->
+<div class="order-2 lg:order-1 flex flex-col gap-md reveal">
+<div class="flex flex-wrap gap-sm">
+<span class="bg-error-container text-on-error-container px-4 py-1 rounded-full font-label-sm">מומלץ החודש</span>
+<span class="bg-secondary-container text-on-secondary-container px-4 py-1 rounded-full font-label-sm">צהריים קלילה</span>
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-1 rounded-full font-label-sm">ללא גלוטן</span>
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-1 rounded-full font-label-sm">טבעוני</span>
+</div>
+<h1 class="font-rubik font-bold text-[52px] leading-tight text-primary lg:text-[60px]">קערת כוח ים-תיכונית עם חומוס פריך</h1>
+<p class="font-body-lg text-on-surface-variant max-w-xl">
+                        שילוב מושלם של חלבון צמחי, שומנים בריאים וירקות טריים. מנה מאוזנת שמעניקה אנרגיה יציבה לאורך כל היום, עם תיבול עדין של לימון ושמן זית כתית מעולה.
+                    </p>
+<div class="grid grid-cols-3 gap-md py-6 border-y border-outline-variant/30">
+<div class="flex flex-col gap-1 items-start">
+<span class="material-symbols-outlined text-secondary">schedule</span>
+<span class="font-label-md text-on-surface-variant">זמן הכנה</span>
+<span class="font-rubik font-bold text-primary">25 דקות</span>
+</div>
+<div class="flex flex-col gap-1 items-start">
+<span class="material-symbols-outlined text-secondary">restaurant</span>
+<span class="font-label-md text-on-surface-variant">מנות</span>
+<span class="font-rubik font-bold text-primary">2 סועדים</span>
+</div>
+<div class="flex flex-col gap-1 items-start">
+<span class="material-symbols-outlined text-secondary">speed</span>
+<span class="font-label-md text-on-surface-variant">רמת קושי</span>
+<span class="font-rubik font-bold text-primary">קל מאוד</span>
+</div>
+</div>
+<div class="flex gap-md pt-4">
+<button class="flex items-center gap-2 border border-primary text-primary px-8 py-3 rounded-xl font-rubik font-medium hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined">print</span>
+                            הדפסת מתכון
+                        </button>
+<button class="flex items-center gap-2 border border-outline text-on-surface-variant px-8 py-3 rounded-xl font-rubik font-medium hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">share</span>
+                            שיתוף
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Recipe Content -->
+<section class="max-w-container-max mx-auto px-gutter mb-section grid grid-cols-1 lg:grid-cols-12 gap-xl">
+<!-- Ingredients -->
+<div class="lg:col-span-5 reveal">
+<div class="bg-white p-xl rounded-3xl shadow-[0_10px_40px_-15px_rgba(40,71,49,0.08)] sticky top-32">
+<h2 class="font-rubik font-bold text-headline-md text-primary mb-xl">רכיבים</h2>
+<ul class="space-y-6">
+<li class="flex items-center gap-4 group cursor-pointer">
+<div class="w-6 h-6 border-2 border-primary/20 rounded flex items-center justify-center group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-primary scale-0 group-active:scale-100 transition-transform">check</span>
+</div>
+<div class="flex gap-2 font-body-md text-on-surface">
+<span class="font-bold">2 כוסות</span>
+<span>עלי בייבי ותרד טרי</span>
+</div>
+</li>
+<li class="flex items-center gap-4 group cursor-pointer">
+<div class="w-6 h-6 border-2 border-primary/20 rounded flex items-center justify-center group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-primary scale-0 group-active:scale-100 transition-transform">check</span>
+</div>
+<div class="flex gap-2 font-body-md text-on-surface">
+<span class="font-bold">1 פחית</span>
+<span>גרגירי חומוס מבושלים ומסוננים</span>
+</div>
+</li>
+<li class="flex items-center gap-4 group cursor-pointer">
+<div class="w-6 h-6 border-2 border-primary/20 rounded flex items-center justify-center group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-primary scale-0 group-active:scale-100 transition-transform">check</span>
+</div>
+<div class="flex gap-2 font-body-md text-on-surface">
+<span class="font-bold">1 יחידה</span>
+<span>אבוקדו בשל פרוס</span>
+</div>
+</li>
+<li class="flex items-center gap-4 group cursor-pointer">
+<div class="w-6 h-6 border-2 border-primary/20 rounded flex items-center justify-center group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-primary scale-0 group-active:scale-100 transition-transform">check</span>
+</div>
+<div class="flex gap-2 font-body-md text-on-surface">
+<span class="font-bold">1/2 כוס</span>
+<span>עגבניות שרי חצויות</span>
+</div>
+</li>
+<li class="flex items-center gap-4 group cursor-pointer">
+<div class="w-6 h-6 border-2 border-primary/20 rounded flex items-center justify-center group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-primary scale-0 group-active:scale-100 transition-transform">check</span>
+</div>
+<div class="flex gap-2 font-body-md text-on-surface">
+<span class="font-bold">2 כפות</span>
+<span>טחינה גולמית איכותית</span>
+</div>
+</li>
+<li class="flex items-center gap-4 group cursor-pointer">
+<div class="w-6 h-6 border-2 border-primary/20 rounded flex items-center justify-center group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-primary scale-0 group-active:scale-100 transition-transform">check</span>
+</div>
+<div class="flex gap-2 font-body-md text-on-surface">
+<span class="font-bold">קורט</span>
+<span>מלח אטלנטי ופלפל שחור גרוס</span>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<!-- Preparation & Tips -->
+<div class="lg:col-span-7 flex flex-col gap-xl">
+<div class="reveal">
+<h2 class="font-rubik font-bold text-headline-md text-primary mb-xl">שלבי הכנה</h2>
+<div class="space-y-6">
+<!-- Step 1 -->
+<div class="bg-white p-lg rounded-3xl flex gap-gutter shadow-sm border border-surface-container-high">
+<div class="flex-shrink-0">
+<div class="w-12 h-12 bg-primary-fixed text-primary rounded-full flex items-center justify-center font-rubik font-bold text-xl">1</div>
+</div>
+<div class="flex flex-col gap-2">
+<h3 class="font-rubik font-bold text-lg text-primary">הכנת החומוס הפריך</h3>
+<p class="font-body-md text-on-surface-variant">מחממים מחבת רחבה עם כף שמן זית. מוסיפים את החומוס, מלח וכמון. מטגנים כ-10 דקות עד שהחומוס מזהיב ונהיה פריך למגע.</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="bg-white p-lg rounded-3xl flex gap-gutter shadow-sm border border-surface-container-high">
+<div class="flex-shrink-0">
+<div class="w-12 h-12 bg-primary-fixed text-primary rounded-full flex items-center justify-center font-rubik font-bold text-xl">2</div>
+</div>
+<div class="flex flex-col gap-2">
+<h3 class="font-rubik font-bold text-lg text-primary">סידור הבסיס</h3>
+<p class="font-body-md text-on-surface-variant">מניחים בקערה עמוקה את עלי התרד והבייבי. מוסיפים מעל את עגבניות השרי והמלפפון הקצוץ.</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="bg-white p-lg rounded-3xl flex gap-gutter shadow-sm border border-surface-container-high">
+<div class="flex-shrink-0">
+<div class="w-12 h-12 bg-primary-fixed text-primary rounded-full flex items-center justify-center font-rubik font-bold text-xl">3</div>
+</div>
+<div class="flex flex-col gap-2">
+<h3 class="font-rubik font-bold text-lg text-primary">הרכבת המנה</h3>
+<p class="font-body-md text-on-surface-variant">מוסיפים את האבוקדו הפרוס ואת החומוס החם. מזלפים מעל טחינה גולמית ולימון טרי.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Yael's Tip -->
+<div class="tip-card relative bg-tertiary-fixed/30 p-lg rounded-3xl reveal overflow-hidden">
+<div class="relative z-10 flex gap-gutter items-start">
+<span class="material-symbols-outlined text-tertiary text-4xl">lightbulb</span>
+<div>
+<h4 class="font-rubik font-bold text-tertiary text-lg mb-2">הטיפ של יעל</h4>
+<p class="font-body-md text-on-tertiary-fixed-variant italic leading-relaxed">
+                                "כדי לשדרג את המנה, אני ממליצה להוסיף מעט קליפת לימון מגורדת מעל החומוס בסוף הטיגון. זה מעניק ארומה מרעננת שמשדרגת את כל הקערה ברגע!"
+                            </p>
+</div>
+</div>
+</div>
+<!-- Gallery -->
+<div class="grid grid-cols-2 gap-md reveal">
+<div class="rounded-2xl overflow-hidden h-64 zoom-hover">
+<img class="w-full h-full object-cover transition-transform duration-700" data-alt="A macro close-up of a perfectly ripe avocado being sliced on a light wooden board. The green flesh is creamy and vibrant, with a focus on the smooth texture and natural organic shapes. Soft, diffused lighting highlights the healthy oils on the surface. Minimalist, premium culinary aesthetic, matching the clean Lumina Nutrition brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSUxX5e8Htjuxq8bRnMiIg8_YvIiqR_jrLs8R92H45naKfwHGvMmqEsR4pTDpWaRdYFvBaj0ErzzMfLdvSL3S4AXJBmpAmxTgFhJ1GXy_yeBjs4aaha6CgvelW-y_NcLtekbWoaiAWa_Cwgo0-pT4u7uR-jf-gsPFpgw6ntNDeQt1DDyQFrWmtiZ1XivcRN5bBAHG-T3xnQXt2EezA_tQ5M9pPiAz_ZESvJrEARpWj2A2wsIGPTwY2vQ"/>
+</div>
+<div class="rounded-2xl overflow-hidden h-64 zoom-hover">
+<img class="w-full h-full object-cover transition-transform duration-700" data-alt="Action shot of golden, crispy chickpeas being tossed in a heavy cast iron skillet. Small flecks of spices and herbs are visible in mid-air. The scene is warm and inviting, with a focus on the movement and texture of the healthy ingredients. Darker green tones in the background provide elegant contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSyRbivr8VYQ5HZI8AYm3oxD_9qRp2b0LeRCLThVZpJ3KAI88SR9p8-zVETwl4fXt9kvDijkyKybzI52zeIZOPzzZ31xSk5-k4CTxGQdJ99kyiUqJOyGSBZYBY1cHiuq6Wi2YgHmh0Zn9BIOojij3yVe9mtBzzOwzpjS__j-z7LD5MYCWEHAsw9fP5ADe0U-DWOpqLdQPe1eg1hb2BhLlhl3BBmouWdOsgaAw28XgXoBxr6jGZ0kt4VQ"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Related Recipes -->
+<section class="max-w-container-max mx-auto px-gutter mb-section reveal">
+<div class="flex justify-between items-end mb-xl">
+<h2 class="font-rubik font-bold text-display-lg-mobile text-primary">מתכונים נוספים</h2>
+<a class="font-label-md text-primary flex items-center gap-2 hover:gap-4 transition-all" href="#">
+                    לכל המתכונים
+                    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-xl">
+<!-- Card 1 -->
+<div class="group cursor-pointer">
+<div class="rounded-2xl overflow-hidden mb-gutter shadow-sm group-hover:shadow-lg transition-all duration-500">
+<img class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A bowl of vibrant pink dragon fruit smoothie topped with chia seeds, granola, and fresh mint leaves. The photography is bright, airy, and high-end, emphasizing the natural colors and healthy lifestyle theme of Lumina Nutrition. The background is a clean white marble surface with soft shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGznPTcuLBYcFQwM0ZHxuU6IT7KdNREpFQQqvtvhqkUbwcHBF8KxC294yw0ODk9ABqNr_twh8iDi3Q116qIZ002yfzT5XC7IJ1yXUt5UpcsaXNgb7x4Av_EsWgtyVDuztyDnDcRi0zwYiPk5SfYCTGUJhv39OV-v8FGIkTP445-9vl0m8db6K-a1kSG_ZJjPU4okbNEG1A9FubsM4k302k5VQjNwHaAAPfMG8yz127eLmfrXBcbxdMxg"/>
+</div>
+<div class="flex flex-col gap-2">
+<span class="font-label-sm text-secondary">ארוחת בוקר</span>
+<h3 class="font-rubik font-bold text-xl text-primary group-hover:text-secondary transition-colors">סמות'י בול פירות יער מרענן</h3>
+<div class="flex gap-md mt-2">
+<span class="flex items-center gap-1 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[18px]">schedule</span> 10 דקות
+                            </span>
+<span class="flex items-center gap-1 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[18px]">speed</span> קל
+                            </span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group cursor-pointer">
+<div class="rounded-2xl overflow-hidden mb-gutter shadow-sm group-hover:shadow-lg transition-all duration-500">
+<img class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Grilled salmon fillet served on a bed of steamed asparagus and quinoa. The salmon is perfectly cooked with a glossy glaze. The lighting is sophisticated, with a shallow depth of field focusing on the texture of the fish. Warm earth tones and deep greens dominate the palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQsmX1qm0A-2D4CaZbREWEvQa2NJlJQE-8lsk5N--OyAnkjCfLwBB-InllkMD7lNCHDD8Z3mRSJAbRusYBCN9aW-6BklYtRtYltFFa4BfDSAXwsSfqle2CDkb3FUXwB9evwgHrkLnSge13a2OuBksrLRTju0FWzduOvm4fJGpoDMUyBovFHNIC7ZfO7Ev7B2718ya3vNAVEX91ngeuPv_VxsqChe-TmvzJe8DDYEmSLls-uOWyiAhBJA"/>
+</div>
+<div class="flex flex-col gap-2">
+<span class="font-label-sm text-secondary">צהריים/ערב</span>
+<h3 class="font-rubik font-bold text-xl text-primary group-hover:text-secondary transition-colors">סלמון צלוי עם אספרגוס וקינואה</h3>
+<div class="flex gap-md mt-2">
+<span class="flex items-center gap-1 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[18px]">schedule</span> 35 דקות
+                            </span>
+<span class="flex items-center gap-1 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[18px]">speed</span> בינוני
+                            </span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group cursor-pointer">
+<div class="rounded-2xl overflow-hidden mb-gutter shadow-sm group-hover:shadow-lg transition-all duration-500">
+<img class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A rustic ceramic bowl containing a warm sweet potato and lentil soup. Topped with a dollop of yogurt and fresh cilantro. The styling is cozy and organic, suggesting a comforting, nutritious meal. The lighting is warm and golden, highlighting the steam rising from the bowl." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClkcVIYIKEgw9T_3Kq2EW15KHw8nbIqcJZHxrRjzReYFJ3pIP8P9gpk4q-bMiQ3islVJ0M4zyujCyaaDJfy8PBi232GCR2D0MPsUUaF_MQgLoQCNnQtE4EjJLp25ysgLqrLtwd6tCkqpw4hZga84SUzHKCfaW59i8bHj_DQb_20AiwOyVMfhRRVG4Yp4w8cl7xVg0-cGQSZl8Ryyczl4xmg4ZYXnvaOOFZLoNdoBWc2Fwmp-vKGfOjyQ"/>
+</div>
+<div class="flex flex-col gap-2">
+<span class="font-label-sm text-secondary">מרקים</span>
+<h3 class="font-rubik font-bold text-xl text-primary group-hover:text-secondary transition-colors">מרק בטטה ועדשים כתומות סמיך</h3>
+<div class="flex gap-md mt-2">
+<span class="flex items-center gap-1 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[18px]">schedule</span> 45 דקות
+                            </span>
+<span class="flex items-center gap-1 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[18px]">speed</span> קל
+                            </span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="max-w-container-max mx-auto px-gutter mb-section reveal">
+<div class="bg-primary rounded-3xl p-xl text-center relative overflow-hidden">
+<!-- Decorative Shapes -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-secondary-container/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+<div class="absolute bottom-0 left-0 w-48 h-48 bg-primary-container/20 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+<div class="relative z-10 max-w-2xl mx-auto">
+<h2 class="font-rubik font-bold text-[40px] text-white mb-md leading-tight">מוכנה להתחיל את השינוי שלך?</h2>
+<p class="font-body-lg text-primary-fixed mb-xl">
+                        הצטרפי למאות נשים שכבר בחרו בתזונה מותאמת אישית שגורמת להן להרגיש במיטבן, מבלי לוותר על הטעם וההנאה מהאוכל.
+                    </p>
+<button class="bg-white text-primary px-12 py-4 rounded-xl font-rubik font-bold text-lg hover:scale-105 transition-transform active:scale-95 shadow-xl">
+                        לקביעת פגישת ייעוץ
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl bg-surface-container-low dark:bg-surface-container-lowest">
+<div class="flex flex-col md:flex-row-reverse justify-between items-center px-gutter w-full max-w-container-max mx-auto gap-md">
+<div class="font-headline-sm text-headline-sm font-bold text-primary">Lumina Nutrition</div>
+<div class="flex gap-md">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">מדיניות פרטיות</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">תנאי שימוש</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">צור קשר</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">שאלות נפוצות</a>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 Lumina Nutrition. כל הזכויות שמורות.</p>
+</div>
+</footer>
+<script>
+        // Simple scroll reveal animation
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Navbar blur on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 20) {
+                nav.classList.add('bg-white/80');
+                nav.classList.remove('bg-transparent');
+            } else {
+                nav.classList.remove('bg-white/80');
+                nav.classList.add('bg-transparent');
+            }
+        });
+    </script>
+</body></html>
+<!-- Injection By NetFree -->
+<script src="//netfree.link/injection-script/go-payment.js" type="text/javascript" async ></script>
+<script src="//netfree.link/injection-script/popup-card-init.js" type="text/javascript" async ></script>

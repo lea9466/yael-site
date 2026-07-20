@@ -48,11 +48,13 @@ const ingredientSchema = z.object({
   quantity: z
     .string()
     .trim()
-    .max(40, "הכמות ארוכה מדי"),
+    .max(40, "הכמות ארוכה מדי")
+    .optional(),
   unit: z
     .string()
     .trim()
-    .max(40, "יחידת המידה ארוכה מדי"),
+    .max(40, "יחידת המידה ארוכה מדי")
+    .optional(),
 });
 
 const stepSchema = z.object({
@@ -62,6 +64,24 @@ const stepSchema = z.object({
     .min(1, "יש להזין תיאור שלב")
     .max(2000, "תיאור השלב ארוך מדי"),
 });
+
+const recipeSectionSchema = z
+  .object({
+    title: z.string().trim().max(80, "שם החלק ארוך מדי"),
+    ingredients: z
+      .array(ingredientSchema)
+      .max(RECIPE_REPEATER_LIMITS.ingredients.max),
+    steps: z.array(stepSchema).max(RECIPE_REPEATER_LIMITS.steps.max),
+  })
+  .superRefine((section, ctx) => {
+    if (section.ingredients.length === 0 && section.steps.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "יש להוסיף לפחות רכיב אחד או שלב הכנה אחד בחלק זה",
+        path: ["ingredients"],
+      });
+    }
+  });
 
 const galleryItemSchema = z.object({
   media_id: uuidSchema,
@@ -85,41 +105,81 @@ const recipeSeoSchema = z.object({
   description: z.string().trim().max(160, "תיאור SEO ארוך מדי"),
 });
 
-const recipeContentDraftSchema = z.object({
-  ingredients: z
-    .array(ingredientSchema)
-    .max(RECIPE_REPEATER_LIMITS.ingredients.max),
-  steps: z.array(stepSchema).max(RECIPE_REPEATER_LIMITS.steps.max),
-  yael_tip: z
-    .string()
-    .trim()
-    .max(2000, "הטיפ ארוך מדי")
-    .nullable()
-    .transform((value) => (value && value.length > 0 ? value : null)),
-  gallery: z
-    .array(galleryItemSchema)
-    .max(
-      RECIPE_REPEATER_LIMITS.gallery.max,
-      `ניתן להוסיף עד ${RECIPE_REPEATER_LIMITS.gallery.max} תמונות לגלריה`
-    ),
-});
+function withSectionTitleRules<T extends z.ZodType>(schema: T) {
+  return schema.superRefine((value, ctx) => {
+    const content = value as {
+      recipe_sections?: Array<{ title?: string }>;
+    };
+    const sections = content.recipe_sections ?? [];
 
-const recipeContentPublishSchema = recipeContentDraftSchema.extend({
-  ingredients: z
-    .array(ingredientSchema)
-    .min(
-      RECIPE_REPEATER_LIMITS.ingredients.min,
-      `יש להוסיף לפחות ${RECIPE_REPEATER_LIMITS.ingredients.min} רכיב`
-    )
-    .max(RECIPE_REPEATER_LIMITS.ingredients.max),
-  steps: z
-    .array(stepSchema)
-    .min(
-      RECIPE_REPEATER_LIMITS.steps.min,
-      `יש להוסיף לפחות ${RECIPE_REPEATER_LIMITS.steps.min} שלב`
-    )
-    .max(RECIPE_REPEATER_LIMITS.steps.max),
-});
+    if (sections.length <= 1) {
+      return;
+    }
+
+    sections.forEach((section, index) => {
+      const title =
+        typeof section.title === "string" ? section.title.trim() : "";
+
+      if (!title) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "במתכון עם כמה חלקים יש להזין שם לכל חלק",
+          path: ["recipe_sections", index, "title"],
+        });
+      }
+    });
+  });
+}
+
+const recipeContentDraftSchema = withSectionTitleRules(
+  z.object({
+    recipe_sections: z
+      .array(recipeSectionSchema)
+      .max(
+        RECIPE_REPEATER_LIMITS.sections.max,
+        `ניתן להוסיף עד ${RECIPE_REPEATER_LIMITS.sections.max} חלקים`
+      ),
+    yael_tip: z
+      .string()
+      .trim()
+      .max(2000, "הטיפ ארוך מדי")
+      .nullable()
+      .transform((value) => (value && value.length > 0 ? value : null)),
+    gallery: z
+      .array(galleryItemSchema)
+      .max(
+        RECIPE_REPEATER_LIMITS.gallery.max,
+        `ניתן להוסיף עד ${RECIPE_REPEATER_LIMITS.gallery.max} תמונות לגלריה`
+      ),
+  })
+);
+
+const recipeContentPublishSchema = withSectionTitleRules(
+  z.object({
+    recipe_sections: z
+      .array(recipeSectionSchema)
+      .min(
+        RECIPE_REPEATER_LIMITS.sections.min,
+        "יש להוסיף לפחות חלק אחד עם רכיבים או שלבי הכנה"
+      )
+      .max(
+        RECIPE_REPEATER_LIMITS.sections.max,
+        `ניתן להוסיף עד ${RECIPE_REPEATER_LIMITS.sections.max} חלקים`
+      ),
+    yael_tip: z
+      .string()
+      .trim()
+      .max(2000, "הטיפ ארוך מדי")
+      .nullable()
+      .transform((value) => (value && value.length > 0 ? value : null)),
+    gallery: z
+      .array(galleryItemSchema)
+      .max(
+        RECIPE_REPEATER_LIMITS.gallery.max,
+        `ניתן להוסיף עד ${RECIPE_REPEATER_LIMITS.gallery.max} תמונות לגלריה`
+      ),
+  })
+);
 
 const recipeBaseFieldsSchema = z.object({
   title: z

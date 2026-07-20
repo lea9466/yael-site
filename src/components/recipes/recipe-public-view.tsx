@@ -1,17 +1,18 @@
-import Image from "next/image";
-
-import { AdminFeaturedBadge } from "@/components/admin/admin-status-badge";
-import { Badge } from "@/components/ui/badge";
-import { MultilineText } from "@/components/ui/multiline-text";
-import { escapeHtml, sanitizePlainText } from "@/lib/services/sanitize";
-import { DIFFICULTY_LABELS } from "@/lib/recipes/constants";
+import { RecipeBreadcrumbs } from "@/components/recipes/public/recipe-breadcrumbs";
+import { RecipeGallery } from "@/components/recipes/public/recipe-gallery";
+import { RecipeHero } from "@/components/recipes/public/recipe-hero";
+import { RecipeSectionBlock } from "@/components/recipes/public/recipe-section-block";
+import { RecipeTip } from "@/components/recipes/public/recipe-tip";
+import { normalizeRecipeSections } from "@/lib/recipes/content";
 import { formatIngredientLine } from "@/lib/recipes/format-ingredient";
+import { sanitizePlainText } from "@/lib/services/sanitize";
 import type { RecipeDetail } from "@/lib/recipes/types";
 import { cn } from "@/lib/utils/cn";
 
 type RecipePublicViewProps = {
   recipe: RecipeDetail;
   mode?: "public" | "preview";
+  showBreadcrumbs?: boolean;
 };
 
 function EmptySectionNote({ children }: { children: React.ReactNode }) {
@@ -25,171 +26,103 @@ function EmptySectionNote({ children }: { children: React.ReactNode }) {
 export function RecipePublicView({
   recipe,
   mode = "public",
+  showBreadcrumbs = mode === "public",
 }: RecipePublicViewProps) {
   const isPreview = mode === "preview";
-  const ogImageUrl = recipe.ogUrl ?? recipe.coverUrl;
-  const description = sanitizePlainText(recipe.description);
   const yaelTip = recipe.content.yael_tip
     ? sanitizePlainText(recipe.content.yael_tip)
     : null;
 
-  const hasIngredients = recipe.content.ingredients.length > 0;
-  const hasSteps = recipe.content.steps.length > 0;
-  const showIngredients = isPreview || hasIngredients;
-  const showSteps = isPreview || hasSteps;
-  const showYaelTip = isPreview || Boolean(yaelTip);
-  const hasGalleryImages = recipe.galleryUrls.some((item) => item.url);
-  const showGallery = isPreview || hasGalleryImages;
+  const galleryImages = recipe.galleryUrls.filter(
+    (item): item is typeof item & { url: string } => Boolean(item.url)
+  );
+
+  const sections = normalizeRecipeSections(recipe.content);
+  const hasMultipleSections = sections.length > 1;
+  const hasRecipeBody = sections.some(
+    (section) =>
+      section.ingredients.some(
+        (ingredient) => formatIngredientLine(ingredient).length > 0
+      ) ||
+      section.steps.some((step) => sanitizePlainText(step.text).length > 0)
+  );
+  const hasTip = Boolean(yaelTip);
+  const hasGallery = galleryImages.length > 0;
 
   return (
     <article
       className={cn(
-        "w-full space-y-10",
-        isPreview
-          ? "rounded-[var(--radius-xl)] bg-[var(--color-surface)] p-4 sm:p-8"
-          : "mx-auto max-w-5xl"
+        "recipe-detail",
+        isPreview && "recipe-detail--preview"
       )}
     >
-      <header className="space-y-4">
-        {recipe.coverUrl ? (
-          <div className="relative aspect-[16/9] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-surface-soft)]">
-            <Image
-              src={recipe.coverUrl}
-              alt={recipe.coverAlt ?? recipe.title}
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 1024px"
-              className="object-cover"
-            />
-          </div>
-        ) : isPreview ? (
-          <EmptySectionNote>טרם נבחרה תמונת כיסוי</EmptySectionNote>
-        ) : null}
-
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-page-title">{escapeHtml(recipe.title)}</h1>
-            {recipe.featured ? <AdminFeaturedBadge size="sm" /> : null}
-          </div>
-
-          {description ? (
-            <MultilineText
-              as="p"
-              className="text-lg text-[var(--color-text-muted)]"
-            >
-              {description}
-            </MultilineText>
-          ) : isPreview ? (
-            <p className="text-sm text-[var(--color-text-muted)]">אין תיאור</p>
-          ) : null}
-
-          <div className="flex flex-wrap gap-3 text-sm text-[var(--color-text-muted)]">
-            {recipe.category ? (
-              <span>קטגוריה: {escapeHtml(recipe.category.name)}</span>
-            ) : isPreview ? (
-              <span>ללא קטגוריה</span>
-            ) : null}
-            <span>זמן הכנה: {escapeHtml(recipe.prep_duration)}</span>
-            <span>{escapeHtml(recipe.servings)}</span>
-            <span>רמת קושי: {DIFFICULTY_LABELS[recipe.difficulty]}</span>
-          </div>
-
-          {recipe.tags.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {recipe.tags.map((tag) => (
-                <Badge key={tag.id} variant="neutral">
-                  {escapeHtml(tag.name)}
-                </Badge>
-              ))}
-            </div>
-          ) : isPreview ? (
-            <p className="text-sm text-[var(--color-text-muted)]">אין תגיות</p>
-          ) : null}
-        </div>
-      </header>
-
-      {showIngredients ? (
-        <section className="space-y-4">
-          <h2 className="text-section-title">רכיבים</h2>
-          {hasIngredients ? (
-            <ul className="space-y-2">
-              {recipe.content.ingredients.map((ingredient, index) => (
-                <li
-                  key={`${index}-${ingredient.name}-${ingredient.quantity}-${ingredient.unit}`}
-                  className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3"
-                >
-                  {escapeHtml(formatIngredientLine(ingredient))}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <EmptySectionNote>טרם נוספו רכיבים</EmptySectionNote>
-          )}
-        </section>
+      {showBreadcrumbs ? (
+        <RecipeBreadcrumbs
+          recipeTitle={recipe.title}
+          category={recipe.category}
+        />
       ) : null}
 
-      {showSteps ? (
-        <section className="space-y-4">
-          <h2 className="text-section-title">שלבי הכנה</h2>
-          {hasSteps ? (
-            <ol className="space-y-3">
-              {recipe.content.steps.map((step, index) => (
-                <li
-                  key={`${index}-${step.text}`}
-                  className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-soft)] px-4 py-3"
-                >
-                  <span className="font-medium">שלב {index + 1}: </span>
-                  {escapeHtml(sanitizePlainText(step.text))}
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <EmptySectionNote>טרם נוספו שלבי הכנה</EmptySectionNote>
-          )}
-        </section>
-      ) : null}
+      <RecipeHero recipe={recipe} showActions={!isPreview} />
 
-      {showYaelTip ? (
-        <section className="space-y-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-soft)] p-5">
-          <h2 className="text-section-title">הטיפ של יעל</h2>
-          {yaelTip ? (
-            <p className="text-body leading-8">{escapeHtml(yaelTip)}</p>
-          ) : (
-            <EmptySectionNote>טרם נוסף טיפ</EmptySectionNote>
+      {hasRecipeBody || isPreview ? (
+        <div
+          className={cn(
+            "recipe-detail__body",
+            hasMultipleSections && "recipe-detail__body--sections"
           )}
-        </section>
-      ) : null}
+        >
+          {hasRecipeBody ? (
+            sections.map((section, index) => {
+              const sectionTitle = sanitizePlainText(section.title);
+              const showSectionTitle =
+                hasMultipleSections || sectionTitle.length > 0;
 
-      {showGallery ? (
-        <section className="space-y-4">
-          <h2 className="text-section-title">גלריה</h2>
-          {hasGalleryImages ? (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {recipe.galleryUrls.map((item) =>
-                item.url ? (
-                  <div
-                    key={item.media_id}
-                    className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface-soft)]"
-                  >
-                    <Image
-                      src={item.url}
-                      alt={item.alt ?? recipe.title}
-                      fill
-                      sizes="(max-width: 1024px) 50vw, 33vw"
-                      className="object-cover"
-                    />
+              return (
+                <RecipeSectionBlock
+                  key={`section-${index}-${sectionTitle}`}
+                  section={section}
+                  index={index}
+                  showSectionTitle={showSectionTitle}
+                  isPreview={isPreview}
+                />
+              );
+            })
+          ) : (
+            <section className="recipe-section recipe-section--named">
+              <div className="recipe-section__grid">
+                <section className="recipe-ingredients">
+                  <div className="recipe-ingredients__card">
+                    <h2 className="recipe-ingredients__title">רכיבים</h2>
+                    <EmptySectionNote>טרם נוספו רכיבים</EmptySectionNote>
                   </div>
-                ) : null
-              )}
-            </div>
-          ) : (
-            <EmptySectionNote>טרם נוספו תמונות לגלריה</EmptySectionNote>
+                </section>
+                <section className="recipe-steps">
+                  <h2 className="recipe-steps__title">שלבי הכנה</h2>
+                  <EmptySectionNote>טרם נוספו שלבי הכנה</EmptySectionNote>
+                </section>
+              </div>
+            </section>
           )}
+        </div>
+      ) : null}
+
+      {hasTip ? (
+        <RecipeTip tip={yaelTip} />
+      ) : isPreview ? (
+        <section className="recipe-tip recipe-tip--empty">
+          <h2 className="recipe-tip__title">הטיפ של יעל</h2>
+          <EmptySectionNote>טרם נוסף טיפ</EmptySectionNote>
         </section>
       ) : null}
 
-      {ogImageUrl ? (
-        <p className="sr-only">תמונת שיתוף: {ogImageUrl}</p>
+      {hasGallery ? (
+        <RecipeGallery images={galleryImages} recipeTitle={recipe.title} />
+      ) : isPreview ? (
+        <section className="recipe-gallery">
+          <h2 className="recipe-gallery__title">גלריה</h2>
+          <EmptySectionNote>טרם נוספו תמונות לגלריה</EmptySectionNote>
+        </section>
       ) : null}
     </article>
   );

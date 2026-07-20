@@ -1,9 +1,13 @@
 import type { RecipeIngredient } from "@/lib/recipes/types";
 
+function asTrimmedText(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 export function formatIngredientLine(ingredient: RecipeIngredient): string {
-  const name = ingredient.name.trim();
-  const quantity = ingredient.quantity.trim();
-  const unit = ingredient.unit.trim();
+  const name = asTrimmedText(ingredient.name);
+  const quantity = asTrimmedText(ingredient.quantity);
+  const unit = asTrimmedText(ingredient.unit);
 
   const prefix = [quantity, unit].filter(Boolean).join(" ");
 

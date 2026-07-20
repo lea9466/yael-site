@@ -36,6 +36,7 @@ export type PublicRecipeSummary = {
   coverUrl: string | null;
   coverAlt: string | null;
   categoryName: string | null;
+  categorySlug: string | null;
   prep_duration: string;
   servings: string;
   difficulty: RecipeDifficulty;
@@ -67,6 +68,12 @@ export type PublicTestimonialSummary = {
 
 export type PublicContentSlug = {
   slug: string;
+  updated_at: string;
+};
+
+export type PublicRecipeSitemapEntry = {
+  slug: string;
+  categorySlug: string | null;
   updated_at: string;
 };
 

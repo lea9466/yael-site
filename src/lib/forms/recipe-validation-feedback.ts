@@ -11,8 +11,7 @@ const FIELD_SECTION_MAP: Record<string, RecipeFormSectionId> = {
   servings: "details",
   difficulty: "details",
   tag_ids: "details",
-  "content.ingredients": "ingredients",
-  "content.steps": "steps",
+  "content.recipe_sections": "sections",
   "content.yael_tip": "tip",
   "content.gallery": "gallery",
 };
@@ -27,8 +26,7 @@ const FIELD_ELEMENT_MAP: Record<string, string> = {
   servings: "recipe-servings",
   difficulty: "recipe-difficulty",
   tag_ids: "section-details",
-  "content.ingredients": "section-ingredients",
-  "content.steps": "section-steps",
+  "content.recipe_sections": "section-recipe-sections",
   "content.yael_tip": "recipe-yael-tip",
   "content.gallery": "section-gallery",
   "seo.title": "field-seo-title",
@@ -45,8 +43,7 @@ const FIELD_PRIORITY = [
   "prep_duration",
   "servings",
   "difficulty",
-  "content.ingredients",
-  "content.steps",
+  "content.recipe_sections",
   "content.yael_tip",
   "content.gallery",
   "tag_ids",
@@ -61,7 +58,7 @@ function normalizeFieldPath(path: string): string {
   }
 
   const contentMatch =
-    /^content\.(ingredients|steps|yael_tip|gallery)(?:\.\d+(?:\.\w+)?)?$/.exec(
+    /^content\.(recipe_sections|yael_tip|gallery)(?:\.\d+(?:\.\w+)?)?$/.exec(
       path
     );
 
@@ -71,6 +68,30 @@ function normalizeFieldPath(path: string): string {
     if (FIELD_SECTION_MAP[base]) {
       return base;
     }
+  }
+
+  const sectionFieldMatch =
+    /^content\.recipe_sections\.(\d+)(?:\.(title|ingredients|steps)(?:\.\d+(?:\.\w+)?)?)?$/.exec(
+      path
+    );
+
+  if (sectionFieldMatch) {
+    const sectionIndex = sectionFieldMatch[1];
+    const field = sectionFieldMatch[2];
+
+    if (field === "title") {
+      return `recipe-section-title-${sectionIndex}`;
+    }
+
+    if (field === "ingredients") {
+      return `recipe-section-ingredients-${sectionIndex}`;
+    }
+
+    if (field === "steps") {
+      return `recipe-section-steps-${sectionIndex}`;
+    }
+
+    return `recipe-section-${sectionIndex}`;
   }
 
   const seoMatch = /^seo\.(title|description)$/.exec(path);
@@ -85,7 +106,18 @@ function normalizeFieldPath(path: string): string {
 export function getSectionIdForField(path: string): RecipeFormSectionId | null {
   const normalized = normalizeFieldPath(path);
 
-  return FIELD_SECTION_MAP[normalized] ?? null;
+  if (FIELD_SECTION_MAP[normalized]) {
+    return FIELD_SECTION_MAP[normalized];
+  }
+
+  if (
+    normalized.startsWith("recipe-section-") ||
+    normalized === "content.recipe_sections"
+  ) {
+    return "sections";
+  }
+
+  return null;
 }
 
 export function getSectionsWithErrors(
@@ -113,6 +145,14 @@ export function getFirstErrorField(
     }
   }
 
+  const sectionError = Object.keys(fieldErrors).find((key) =>
+    key.startsWith("content.recipe_sections")
+  );
+
+  if (sectionError) {
+    return sectionError;
+  }
+
   const keys = Object.keys(fieldErrors);
 
   return keys.length > 0 ? normalizeFieldPath(keys[0]) : null;
@@ -129,10 +169,15 @@ export function focusFirstFieldError(fieldErrors: Record<string, string>): {
   }
 
   const sectionId = getSectionIdForField(fieldPath);
+  const normalized = normalizeFieldPath(fieldPath);
 
   window.requestAnimationFrame(() => {
     const target = document.getElementById(
-      FIELD_ELEMENT_MAP[fieldPath] ?? `section-${sectionId ?? "basic"}`
+      FIELD_ELEMENT_MAP[normalized] ??
+        FIELD_ELEMENT_MAP[fieldPath] ??
+        (normalized.startsWith("recipe-section-")
+          ? normalized
+          : `section-${sectionId ?? "basic"}`)
     );
 
     target?.scrollIntoView({

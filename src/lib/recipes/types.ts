@@ -9,12 +9,18 @@ import type {
 
 export type RecipeIngredient = {
   name: string;
-  quantity: string;
-  unit: string;
+  quantity?: string;
+  unit?: string;
 };
 
 export type RecipeStep = {
   text: string;
+};
+
+export type RecipeSection = {
+  title: string;
+  ingredients: RecipeIngredient[];
+  steps: RecipeStep[];
 };
 
 export type RecipeGalleryItem = {
@@ -23,8 +29,11 @@ export type RecipeGalleryItem = {
 };
 
 export type RecipeContent = {
-  ingredients: RecipeIngredient[];
-  steps: RecipeStep[];
+  recipe_sections?: RecipeSection[];
+  /** @deprecated Kept for backward compatibility with legacy recipes. */
+  ingredients?: RecipeIngredient[];
+  /** @deprecated Kept for backward compatibility with legacy recipes. */
+  steps?: RecipeStep[];
   yael_tip: string | null;
   gallery: RecipeGalleryItem[];
 };
@@ -59,6 +68,7 @@ export type RecipeTagSummary = {
 export type RecipeCategorySummary = {
   id: string;
   name: string;
+  slug?: string;
 };
 
 export type RecipeListItem = RecipeRecord & {

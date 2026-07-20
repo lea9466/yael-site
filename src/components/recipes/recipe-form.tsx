@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import {
   Archive,
-  ChefHat,
   Clock,
   Eye,
   FileText,
   Image,
-  Leaf,
+  Layers,
   Sparkles,
   Trash2,
 } from "lucide-react";
@@ -38,14 +37,14 @@ import {
   RecipeGalleryField,
   type GalleryFormItem,
 } from "@/components/recipes/recipe-gallery-field";
+import {
+  createEmptyRecipeSection,
+  RecipeSectionsField,
+  type SectionRepeaterItem,
+} from "@/components/recipes/recipe-sections-field";
 import { RecipeTagPicker } from "@/components/recipes/recipe-tag-picker";
 import { ServiceMediaPicker } from "@/components/services/service-media-picker";
-import {
-  createRepeaterItemId,
-  RepeaterField,
-  RepeaterTextareaField,
-  RepeaterTextField,
-} from "@/components/services/service-repeater-field";
+import { createRepeaterItemId } from "@/components/services/service-repeater-field";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -65,8 +64,11 @@ import { useUnsavedChangesWarning } from "@/lib/hooks/use-unsaved-changes-warnin
 import {
   DIFFICULTY_LABELS,
   RECIPE_DESCRIPTION_MAX,
-  RECIPE_REPEATER_LIMITS,
 } from "@/lib/recipes/constants";
+import {
+  normalizeRecipeSections,
+  sanitizeRecipeSectionsForSave,
+} from "@/lib/recipes/content";
 import { RECIPE_ERRORS } from "@/lib/recipes/errors";
 import { slugifyTitle } from "@/lib/recipes/slug";
 import type {
@@ -81,21 +83,8 @@ import {
   type RecipeDraftInput,
 } from "@/lib/validations/recipe";
 
-type IngredientRepeaterItem = {
-  id: string;
-  name: string;
-  quantity: string;
-  unit: string;
-};
-
-type StepRepeaterItem = {
-  id: string;
-  text: string;
-};
-
 type FormContentState = {
-  ingredients: IngredientRepeaterItem[];
-  steps: StepRepeaterItem[];
+  recipe_sections: SectionRepeaterItem[];
   yael_tip: string;
   gallery: GalleryFormItem[];
 };
@@ -112,19 +101,44 @@ function toRepeaterContent(
   content: RecipeDraftInput["content"],
   galleryUrls?: RecipeDetail["galleryUrls"]
 ): FormContentState {
+  const sections = normalizeRecipeSections(content).map((section) => ({
+    id: createRepeaterItemId(),
+    title: section.title,
+    ingredients:
+      section.ingredients.length > 0
+        ? section.ingredients.map((item) => ({
+            id: createRepeaterItemId(),
+            name: item.name,
+            quantity: item.quantity ?? "",
+            unit: item.unit ?? "",
+          }))
+        : [
+            {
+              id: createRepeaterItemId(),
+              name: "",
+              quantity: "",
+              unit: "",
+            },
+          ],
+    steps:
+      section.steps.length > 0
+        ? section.steps.map((item) => ({
+            id: createRepeaterItemId(),
+            text: item.text,
+          }))
+        : [
+            {
+              id: createRepeaterItemId(),
+              text: "",
+            },
+          ],
+  }));
+
   return {
-    ingredients: content.ingredients.map((item) => ({
-      id: createRepeaterItemId(),
-      name: item.name,
-      quantity: item.quantity,
-      unit: item.unit,
-    })),
-    steps: content.steps.map((item) => ({
-      id: createRepeaterItemId(),
-      text: item.text,
-    })),
+    recipe_sections:
+      sections.length > 0 ? sections : [createEmptyRecipeSection()],
     yael_tip: content.yael_tip ?? "",
-    gallery: content.gallery
+    gallery: (content.gallery ?? [])
       .slice()
       .sort((left, right) => left.order - right.order)
       .map((item) => {
@@ -148,17 +162,22 @@ function toRepeaterContent(
 }
 
 function toSubmitContent(content: FormContentState): RecipeDraftInput["content"] {
+  const recipe_sections = sanitizeRecipeSectionsForSave(
+    content.recipe_sections.map((section) => ({
+      title: section.title,
+      ingredients: section.ingredients.map(
+        ({ name, quantity, unit }) => ({
+          name,
+          quantity,
+          unit,
+        })
+      ),
+      steps: section.steps.map(({ text }) => ({ text })),
+    }))
+  );
+
   return {
-    ingredients: content.ingredients
-      .filter((item) => item.name.trim().length > 0)
-      .map(({ name, quantity, unit }) => ({
-        name: name.trim(),
-        quantity: quantity.trim(),
-        unit: unit.trim(),
-      })),
-    steps: content.steps
-      .filter((item) => item.text.trim().length > 0)
-      .map(({ text }) => ({ text: text.trim() })),
+    recipe_sections,
     yael_tip:
       content.yael_tip.trim().length > 0 ? content.yael_tip.trim() : null,
     gallery: content.gallery.map((item, index) => ({
@@ -797,111 +816,21 @@ export function RecipeForm({
 
         <hr className="border-[var(--color-border)]" />
 
-        <section id="section-ingredients">
+        <section id="section-recipe-sections">
           <AdminSectionHeader
-            icon={Leaf}
+            icon={Layers}
             module="recipes"
             emoji="🥗"
-            title="רכיבים"
-            description="הוסיפי את כל רכיבי המתכון — טריים ובריאים."
+            title="חלקי המתכון"
+            description="ניתן לחלק את המתכון למספר חלקים, למשל עוגה, ציפוי, מילוי או רוטב."
             className="mb-8"
           />
-          <RepeaterField
-            label="רכיבים"
-            description="שם הרכיב חובה. כמות ויחידת מידה אופציונליות."
-            items={content.ingredients}
-            minItems={RECIPE_REPEATER_LIMITS.ingredients.min}
-            maxItems={RECIPE_REPEATER_LIMITS.ingredients.max}
-            addLabel="הוספת רכיב"
-            emptyLabel="הוסיפו לפחות רכיב אחד לפני פרסום"
-            error={getFieldErrorMessage(fieldErrors, "content.ingredients")}
-            createItem={() => ({
-              id: createRepeaterItemId(),
-              name: "",
-              quantity: "",
-              unit: "",
-            })}
-            onChange={(items) =>
-              setContent((current) => ({ ...current, ingredients: items }))
+          <RecipeSectionsField
+            sections={content.recipe_sections}
+            fieldErrors={fieldErrors}
+            onChange={(recipe_sections) =>
+              setContent((current) => ({ ...current, recipe_sections }))
             }
-            renderFields={(item, _index, updateItem) => (
-              <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
-                <FormField
-                  label="רכיב"
-                  htmlFor={`ingredient-name-${item.id}`}
-                  required
-                >
-                  <RepeaterTextField
-                    id={`ingredient-name-${item.id}`}
-                    value={item.name}
-                    placeholder="לדוגמה: עגבנייה"
-                    onChange={(name) => updateItem({ ...item, name })}
-                  />
-                </FormField>
-                <FormField
-                  label="כמות"
-                  htmlFor={`ingredient-quantity-${item.id}`}
-                  hint="אופציונלי"
-                >
-                  <RepeaterTextField
-                    id={`ingredient-quantity-${item.id}`}
-                    value={item.quantity}
-                    placeholder="לדוגמה: 2, חצי, לפי הטעם"
-                    onChange={(quantity) => updateItem({ ...item, quantity })}
-                  />
-                </FormField>
-                <FormField
-                  label="יחידת מידה"
-                  htmlFor={`ingredient-unit-${item.id}`}
-                  hint="אופציונלי"
-                >
-                  <RepeaterTextField
-                    id={`ingredient-unit-${item.id}`}
-                    value={item.unit}
-                    placeholder="לדוגמה: כוס, כפית"
-                    onChange={(unit) => updateItem({ ...item, unit })}
-                  />
-                </FormField>
-              </div>
-            )}
-          />
-        </section>
-
-        <hr className="border-[var(--color-border)]" />
-
-        <section id="section-steps">
-          <AdminSectionHeader
-            icon={ChefHat}
-            module="recipes"
-            emoji="👩‍🍳"
-            title="שלבי הכנה"
-            description="כתבי את שלבי ההכנה בצורה ברורה — כמו במגזין."
-            className="mb-8"
-          />
-          <RepeaterField
-            label="שלבי הכנה"
-            variant="article"
-            items={content.steps}
-            minItems={RECIPE_REPEATER_LIMITS.steps.min}
-            maxItems={RECIPE_REPEATER_LIMITS.steps.max}
-            addLabel="הוספת שלב"
-            emptyLabel="הוסיפו לפחות שלב אחד לפני פרסום"
-            error={getFieldErrorMessage(fieldErrors, "content.steps")}
-            createItem={() => ({
-              id: createRepeaterItemId(),
-              text: "",
-            })}
-            onChange={(items) =>
-              setContent((current) => ({ ...current, steps: items }))
-            }
-            renderFields={(item, _index, updateItem) => (
-              <RepeaterTextareaField
-                value={item.text}
-                placeholder="תארי את השלב — כמו שכותבים פוסט"
-                className="min-h-36"
-                onChange={(text) => updateItem({ ...item, text })}
-              />
-            )}
           />
         </section>
 

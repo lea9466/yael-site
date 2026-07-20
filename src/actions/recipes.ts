@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { createClient, getAuthenticatedAdmin } from "@/lib/auth/session";
-import { normalizeGalleryForSave } from "@/lib/recipes/content";
+import { buildRecipeContentForSave } from "@/lib/recipes/content";
 import { RECIPE_ERRORS } from "@/lib/recipes/errors";
 import {
   fetchRecipeById,
@@ -49,12 +49,17 @@ async function getAdminSupabase(): Promise<{
   return { supabase };
 }
 
-function revalidateRecipePaths(recipeId?: string) {
+function revalidateRecipePaths(recipeId?: string, slug?: string) {
   revalidatePath("/admin/recipes");
+  revalidatePath("/recipes", "layout");
 
   if (recipeId) {
     revalidatePath(`/admin/recipes/${recipeId}`);
     revalidatePath(`/admin/recipes/${recipeId}/preview`);
+  }
+
+  if (slug) {
+    revalidatePath(`/recipes/${slug}`);
   }
 }
 
@@ -158,9 +163,16 @@ async function validateTaxonomy(
 function toRecipeContentForSave(
   content: RecipeDraftInput["content"]
 ): RecipeDraftInput["content"] {
+  const saved = buildRecipeContentForSave({
+    recipe_sections: content.recipe_sections ?? [],
+    yael_tip: content.yael_tip,
+    gallery: content.gallery,
+  });
+
   return {
-    ...content,
-    gallery: normalizeGalleryForSave(content.gallery),
+    recipe_sections: saved.recipe_sections,
+    yael_tip: saved.yael_tip,
+    gallery: saved.gallery,
   };
 }
 
@@ -327,7 +339,7 @@ export async function createRecipeAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths(inserted.id);
+  revalidateRecipePaths(inserted.id, data.slug);
 
   return { success: true, data: { id: inserted.id } };
 }
@@ -412,7 +424,11 @@ export async function updateRecipeAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths(data.id);
+  revalidateRecipePaths(data.id, data.slug);
+
+  if (existing.slug !== data.slug) {
+    revalidatePath(`/recipes/${existing.slug}`);
+  }
 
   return { success: true };
 }
@@ -488,7 +504,11 @@ export async function publishRecipeAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths(data.id);
+  revalidateRecipePaths(data.id, data.slug);
+
+  if (existing.slug !== data.slug) {
+    revalidatePath(`/recipes/${existing.slug}`);
+  }
 
   return { success: true };
 }
@@ -577,6 +597,12 @@ export async function archiveRecipeAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
+  const existing = await fetchRecipeById(parsed.data.id);
+
+  if (!existing) {
+    return { success: false, error: RECIPE_ERRORS.notFound };
+  }
+
   const { error } = await session.supabase
     .from("recipes")
     .update({ status: "archived" })
@@ -586,7 +612,7 @@ export async function archiveRecipeAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths(parsed.data.id);
+  revalidateRecipePaths(parsed.data.id, existing.slug);
 
   return { success: true };
 }
@@ -621,7 +647,7 @@ export async function restoreRecipeToDraftAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths(parsed.data.id);
+  revalidateRecipePaths(parsed.data.id, existing.slug);
 
   return { success: true };
 }
@@ -662,7 +688,7 @@ export async function restoreAndPublishRecipeAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths(parsed.data.id);
+  revalidateRecipePaths(parsed.data.id, existing.slug);
 
   return { success: true };
 }
@@ -710,7 +736,7 @@ export async function permanentlyDeleteRecipeAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths();
+  revalidateRecipePaths(undefined, existing.slug);
 
   return { success: true };
 }

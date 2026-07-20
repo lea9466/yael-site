@@ -3,16 +3,19 @@ import type { MetadataRoute } from "next";
 import { PUBLIC_STATIC_ROUTES } from "@/constants/public-navigation";
 import {
   getPublishedPostSlugs,
+  getPublishedRecipeCategorySlugs,
   getPublishedRecipeSlugs,
   getPublishedServiceSlugs,
 } from "@/lib/public/queries";
+import { buildRecipeCategoryPath, buildRecipePath } from "@/lib/public/recipe-paths";
 import { getSiteOrigin } from "@/lib/seo/metadata";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = getSiteOrigin();
-  const [services, recipes, posts] = await Promise.all([
+  const [services, recipes, recipeCategories, posts] = await Promise.all([
     getPublishedServiceSlugs(),
     getPublishedRecipeSlugs(),
+    getPublishedRecipeCategorySlugs(),
     getPublishedPostSlugs(),
   ]);
 
@@ -32,8 +35,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  const recipeCategoryEntries: MetadataRoute.Sitemap = recipeCategories.map(
+    (item) => ({
+      url: `${origin}${buildRecipeCategoryPath(item.slug)}`,
+      lastModified: new Date(item.updated_at),
+      changeFrequency: "weekly",
+      priority: 0.75,
+    })
+  );
+
   const recipeEntries: MetadataRoute.Sitemap = recipes.map((item) => ({
-    url: `${origin}/recipes/${item.slug}`,
+    url: `${origin}${buildRecipePath(item.categorySlug, item.slug)}`,
     lastModified: new Date(item.updated_at),
     changeFrequency: "monthly",
     priority: 0.8,
@@ -49,6 +61,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticEntries,
     ...serviceEntries,
+    ...recipeCategoryEntries,
     ...recipeEntries,
     ...postEntries,
   ];

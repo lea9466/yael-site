@@ -1,6 +1,7 @@
 import {
   createDefaultRecipeContent,
   createDefaultRecipeSeo,
+  normalizeRecipeSections,
 } from "@/lib/recipes/content";
 import type { RecipeDetail } from "@/lib/recipes/types";
 import type { RecipeDraftInput } from "@/lib/validations/recipe";
@@ -19,7 +20,13 @@ export function recipeDetailToFormInput(recipe: RecipeDetail): RecipeDraftInput 
     featured: recipe.featured,
     status: recipe.status,
     tag_ids: recipe.tags.map((tag) => tag.id),
-    content: recipe.content ?? createDefaultRecipeContent(),
+    content: {
+      recipe_sections: normalizeRecipeSections(
+        recipe.content ?? createDefaultRecipeContent()
+      ),
+      yael_tip: recipe.content?.yael_tip ?? null,
+      gallery: recipe.content?.gallery ?? [],
+    },
     seo: recipe.seo ?? createDefaultRecipeSeo(),
   };
 }
@@ -40,7 +47,17 @@ export function createEmptyRecipeFormInput(
     featured: false,
     status: "draft",
     tag_ids: [],
-    content: createDefaultRecipeContent(),
+    content: {
+      recipe_sections: [
+        {
+          title: "",
+          ingredients: [],
+          steps: [],
+        },
+      ],
+      yael_tip: null,
+      gallery: [],
+    },
     seo: createDefaultRecipeSeo(),
   };
 }

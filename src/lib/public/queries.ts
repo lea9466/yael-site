@@ -21,6 +21,7 @@ import type {
   PublicHomepageContent,
   PublicMediaPreview,
   PublicPostSummary,
+  PublicRecipeSitemapEntry,
   PublicRecipeSummary,
   PublicServiceSummary,
   PublicTestimonialSummary,
@@ -124,9 +125,9 @@ async function fetchCoverMediaMap(
   );
 }
 
-async function fetchCategoryNames(
+async function fetchCategorySummaries(
   categoryIds: string[]
-): Promise<Map<string, string>> {
+): Promise<Map<string, { name: string; slug: string }>> {
   const uniqueIds = [...new Set(categoryIds.filter(Boolean))];
 
   if (uniqueIds.length === 0) {
@@ -136,14 +137,22 @@ async function fetchCategoryNames(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("categories")
-    .select("id, name")
+    .select("id, name, slug")
     .in("id", uniqueIds);
 
   if (error || !data) {
     return new Map();
   }
 
-  return new Map(data.map((row) => [row.id, row.name]));
+  return new Map(
+    data.map((row) => [
+      row.id,
+      {
+        name: row.name,
+        slug: row.slug,
+      },
+    ])
+  );
 }
 
 async function fetchServiceTitles(
@@ -272,18 +281,45 @@ export async function getPublishedServices(): Promise<PublicServiceSummary[]> {
   }
 }
 
-export async function getPublishedRecipes(): Promise<PublicRecipeSummary[]> {
+export async function getPublishedRecipes(options?: {
+  categorySlug?: string;
+}): Promise<PublicRecipeSummary[]> {
   if (!isSupabaseConfigured()) {
     return [];
   }
 
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
+    const categorySlug = options?.categorySlug?.trim();
+
+    let categoryId: string | null = null;
+
+    if (categorySlug) {
+      const { data: category, error: categoryError } = await supabase
+        .from("categories")
+        .select("id")
+        .eq("type", "recipe")
+        .eq("slug", categorySlug)
+        .maybeSingle();
+
+      if (categoryError || !category) {
+        return [];
+      }
+
+      categoryId = category.id;
+    }
+
+    let listQuery = supabase
       .from("recipes")
       .select(RECIPE_PUBLIC_COLUMNS)
       .eq("status", "published")
       .order("published_at", { ascending: false });
+
+    if (categoryId) {
+      listQuery = listQuery.eq("category_id", categoryId);
+    }
+
+    const { data, error } = await listQuery;
 
     if (error || !data) {
       return [];
@@ -292,12 +328,13 @@ export async function getPublishedRecipes(): Promise<PublicRecipeSummary[]> {
     const mediaMap = await fetchCoverMediaMap(
       data.map((row) => row.cover_media_id as string)
     );
-    const categoryMap = await fetchCategoryNames(
+    const categoryMap = await fetchCategorySummaries(
       data.map((row) => row.category_id as string)
     );
 
     return data.map((row) => {
       const cover = mediaMap.get(row.cover_media_id as string);
+      const category = categoryMap.get(row.category_id as string);
 
       return {
         id: row.id,
@@ -306,7 +343,8 @@ export async function getPublishedRecipes(): Promise<PublicRecipeSummary[]> {
         description: row.description,
         coverUrl: cover?.url ?? null,
         coverAlt: cover?.alt ?? null,
-        categoryName: categoryMap.get(row.category_id as string) ?? null,
+        categoryName: category?.name ?? null,
+        categorySlug: category?.slug ?? null,
         prep_duration: row.prep_duration,
         servings: row.servings,
         difficulty: row.difficulty,
@@ -316,6 +354,38 @@ export async function getPublishedRecipes(): Promise<PublicRecipeSummary[]> {
     });
   } catch {
     return [];
+  }
+}
+
+export async function getRecipeCategoryBySlug(
+  slug: string
+): Promise<{ id: string; name: string; slug: string } | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const normalized = slug.trim();
+
+  if (!normalized) {
+    return null;
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("categories")
+      .select("id, name, slug")
+      .eq("type", "recipe")
+      .eq("slug", normalized)
+      .maybeSingle();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return data;
+  } catch {
+    return null;
   }
 }
 
@@ -339,7 +409,7 @@ export async function getPublishedPosts(): Promise<PublicPostSummary[]> {
     const mediaMap = await fetchCoverMediaMap(
       data.map((row) => row.cover_media_id as string)
     );
-    const categoryMap = await fetchCategoryNames(
+    const categoryMap = await fetchCategorySummaries(
       data.map((row) => row.category_id as string)
     );
 
@@ -353,7 +423,7 @@ export async function getPublishedPosts(): Promise<PublicPostSummary[]> {
         excerpt: shortenForSeoDescription(row.body as string, 180),
         coverUrl: cover?.url ?? null,
         coverAlt: cover?.alt ?? null,
-        categoryName: categoryMap.get(row.category_id as string) ?? null,
+        categoryName: categoryMap.get(row.category_id as string)?.name ?? null,
         reading_time_minutes: row.reading_time_minutes,
         featured: row.featured,
         published_at: row.published_at,
@@ -428,7 +498,9 @@ export async function getPublishedServiceSlugs(): Promise<PublicContentSlug[]> {
   }
 }
 
-export async function getPublishedRecipeSlugs(): Promise<PublicContentSlug[]> {
+export async function getPublishedRecipeSlugs(): Promise<
+  PublicRecipeSitemapEntry[]
+> {
   if (!isSupabaseConfigured()) {
     return [];
   }
@@ -437,16 +509,48 @@ export async function getPublishedRecipeSlugs(): Promise<PublicContentSlug[]> {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("recipes")
-      .select("slug, updated_at")
+      .select("slug, updated_at, category_id")
       .eq("status", "published");
 
     if (error || !data) {
       return [];
     }
 
+    const categoryMap = await fetchCategorySummaries(
+      data.map((row) => row.category_id as string)
+    );
+
     return data.map((row) => ({
-      slug: row.slug,
-      updated_at: row.updated_at,
+      slug: row.slug as string,
+      categorySlug: categoryMap.get(row.category_id as string)?.slug ?? null,
+      updated_at: row.updated_at as string,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export async function getPublishedRecipeCategorySlugs(): Promise<
+  PublicContentSlug[]
+> {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("categories")
+      .select("slug, created_at")
+      .eq("type", "recipe");
+
+    if (error || !data) {
+      return [];
+    }
+
+    return data.map((row) => ({
+      slug: row.slug as string,
+      updated_at: row.created_at as string,
     }));
   } catch {
     return [];

@@ -55,6 +55,9 @@ async function getAdminSupabase(): Promise<{
 
 function revalidateArticlePaths(articleId?: string) {
   revalidatePath("/admin/articles");
+  revalidatePath("/blog");
+  revalidatePath("/blog", "layout");
+  revalidatePath("/");
 
   if (articleId) {
     revalidatePath(`/admin/articles/${articleId}`);

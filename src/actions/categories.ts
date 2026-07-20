@@ -38,6 +38,8 @@ async function getAdminSupabase(): Promise<{
 function revalidateCategoryPaths(categoryId?: string) {
   revalidatePath("/admin/categories");
   revalidatePath("/admin/recipes", "layout");
+  revalidatePath("/admin/articles", "layout");
+  revalidatePath("/blog", "layout");
 
   if (categoryId) {
     revalidatePath(`/admin/categories/${categoryId}`);

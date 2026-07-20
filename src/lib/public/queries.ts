@@ -20,6 +20,7 @@ import type {
   PublicContentSlug,
   PublicHomepageContent,
   PublicMediaPreview,
+  PublicPostSitemapEntry,
   PublicPostSummary,
   PublicRecipeSitemapEntry,
   PublicRecipeSummary,
@@ -415,6 +416,7 @@ export async function getPublishedPosts(): Promise<PublicPostSummary[]> {
 
     return data.map((row) => {
       const cover = mediaMap.get(row.cover_media_id as string);
+      const category = categoryMap.get(row.category_id as string);
 
       return {
         id: row.id,
@@ -423,7 +425,8 @@ export async function getPublishedPosts(): Promise<PublicPostSummary[]> {
         excerpt: shortenForSeoDescription(row.body as string, 180),
         coverUrl: cover?.url ?? null,
         coverAlt: cover?.alt ?? null,
-        categoryName: categoryMap.get(row.category_id as string)?.name ?? null,
+        categoryName: category?.name ?? null,
+        categorySlug: category?.slug ?? null,
         reading_time_minutes: row.reading_time_minutes,
         featured: row.featured,
         published_at: row.published_at,
@@ -557,7 +560,7 @@ export async function getPublishedRecipeCategorySlugs(): Promise<
   }
 }
 
-export async function getPublishedPostSlugs(): Promise<PublicContentSlug[]> {
+export async function getPublishedPostSlugs(): Promise<PublicPostSitemapEntry[]> {
   if (!isSupabaseConfigured()) {
     return [];
   }
@@ -566,16 +569,48 @@ export async function getPublishedPostSlugs(): Promise<PublicContentSlug[]> {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("articles")
-      .select("slug, updated_at")
+      .select("slug, category_id, updated_at")
       .eq("status", "published");
 
     if (error || !data) {
       return [];
     }
 
+    const categoryMap = await fetchCategorySummaries(
+      data.map((row) => row.category_id as string)
+    );
+
     return data.map((row) => ({
       slug: row.slug,
+      categorySlug: categoryMap.get(row.category_id as string)?.slug ?? null,
       updated_at: row.updated_at,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export async function getPublishedBlogCategorySlugs(): Promise<
+  PublicContentSlug[]
+> {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("categories")
+      .select("slug, created_at")
+      .eq("type", "article");
+
+    if (error || !data) {
+      return [];
+    }
+
+    return data.map((row) => ({
+      slug: row.slug as string,
+      updated_at: row.created_at as string,
     }));
   } catch {
     return [];

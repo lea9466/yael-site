@@ -94,6 +94,7 @@ export type ArticleTagSummary = {
 export type ArticleCategorySummary = {
   id: string;
   name: string;
+  slug?: string;
 };
 
 export type ArticleListItem = ArticleRecord & {

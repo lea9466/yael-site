@@ -341,7 +341,7 @@ export async function fetchArticleById(id: string): Promise<ArticleDetail | null
 
     const { data: categoryData } = await supabase
       .from("categories")
-      .select("id, name, type")
+      .select("id, name, slug, type")
       .eq("id", record.category_id)
       .maybeSingle();
 
@@ -380,7 +380,11 @@ export async function fetchArticleById(id: string): Promise<ArticleDetail | null
       ogAlt: og?.alt_text ?? null,
       category:
         categoryData && categoryData.type === "article"
-          ? { id: categoryData.id, name: categoryData.name }
+          ? {
+              id: categoryData.id,
+              name: categoryData.name,
+              slug: categoryData.slug,
+            }
           : null,
       tags,
       galleryUrls: record.content.gallery

@@ -52,9 +52,16 @@ export type PublicPostSummary = {
   coverUrl: string | null;
   coverAlt: string | null;
   categoryName: string | null;
+  categorySlug: string | null;
   reading_time_minutes: number;
   featured: boolean;
   published_at: string | null;
+};
+
+export type PublicPostSitemapEntry = {
+  slug: string;
+  categorySlug: string | null;
+  updated_at: string;
 };
 
 export type PublicTestimonialSummary = {

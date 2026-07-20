@@ -38,6 +38,7 @@ function revalidateTagPaths(tagId?: string) {
   revalidatePath("/admin/tags");
   revalidatePath("/admin/recipes", "layout");
   revalidatePath("/admin/articles", "layout");
+  revalidatePath("/blog", "layout");
 
   if (tagId) {
     revalidatePath(`/admin/tags/${tagId}`);

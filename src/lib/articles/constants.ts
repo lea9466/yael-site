@@ -10,6 +10,7 @@ export const RESERVED_ARTICLE_SLUGS = [
   "services",
   "recipes",
   "articles",
+  "blog",
   "contact",
   "privacy",
   "terms",

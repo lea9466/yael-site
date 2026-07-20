@@ -30,7 +30,7 @@ export function RecentPostsSection({ posts }: RecentPostsSectionProps) {
             title="פוסטים אחרונים"
             description="תובנות, השראה וכלים מעשיים לחיים מאוזנים יותר."
             actionLabel="לכל המאמרים"
-            actionHref="/articles"
+            actionHref="/blog"
           />
         </HomepageReveal>
 

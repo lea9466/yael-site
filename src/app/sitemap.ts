@@ -2,22 +2,29 @@ import type { MetadataRoute } from "next";
 
 import { PUBLIC_STATIC_ROUTES } from "@/constants/public-navigation";
 import {
+  getPublishedBlogCategorySlugs,
   getPublishedPostSlugs,
   getPublishedRecipeCategorySlugs,
   getPublishedRecipeSlugs,
   getPublishedServiceSlugs,
 } from "@/lib/public/queries";
+import {
+  buildBlogCategoryPath,
+  buildPostPath,
+} from "@/lib/public/blog-paths";
 import { buildRecipeCategoryPath, buildRecipePath } from "@/lib/public/recipe-paths";
 import { getSiteOrigin } from "@/lib/seo/metadata";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = getSiteOrigin();
-  const [services, recipes, recipeCategories, posts] = await Promise.all([
-    getPublishedServiceSlugs(),
-    getPublishedRecipeSlugs(),
-    getPublishedRecipeCategorySlugs(),
-    getPublishedPostSlugs(),
-  ]);
+  const [services, recipes, recipeCategories, posts, blogCategories] =
+    await Promise.all([
+      getPublishedServiceSlugs(),
+      getPublishedRecipeSlugs(),
+      getPublishedRecipeCategorySlugs(),
+      getPublishedPostSlugs(),
+      getPublishedBlogCategorySlugs(),
+    ]);
 
   const staticEntries: MetadataRoute.Sitemap = PUBLIC_STATIC_ROUTES.map(
     (route) => ({
@@ -51,8 +58,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  const blogCategoryEntries: MetadataRoute.Sitemap = blogCategories.map(
+    (item) => ({
+      url: `${origin}${buildBlogCategoryPath(item.slug)}`,
+      lastModified: new Date(item.updated_at),
+      changeFrequency: "weekly",
+      priority: 0.75,
+    })
+  );
+
   const postEntries: MetadataRoute.Sitemap = posts.map((item) => ({
-    url: `${origin}/articles/${item.slug}`,
+    url: `${origin}${buildPostPath(item.categorySlug, item.slug)}`,
     lastModified: new Date(item.updated_at),
     changeFrequency: "weekly",
     priority: 0.8,
@@ -63,6 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...serviceEntries,
     ...recipeCategoryEntries,
     ...recipeEntries,
+    ...blogCategoryEntries,
     ...postEntries,
   ];
 }

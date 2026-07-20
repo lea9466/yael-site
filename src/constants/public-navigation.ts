@@ -7,7 +7,7 @@ export const PUBLIC_PRIMARY_NAV: PublicNavLink[] = [
   { label: "אודות", href: "/about" },
   { label: "שירותים", href: "/services" },
   { label: "מתכונים", href: "/recipes" },
-  { label: "מאמרים", href: "/articles" },
+  { label: "מאמרים", href: "/blog" },
   { label: "המלצות", href: "/testimonials" },
 ];
 

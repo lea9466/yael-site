@@ -16,6 +16,20 @@ export function formatArticleDate(value: string): string {
   }).format(date);
 }
 
+export function formatArticleDateShort(value: string): string {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "—";
+  }
+
+  return new Intl.DateTimeFormat("he-IL", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
 export function formatArticleExcerpt(body: string, maxLength = 160): string {
   const normalized = body.trim().replace(/\s+/g, " ");
 

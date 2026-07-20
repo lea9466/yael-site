@@ -20,19 +20,15 @@ import { cn } from "@/lib/utils/cn";
 
 type RecipesListingProps = {
   data: PublicRecipeListingResult;
-  categoryMissing?: boolean;
 };
 
-export function RecipesListing({
-  data,
-  categoryMissing = false,
-}: RecipesListingProps) {
+export function RecipesListing({ data }: RecipesListingProps) {
   const { category, recipes, categories, tags, query, totalCount, totalPages } =
     data;
   const basePath = category
     ? buildRecipeCategoryPath(category.slug)
     : buildRecipesPath();
-  const showCategoryPills = !category && !categoryMissing;
+  const showCategoryPills = !category;
   const hasActiveFilters =
     query.q.length > 0 ||
     (query.tag !== "all" && query.tag.length > 0) ||
@@ -55,29 +51,13 @@ export function RecipesListing({
             <RecipesCategoryPills categories={categories} />
           ) : null}
 
-          {!categoryMissing ? (
-            <RecipesListingFilters
-              basePath={basePath}
-              query={query}
-              tags={tags}
-            />
-          ) : null}
+          <RecipesListingFilters
+            basePath={basePath}
+            query={query}
+            tags={tags}
+          />
 
-          {categoryMissing ? (
-            <PublicEmptyState
-              icon={ChefHat}
-              title="הקטגוריה לא נמצאה"
-              description="ייתכן שהכתובת השתנתה או שהקטגוריה הוסרה."
-              action={
-                <Link
-                  href={buildRecipesPath()}
-                  className="recipes-listing__empty-action public-focus-ring"
-                >
-                  לכל המתכונים
-                </Link>
-              }
-            />
-          ) : recipes.length > 0 ? (
+          {recipes.length > 0 ? (
             <>
               <ul
                 className={cn(

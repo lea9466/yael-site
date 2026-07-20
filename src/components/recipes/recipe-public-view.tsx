@@ -75,15 +75,13 @@ export function RecipePublicView({
           {hasRecipeBody ? (
             sections.map((section, index) => {
               const sectionTitle = sanitizePlainText(section.title);
-              const showSectionTitle =
-                hasMultipleSections || sectionTitle.length > 0;
 
               return (
                 <RecipeSectionBlock
                   key={`section-${index}-${sectionTitle}`}
                   section={section}
                   index={index}
-                  showSectionTitle={showSectionTitle}
+                  showSectionTitle={hasMultipleSections}
                   isPreview={isPreview}
                 />
               );

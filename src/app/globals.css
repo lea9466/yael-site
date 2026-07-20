@@ -4841,10 +4841,8 @@
       max-width: 26rem;
     }
 
-    .recipe-detail__body:not(.recipe-detail__body--sections) .recipe-section__grid,
     .recipe-detail__body:not(.recipe-detail__body--sections) {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-      gap: 2rem;
+      display: block;
     }
 
     .recipe-detail__body--sections {
@@ -4910,8 +4908,6 @@
   }
 
   @media (min-width: 1024px) {
-    .recipe-detail__body:not(.recipe-detail__body--sections) .recipe-section__grid,
-    .recipe-detail__body:not(.recipe-detail__body--sections),
     .recipe-section__grid {
       grid-template-columns: minmax(0, 4.5fr) minmax(0, 7.5fr);
       gap: 2.5rem;

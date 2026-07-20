@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 
 import { ContactCtaSection } from "@/components/homepage/sections/contact-cta-section";
+import { RecipeAdminPreviewBanner } from "@/components/recipes/public/recipe-admin-preview-banner";
 import { RecipeBreadcrumbJsonLd } from "@/components/recipes/public/recipe-breadcrumb-json-ld";
 import { RecipeJsonLd } from "@/components/recipes/public/recipe-json-ld";
 import { RelatedRecipes } from "@/components/recipes/public/related-recipes";
 import { RecipePublicView } from "@/components/recipes/recipe-public-view";
 import { getDefaultHomepageData } from "@/lib/homepage/defaults";
 import {
-  getPublishedRecipeBySlug,
   getRelatedRecipes,
+  resolvePublicRecipePage,
 } from "@/lib/public/recipe-detail";
 import { buildRecipePath } from "@/lib/public/recipe-paths";
 import {
@@ -34,12 +35,12 @@ export async function generateMetadata({
     await params;
   const categorySlug = normalizeRouteSlug(rawCategorySlug);
   const recipeSlug = normalizeRouteSlug(rawRecipeSlug);
-  const [settings, recipe] = await Promise.all([
+  const [settings, resolved] = await Promise.all([
     getWebsiteSettings(),
-    getPublishedRecipeBySlug(recipeSlug),
+    resolvePublicRecipePage(recipeSlug),
   ]);
 
-  if (!recipe) {
+  if (!resolved) {
     return buildSiteMetadata(settings, {
       path: buildRecipePath(categorySlug, recipeSlug),
       title: "מתכון לא נמצא",
@@ -47,6 +48,7 @@ export async function generateMetadata({
     });
   }
 
+  const { recipe, isAdminOnlyPreview } = resolved;
   const resolvedCategorySlug = recipe.category?.slug ?? categorySlug;
   const title = recipe.seo.title.trim() || recipe.title;
   const description =
@@ -61,11 +63,12 @@ export async function generateMetadata({
     description,
     ogImage,
     ogImageAlt,
+    noIndex: isAdminOnlyPreview,
   });
 
   const customCanonical = recipe.seo.canonical_url?.trim();
 
-  if (customCanonical) {
+  if (customCanonical && !isAdminOnlyPreview) {
     metadata.alternates = {
       ...metadata.alternates,
       canonical: customCanonical,
@@ -82,11 +85,13 @@ export default async function PublicRecipeDetailPage({
     await params;
   const categorySlug = normalizeRouteSlug(rawCategorySlug);
   const recipeSlug = normalizeRouteSlug(rawRecipeSlug);
-  const recipe = await getPublishedRecipeBySlug(recipeSlug);
+  const resolved = await resolvePublicRecipePage(recipeSlug);
 
-  if (!recipe) {
+  if (!resolved) {
     notFound();
   }
+
+  const { recipe, isAdminOnlyPreview } = resolved;
 
   if (recipe.category?.slug && recipe.category.slug !== categorySlug) {
     permanentRedirect(buildRecipePath(recipe.category.slug, recipe.slug));
@@ -95,34 +100,52 @@ export default async function PublicRecipeDetailPage({
   const [settings, homepageContent, relatedRecipes] = await Promise.all([
     getWebsiteSettings(),
     getHomepageContent(),
-    getRelatedRecipes({
-      recipeId: recipe.id,
-      categoryId: recipe.category_id,
-      limit: 3,
-    }),
+    isAdminOnlyPreview
+      ? Promise.resolve([])
+      : getRelatedRecipes({
+          recipeId: recipe.id,
+          categoryId: recipe.category_id,
+          limit: 3,
+        }),
   ]);
 
   const homepage = homepageContent ?? getDefaultHomepageData();
 
   return (
     <>
-      <RecipeJsonLd recipe={recipe} />
-      <RecipeBreadcrumbJsonLd
-        recipeTitle={recipe.title}
-        recipeSlug={recipe.slug}
-        category={recipe.category}
-      />
+      {isAdminOnlyPreview ? (
+        <RecipeAdminPreviewBanner
+          status={recipe.status}
+          editHref={`/admin/recipes/${recipe.id}`}
+        />
+      ) : (
+        <>
+          <RecipeJsonLd recipe={recipe} />
+          <RecipeBreadcrumbJsonLd
+            recipeTitle={recipe.title}
+            recipeSlug={recipe.slug}
+            category={recipe.category}
+          />
+        </>
+      )}
 
       <div className="recipe-page">
         <div className="recipe-page__main">
-          <RecipePublicView recipe={recipe} mode="public" />
+          <RecipePublicView
+            recipe={recipe}
+            mode={isAdminOnlyPreview ? "preview" : "public"}
+          />
         </div>
 
-        <RelatedRecipes recipes={relatedRecipes} />
-        <ContactCtaSection
-          content={homepage.contact_cta}
-          settings={settings}
-        />
+        {!isAdminOnlyPreview ? (
+          <>
+            <RelatedRecipes recipes={relatedRecipes} />
+            <ContactCtaSection
+              content={homepage.contact_cta}
+              settings={settings}
+            />
+          </>
+        ) : null}
       </div>
     </>
   );

@@ -41,6 +41,16 @@ export function RecipeSectionBlock({
   }
 
   const nestedHeading = showSectionTitle ? "h3" : "h2";
+  const titleId = `recipe-section-title-${index}`;
+  const sectionTitle =
+    showSectionTitle && title ? (
+      <h2 id={titleId} className="recipe-section__title">
+        {title}
+      </h2>
+    ) : null;
+
+  const showIngredientsColumn = hasIngredients || isPreview;
+  const showStepsColumn = hasSteps || isPreview;
 
   return (
     <section
@@ -49,43 +59,51 @@ export function RecipeSectionBlock({
         showSectionTitle && "recipe-section--named",
         className
       )}
-      aria-labelledby={
-        showSectionTitle && title ? `recipe-section-title-${index}` : undefined
-      }
+      aria-labelledby={sectionTitle ? titleId : undefined}
     >
-      {showSectionTitle && title ? (
-        <h2 id={`recipe-section-title-${index}`} className="recipe-section__title">
-          {title}
-        </h2>
-      ) : null}
-
       <div className="recipe-section__grid">
-        {hasIngredients ? (
-          <RecipeIngredients
-            ingredients={section.ingredients}
-            headingLevel={nestedHeading}
-            titleId={`recipe-section-${index}-ingredients-title`}
-          />
-        ) : isPreview ? (
-          <section className="recipe-ingredients">
-            <div className="recipe-ingredients__card">
-              <h3 className="recipe-ingredients__title">רכיבים</h3>
-              <EmptySectionNote>טרם נוספו רכיבים</EmptySectionNote>
-            </div>
-          </section>
+        {showIngredientsColumn ? (
+          <div
+            className={cn(
+              "recipe-section__column",
+              sectionTitle && "recipe-section__column--titled"
+            )}
+          >
+            {sectionTitle}
+            {hasIngredients ? (
+              <RecipeIngredients
+                ingredients={section.ingredients}
+                headingLevel={nestedHeading}
+                titleId={`recipe-section-${index}-ingredients-title`}
+              />
+            ) : (
+              <section className="recipe-ingredients">
+                <div className="recipe-ingredients__card">
+                  <h3 className="recipe-ingredients__title">רכיבים</h3>
+                  <EmptySectionNote>טרם נוספו רכיבים</EmptySectionNote>
+                </div>
+              </section>
+            )}
+          </div>
+        ) : sectionTitle ? (
+          <div className="recipe-section__column recipe-section__column--titled">
+            {sectionTitle}
+          </div>
         ) : null}
 
-        {hasSteps ? (
-          <RecipeSteps
-            steps={section.steps}
-            headingLevel={nestedHeading}
-            titleId={`recipe-section-${index}-steps-title`}
-          />
-        ) : isPreview ? (
-          <section className="recipe-steps">
-            <h3 className="recipe-steps__title">שלבי הכנה</h3>
-            <EmptySectionNote>טרם נוספו שלבי הכנה</EmptySectionNote>
-          </section>
+        {showStepsColumn ? (
+          hasSteps ? (
+            <RecipeSteps
+              steps={section.steps}
+              headingLevel={nestedHeading}
+              titleId={`recipe-section-${index}-steps-title`}
+            />
+          ) : (
+            <section className="recipe-steps">
+              <h3 className="recipe-steps__title">שלבי הכנה</h3>
+              <EmptySectionNote>טרם נוספו שלבי הכנה</EmptySectionNote>
+            </section>
+          )
         ) : null}
       </div>
     </section>

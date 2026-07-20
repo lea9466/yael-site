@@ -1,4 +1,8 @@
 import { createEmptyStoredSeo } from "@/lib/seo/resolve";
+import {
+  legacyIngredientToText,
+  toRecipeIngredient,
+} from "@/lib/recipes/format-ingredient";
 import type {
   RecipeContent,
   RecipeGalleryItem,
@@ -12,25 +16,7 @@ function asTrimmedString(value: unknown): string {
 }
 
 function normalizeIngredient(value: unknown): RecipeIngredient | null {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    return null;
-  }
-
-  const record = value as Partial<RecipeIngredient>;
-  const name = asTrimmedString(record.name);
-
-  if (!name) {
-    return null;
-  }
-
-  const quantity = asTrimmedString(record.quantity);
-  const unit = asTrimmedString(record.unit);
-
-  return {
-    name,
-    ...(quantity ? { quantity } : {}),
-    ...(unit ? { unit } : {}),
-  };
+  return toRecipeIngredient(value);
 }
 
 function normalizeStep(value: unknown): RecipeStep | null {
@@ -75,10 +61,27 @@ function normalizeSection(value: unknown): RecipeSection | null {
   };
 }
 
+function mapIngredientForEditor(value: unknown): RecipeIngredient {
+  return { text: legacyIngredientToText(value) };
+}
+
+function mapStepForEditor(value: unknown): RecipeStep {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return { text: "" };
+  }
+
+  const step = value as Partial<RecipeStep>;
+
+  return {
+    text: typeof step.text === "string" ? step.text : "",
+  };
+}
+
 /**
  * Returns a unified RecipeSection[] from either the new recipe_sections
  * shape or the legacy top-level ingredients/steps arrays.
  * Does not mutate stored database content.
+ * Ingredients are normalized in-memory to `{ text }` (including legacy rows).
  */
 export function normalizeRecipeSections(
   content: RecipeContent | Partial<RecipeContent> | null | undefined
@@ -103,45 +106,10 @@ export function normalizeRecipeSections(
 
         const record = section as Partial<RecipeSection>;
         const ingredients = Array.isArray(record.ingredients)
-          ? record.ingredients.map((item) => {
-              if (
-                typeof item !== "object" ||
-                item === null ||
-                Array.isArray(item)
-              ) {
-                return { name: "", quantity: "", unit: "" };
-              }
-
-              const ingredient = item as Partial<RecipeIngredient>;
-
-              return {
-                name:
-                  typeof ingredient.name === "string" ? ingredient.name : "",
-                quantity:
-                  typeof ingredient.quantity === "string"
-                    ? ingredient.quantity
-                    : "",
-                unit:
-                  typeof ingredient.unit === "string" ? ingredient.unit : "",
-              };
-            })
+          ? record.ingredients.map((item) => mapIngredientForEditor(item))
           : [];
         const steps = Array.isArray(record.steps)
-          ? record.steps.map((item) => {
-              if (
-                typeof item !== "object" ||
-                item === null ||
-                Array.isArray(item)
-              ) {
-                return { text: "" };
-              }
-
-              const step = item as Partial<RecipeStep>;
-
-              return {
-                text: typeof step.text === "string" ? step.text : "",
-              };
-            })
+          ? record.steps.map((item) => mapStepForEditor(item))
           : [];
 
         return {
@@ -160,42 +128,11 @@ export function normalizeRecipeSections(
   }
 
   const legacyIngredients = Array.isArray(content.ingredients)
-    ? content.ingredients.map((item) => {
-        if (
-          typeof item !== "object" ||
-          item === null ||
-          Array.isArray(item)
-        ) {
-          return { name: "", quantity: "", unit: "" };
-        }
-
-        const ingredient = item as Partial<RecipeIngredient>;
-
-        return {
-          name: typeof ingredient.name === "string" ? ingredient.name : "",
-          quantity:
-            typeof ingredient.quantity === "string" ? ingredient.quantity : "",
-          unit: typeof ingredient.unit === "string" ? ingredient.unit : "",
-        };
-      })
+    ? content.ingredients.map((item) => mapIngredientForEditor(item))
     : [];
 
   const legacySteps = Array.isArray(content.steps)
-    ? content.steps.map((item) => {
-        if (
-          typeof item !== "object" ||
-          item === null ||
-          Array.isArray(item)
-        ) {
-          return { text: "" };
-        }
-
-        const step = item as Partial<RecipeStep>;
-
-        return {
-          text: typeof step.text === "string" ? step.text : "",
-        };
-      })
+    ? content.steps.map((item) => mapStepForEditor(item))
     : [];
 
   return [

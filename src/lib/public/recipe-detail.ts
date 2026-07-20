@@ -1,4 +1,8 @@
-import { createClient, isSupabaseConfigured } from "@/lib/auth/session";
+import {
+  createClient,
+  getAuthenticatedAdmin,
+  isSupabaseConfigured,
+} from "@/lib/auth/session";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
 import { normalizeRecipeContent } from "@/lib/recipes/content";
 import type { RecipeDetail } from "@/lib/recipes/types";
@@ -6,6 +10,7 @@ import type { PublicRecipeSummary } from "@/lib/public/types";
 import type { RecipeDifficulty } from "@/lib/recipes/constants";
 import type { StoredSeo } from "@/lib/seo/types";
 import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
+import type { ContentStatus } from "@/types/content";
 
 const RECIPE_DETAIL_COLUMNS =
   "id, title, slug, description, cover_media_id, seo_og_media_id, category_id, prep_duration, servings, difficulty, content, seo, featured, status, published_at, created_at, updated_at";
@@ -147,8 +152,13 @@ function sortRecipesByRecency(
     .sort((left, right) => getRecipeSortTimestamp(right) - getRecipeSortTimestamp(left));
 }
 
-export async function getPublishedRecipeBySlug(
-  slug: string
+function isContentStatus(value: unknown): value is ContentStatus {
+  return value === "draft" || value === "published" || value === "archived";
+}
+
+async function fetchRecipeDetailBySlug(
+  slug: string,
+  options: { publishedOnly: boolean }
 ): Promise<RecipeDetail | null> {
   if (!isSupabaseConfigured()) {
     return null;
@@ -162,12 +172,16 @@ export async function getPublishedRecipeBySlug(
 
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from("recipes")
       .select(RECIPE_DETAIL_COLUMNS)
-      .eq("slug", normalizedSlug)
-      .eq("status", "published")
-      .maybeSingle();
+      .eq("slug", normalizedSlug);
+
+    if (options.publishedOnly) {
+      query = query.eq("status", "published");
+    }
+
+    const { data, error } = await query.maybeSingle();
 
     if (error || !data) {
       return null;
@@ -207,6 +221,8 @@ export async function getPublishedRecipeBySlug(
         )
         .map((tag) => ({ id: tag.id, name: tag.name })) ?? [];
 
+    const status = isContentStatus(data.status) ? data.status : "draft";
+
     return {
       id: data.id as string,
       title: data.title as string,
@@ -221,7 +237,7 @@ export async function getPublishedRecipeBySlug(
       content,
       seo,
       featured: Boolean(data.featured),
-      status: "published",
+      status,
       published_at: (data.published_at as string | null) ?? null,
       created_at: data.created_at as string,
       updated_at: data.updated_at as string,
@@ -255,6 +271,44 @@ export async function getPublishedRecipeBySlug(
   } catch {
     return null;
   }
+}
+
+export async function getPublishedRecipeBySlug(
+  slug: string
+): Promise<RecipeDetail | null> {
+  return fetchRecipeDetailBySlug(slug, { publishedOnly: true });
+}
+
+/**
+ * Resolves a recipe for the public detail route.
+ * Published recipes are available to everyone.
+ * Draft/archived recipes are available only to the authenticated administrator
+ * (so local "view on site" works before publish).
+ */
+export async function resolvePublicRecipePage(
+  slug: string
+): Promise<{ recipe: RecipeDetail; isAdminOnlyPreview: boolean } | null> {
+  const published = await getPublishedRecipeBySlug(slug);
+
+  if (published) {
+    return { recipe: published, isAdminOnlyPreview: false };
+  }
+
+  const admin = await getAuthenticatedAdmin();
+
+  if (!admin) {
+    return null;
+  }
+
+  const unpublished = await fetchRecipeDetailBySlug(slug, {
+    publishedOnly: false,
+  });
+
+  if (!unpublished || unpublished.status === "published") {
+    return null;
+  }
+
+  return { recipe: unpublished, isAdminOnlyPreview: true };
 }
 
 export async function getRelatedRecipes(input: {

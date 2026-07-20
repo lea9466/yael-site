@@ -8,9 +8,7 @@ import type {
 } from "@/lib/validations/recipe";
 
 export type RecipeIngredient = {
-  name: string;
-  quantity?: string;
-  unit?: string;
+  text: string;
 };
 
 export type RecipeStep = {

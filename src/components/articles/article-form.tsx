@@ -289,7 +289,7 @@ export function ArticleForm({
     content: toSubmitContent(content),
   });
 
-  const handleSaveDraft = () => {
+  const handleSave = () => {
     if (isPending) {
       return;
     }
@@ -298,7 +298,9 @@ export function ArticleForm({
       closeToast();
       setFieldErrors({});
 
-      const payload = buildPayload("draft");
+      const statusToKeep =
+        mode === "create" ? "draft" : (initialArticle?.status ?? values.status);
+      const payload = buildPayload(statusToKeep);
       const parsed = articleDraftInputSchema.safeParse(payload);
 
       if (!parsed.success) {
@@ -327,7 +329,7 @@ export function ArticleForm({
       redirectAfterSave(
         router,
         ADMIN_LIST_PATHS.article,
-        "הפוסט נשמר כטיוטה."
+        "הפוסט נשמר בהצלחה."
       );
     });
   };
@@ -729,7 +731,7 @@ export function ArticleForm({
 
       <AdminFormActionBar
         cancelHref={ADMIN_LIST_PATHS.article}
-        onSave={handleSaveDraft}
+        onSave={handleSave}
         onPublish={showPublish ? handlePublish : undefined}
         showPublish={showPublish}
         isDirty={isDirty}

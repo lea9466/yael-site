@@ -289,7 +289,7 @@ export function ServiceForm({
     content: toSubmitContent(content),
   });
 
-  const handleSaveDraft = () => {
+  const handleSave = () => {
     if (isPending) {
       return;
     }
@@ -298,7 +298,9 @@ export function ServiceForm({
       closeToast();
       setFieldErrors({});
 
-      const payload = buildPayload("draft");
+      const statusToKeep =
+        mode === "create" ? "draft" : (initialService?.status ?? values.status);
+      const payload = buildPayload(statusToKeep);
       const parsed = serviceDraftInputSchema.safeParse(payload);
 
       if (!parsed.success) {
@@ -327,7 +329,7 @@ export function ServiceForm({
       redirectAfterSave(
         router,
         ADMIN_LIST_PATHS.service,
-        "השירות נשמר כטיוטה."
+        "השירות נשמר בהצלחה."
       );
     });
   };
@@ -932,7 +934,7 @@ export function ServiceForm({
 
       <AdminFormActionBar
         cancelHref={ADMIN_LIST_PATHS.service}
-        onSave={handleSaveDraft}
+        onSave={handleSave}
         onPublish={handlePublish}
         showPublish={showPublish}
         isDirty={isDirty}

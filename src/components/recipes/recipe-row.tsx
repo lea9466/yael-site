@@ -7,6 +7,7 @@ import {
   Archive,
   Copy,
   Eye,
+  FileMinus,
   MoreVertical,
   Pencil,
   RotateCcw,
@@ -18,8 +19,9 @@ import {
   archiveRecipeAction,
   duplicateRecipeAction,
   permanentlyDeleteRecipeAction,
-  restoreAndPublishRecipeAction,
+  quickPublishRecipeAction,
   restoreRecipeToDraftAction,
+  unpublishRecipeAction,
 } from "@/actions/recipes";
 import {
   AdminFeaturedBadge,
@@ -60,7 +62,11 @@ export function RecipeRow({ item }: RecipeRowProps) {
 
   const runAction = (
     action: () => Promise<{ success: boolean; error?: string; data?: { id: string } }>,
-    onSuccess?: () => void
+    options?: {
+      onSuccess?: () => void;
+      successMessage?: string;
+      navigateOnDuplicate?: boolean;
+    }
   ) => {
     startTransition(async () => {
       setToast((current) => ({ ...current, open: false }));
@@ -75,11 +81,19 @@ export function RecipeRow({ item }: RecipeRowProps) {
         return;
       }
 
-      onSuccess?.();
+      options?.onSuccess?.();
 
-      if (result.data?.id) {
+      if (options?.navigateOnDuplicate && result.data?.id) {
         router.push(`/admin/recipes/${result.data.id}`);
         return;
+      }
+
+      if (options?.successMessage) {
+        setToast({
+          open: true,
+          variant: "success",
+          message: options.successMessage,
+        });
       }
 
       router.refresh();
@@ -145,23 +159,43 @@ export function RecipeRow({ item }: RecipeRowProps) {
                 <Pencil aria-hidden="true" className="size-4" />
                 עריכה
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={() =>
-                  runAction(() => duplicateRecipeAction({ id: item.id }))
-                }
-              >
-                <Copy aria-hidden="true" className="size-4" />
-                שכפול
-              </DropdownMenuItem>
 
               {item.status === "draft" ? (
                 <DropdownMenuItem
                   onSelect={() =>
-                    router.push(`/admin/recipes/${item.id}?publish=1`)
+                    runAction(() => quickPublishRecipeAction({ id: item.id }), {
+                      successMessage: "פורסם בהצלחה",
+                    })
                   }
                 >
                   <Send aria-hidden="true" className="size-4" />
                   פרסום
+                </DropdownMenuItem>
+              ) : null}
+
+              {item.status === "published" ? (
+                <DropdownMenuItem
+                  onSelect={() =>
+                    runAction(() => unpublishRecipeAction({ id: item.id }), {
+                      successMessage: "הועבר לטיוטה",
+                    })
+                  }
+                >
+                  <FileMinus aria-hidden="true" className="size-4" />
+                  ביטול פרסום
+                </DropdownMenuItem>
+              ) : null}
+
+              {item.status === "archived" ? (
+                <DropdownMenuItem
+                  onSelect={() =>
+                    runAction(() => restoreRecipeToDraftAction({ id: item.id }), {
+                      successMessage: "הועבר לטיוטה",
+                    })
+                  }
+                >
+                  <RotateCcw aria-hidden="true" className="size-4" />
+                  שחזור
                 </DropdownMenuItem>
               ) : null}
 
@@ -172,37 +206,24 @@ export function RecipeRow({ item }: RecipeRowProps) {
                 </DropdownMenuItem>
               ) : null}
 
-              {item.status === "archived" ? (
-                <>
-                  <DropdownMenuItem
-                    onSelect={() =>
-                      runAction(() =>
-                        restoreRecipeToDraftAction({ id: item.id })
-                      )
-                    }
-                  >
-                    <RotateCcw aria-hidden="true" className="size-4" />
-                    שחזור כטיוטה
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() =>
-                      runAction(() =>
-                        restoreAndPublishRecipeAction({ id: item.id })
-                      )
-                    }
-                  >
-                    <Send aria-hidden="true" className="size-4" />
-                    שחזור ופרסום
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    destructive
-                    onSelect={() => setDeleteOpen(true)}
-                  >
-                    <Trash2 aria-hidden="true" className="size-4" />
-                    מחיקה לצמיתות
-                  </DropdownMenuItem>
-                </>
-              ) : null}
+              <DropdownMenuItem
+                onSelect={() =>
+                  runAction(() => duplicateRecipeAction({ id: item.id }), {
+                    navigateOnDuplicate: true,
+                  })
+                }
+              >
+                <Copy aria-hidden="true" className="size-4" />
+                שכפול
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                destructive
+                onSelect={() => setDeleteOpen(true)}
+              >
+                <Trash2 aria-hidden="true" className="size-4" />
+                מחיקה
+              </DropdownMenuItem>
             </DropdownMenu>
           </div>
 
@@ -218,9 +239,10 @@ export function RecipeRow({ item }: RecipeRowProps) {
         loading={isPending}
         onClose={() => setArchiveOpen(false)}
         onConfirm={() =>
-          runAction(() => archiveRecipeAction({ id: item.id }), () =>
-            setArchiveOpen(false)
-          )
+          runAction(() => archiveRecipeAction({ id: item.id }), {
+            onSuccess: () => setArchiveOpen(false),
+            successMessage: "הועבר לארכיון",
+          })
         }
       />
 
@@ -230,9 +252,10 @@ export function RecipeRow({ item }: RecipeRowProps) {
         loading={isPending}
         onClose={() => setDeleteOpen(false)}
         onConfirm={() =>
-          runAction(() => permanentlyDeleteRecipeAction({ id: item.id }), () =>
-            setDeleteOpen(false)
-          )
+          runAction(() => permanentlyDeleteRecipeAction({ id: item.id }), {
+            onSuccess: () => setDeleteOpen(false),
+            successMessage: "המתכון נמחק.",
+          })
         }
       />
     </AdminListItem>

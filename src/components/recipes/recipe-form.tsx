@@ -6,6 +6,7 @@ import { useMemo, useState, useTransition } from "react";
 import {
   Archive,
   Clock,
+  ExternalLink,
   Eye,
   FileText,
   Image,
@@ -61,6 +62,7 @@ import {
 import { ADMIN_LIST_PATHS } from "@/lib/forms/admin-list-paths";
 import { redirectAfterSave } from "@/lib/forms/redirect-after-save";
 import { useUnsavedChangesWarning } from "@/lib/hooks/use-unsaved-changes-warning";
+import { buildRecipePath } from "@/lib/public/recipe-paths";
 import {
   DIFFICULTY_LABELS,
   RECIPE_DESCRIPTION_MAX,
@@ -108,16 +110,12 @@ function toRepeaterContent(
       section.ingredients.length > 0
         ? section.ingredients.map((item) => ({
             id: createRepeaterItemId(),
-            name: item.name,
-            quantity: item.quantity ?? "",
-            unit: item.unit ?? "",
+            text: item.text,
           }))
         : [
             {
               id: createRepeaterItemId(),
-              name: "",
-              quantity: "",
-              unit: "",
+              text: "",
             },
           ],
     steps:
@@ -165,13 +163,7 @@ function toSubmitContent(content: FormContentState): RecipeDraftInput["content"]
   const recipe_sections = sanitizeRecipeSectionsForSave(
     content.recipe_sections.map((section) => ({
       title: section.title,
-      ingredients: section.ingredients.map(
-        ({ name, quantity, unit }) => ({
-          name,
-          quantity,
-          unit,
-        })
-      ),
+      ingredients: section.ingredients.map(({ text }) => ({ text })),
       steps: section.steps.map(({ text }) => ({ text })),
     }))
   );
@@ -338,7 +330,7 @@ export function RecipeForm({
     content: toSubmitContent(content),
   });
 
-  const handleSaveDraft = () => {
+  const handleSave = () => {
     if (isPending) {
       return;
     }
@@ -347,7 +339,9 @@ export function RecipeForm({
       closeToast();
       setFieldErrors({});
 
-      const payload = buildPayload("draft");
+      const statusToKeep =
+        mode === "create" ? "draft" : (initialRecipe?.status ?? values.status);
+      const payload = buildPayload(statusToKeep);
       const parsed = recipeDraftInputSchema.safeParse(payload);
 
       if (!parsed.success) {
@@ -376,7 +370,7 @@ export function RecipeForm({
       redirectAfterSave(
         router,
         ADMIN_LIST_PATHS.recipe,
-        "המתכון נשמר כטיוטה."
+        "המתכון נשמר בהצלחה."
       );
     });
   };
@@ -497,6 +491,11 @@ export function RecipeForm({
   const showPublish =
     currentStatus !== "archived" && (mode === "create" || currentStatus === "draft");
 
+  const publicRecipeHref =
+    mode === "edit" && initialRecipe?.category?.slug
+      ? buildRecipePath(initialRecipe.category.slug, initialRecipe.slug)
+      : null;
+
   const secondaryActions = (
     <>
       {mode === "edit" ? (
@@ -506,6 +505,17 @@ export function RecipeForm({
         >
           <Eye aria-hidden="true" className="size-4" />
           תצוגה מקדימה
+        </Link>
+      ) : null}
+      {publicRecipeHref ? (
+        <Link
+          href={publicRecipeHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="admin-btn-outline inline-flex h-9 items-center gap-2 rounded-[var(--radius-md)] px-3 text-sm font-medium"
+        >
+          <ExternalLink aria-hidden="true" className="size-4" />
+          צפייה באתר
         </Link>
       ) : null}
       {mode === "edit" && currentStatus !== "archived" ? (
@@ -900,7 +910,7 @@ export function RecipeForm({
 
       <AdminFormActionBar
         cancelHref={ADMIN_LIST_PATHS.recipe}
-        onSave={handleSaveDraft}
+        onSave={handleSave}
         onPublish={handlePublish}
         showPublish={showPublish}
         isDirty={isDirty}

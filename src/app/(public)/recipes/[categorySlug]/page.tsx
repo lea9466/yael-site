@@ -10,7 +10,7 @@ import {
   getPublicRecipeCategoryBySlug,
   getPublicRecipeListing,
 } from "@/lib/public/recipe-listing";
-import { getPublishedRecipeBySlug } from "@/lib/public/recipe-detail";
+import { resolvePublicRecipePage } from "@/lib/public/recipe-detail";
 import { getWebsiteSettings } from "@/lib/public/queries";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
@@ -64,10 +64,12 @@ export default async function PublicRecipeCategoryPage({
   const category = await getPublicRecipeCategoryBySlug(categorySlug);
 
   if (!category) {
-    const recipe = await getPublishedRecipeBySlug(categorySlug);
+    const resolved = await resolvePublicRecipePage(categorySlug);
 
-    if (recipe?.category?.slug) {
-      permanentRedirect(buildRecipePath(recipe.category.slug, recipe.slug));
+    if (resolved?.recipe.category?.slug) {
+      permanentRedirect(
+        buildRecipePath(resolved.recipe.category.slug, resolved.recipe.slug)
+      );
     }
 
     notFound();

@@ -223,6 +223,9 @@ export const duplicateServiceSchema = serviceIdSchema;
 
 export const archiveServiceSchema = serviceIdSchema;
 
+export const quickPublishServiceSchema = serviceIdSchema;
+export const unpublishServiceSchema = serviceIdSchema;
+
 export const restoreServiceSchema = z.object({
   id: uuidSchema,
   publish: z.boolean().default(false),

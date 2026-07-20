@@ -33,7 +33,9 @@ import {
   mapZodErrors,
   permanentlyDeleteArticleSchema,
   publishArticleSchema,
+  quickPublishArticleSchema,
   articlePublishInputSchema,
+  unpublishArticleSchema,
   updateArticleSchema,
   type ArticleDraftInput,
   type ArticlePublishInput,
@@ -581,6 +583,90 @@ export async function duplicateArticleAction(
   return { success: true, data: { id: inserted.id } };
 }
 
+export async function quickPublishArticleAction(
+  input: { id: string }
+): Promise<ArticleActionResult> {
+  const session = await getAdminSupabase();
+
+  if (!session) {
+    return { success: false, error: ARTICLE_ERRORS.unauthorized };
+  }
+
+  const parsed = quickPublishArticleSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return { success: false, error: ARTICLE_ERRORS.generic };
+  }
+
+  const existing = await fetchArticleById(parsed.data.id);
+
+  if (!existing) {
+    return { success: false, error: ARTICLE_ERRORS.notFound };
+  }
+
+  if (existing.status !== "draft") {
+    return { success: false, error: ARTICLE_ERRORS.generic };
+  }
+
+  const publishedAt =
+    existing.published_at ?? new Date().toISOString();
+
+  const { error } = await session.supabase
+    .from("articles")
+    .update({
+      status: "published",
+      published_at: publishedAt,
+    })
+    .eq("id", parsed.data.id);
+
+  if (error) {
+    return { success: false, error: ARTICLE_ERRORS.generic };
+  }
+
+  revalidateArticlePaths(parsed.data.id);
+
+  return { success: true };
+}
+
+export async function unpublishArticleAction(
+  input: { id: string }
+): Promise<ArticleActionResult> {
+  const session = await getAdminSupabase();
+
+  if (!session) {
+    return { success: false, error: ARTICLE_ERRORS.unauthorized };
+  }
+
+  const parsed = unpublishArticleSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return { success: false, error: ARTICLE_ERRORS.generic };
+  }
+
+  const existing = await fetchArticleById(parsed.data.id);
+
+  if (!existing) {
+    return { success: false, error: ARTICLE_ERRORS.notFound };
+  }
+
+  if (existing.status !== "published") {
+    return { success: false, error: ARTICLE_ERRORS.generic };
+  }
+
+  const { error } = await session.supabase
+    .from("articles")
+    .update({ status: "draft" })
+    .eq("id", parsed.data.id);
+
+  if (error) {
+    return { success: false, error: ARTICLE_ERRORS.generic };
+  }
+
+  revalidateArticlePaths(parsed.data.id);
+
+  return { success: true };
+}
+
 export async function archiveArticleAction(
   input: { id: string }
 ): Promise<ArticleActionResult> {
@@ -705,10 +791,6 @@ export async function permanentlyDeleteArticleAction(
 
   if (!existing) {
     return { success: false, error: ARTICLE_ERRORS.notFound };
-  }
-
-  if (existing.status !== "archived") {
-    return { success: false, error: ARTICLE_ERRORS.archiveOnlyDelete };
   }
 
   const { error: tagsError } = await session.supabase

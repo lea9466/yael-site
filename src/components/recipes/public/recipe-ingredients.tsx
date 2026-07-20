@@ -50,20 +50,12 @@ export function RecipeIngredients({
 
         <ul className="recipe-ingredients__list">
           {items.map((ingredient, index) => {
-            const quantity =
-              typeof ingredient.quantity === "string"
-                ? ingredient.quantity.trim()
-                : "";
-            const unit =
-              typeof ingredient.unit === "string" ? ingredient.unit.trim() : "";
-            const name =
-              typeof ingredient.name === "string" ? ingredient.name.trim() : "";
-            const measure = [quantity, unit].filter(Boolean).join(" ");
+            const line = formatIngredientLine(ingredient);
             const checkboxId = `${generatedId}-ingredient-${index}`;
             const isChecked = Boolean(checked[index]);
 
             return (
-              <li key={`${index}-${formatIngredientLine(ingredient)}`}>
+              <li key={`${index}-${line}`}>
                 <label
                   htmlFor={checkboxId}
                   className={cn(
@@ -84,14 +76,7 @@ export function RecipeIngredients({
                     }}
                   />
                   <span className="recipe-ingredients__text">
-                    {measure ? (
-                      <span className="recipe-ingredients__measure">
-                        {measure}
-                      </span>
-                    ) : null}
-                    {name ? (
-                      <span className="recipe-ingredients__name">{name}</span>
-                    ) : null}
+                    <span className="recipe-ingredients__name">{line}</span>
                   </span>
                 </label>
               </li>

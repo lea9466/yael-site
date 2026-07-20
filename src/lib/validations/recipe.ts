@@ -40,21 +40,11 @@ export type RecipeFeaturedFilter = (typeof RECIPE_FEATURED_FILTERS)[number];
 const uuidSchema = z.string().uuid("מזהה אינו תקין");
 
 const ingredientSchema = z.object({
-  name: z
+  text: z
     .string()
     .trim()
-    .min(1, "יש להזין שם רכיב")
-    .max(120, "שם הרכיב ארוך מדי"),
-  quantity: z
-    .string()
-    .trim()
-    .max(40, "הכמות ארוכה מדי")
-    .optional(),
-  unit: z
-    .string()
-    .trim()
-    .max(40, "יחידת המידה ארוכה מדי")
-    .optional(),
+    .min(1, "יש להזין רכיב")
+    .max(200, "שורת הרכיב ארוכה מדי"),
 });
 
 const stepSchema = z.object({
@@ -273,6 +263,8 @@ export const recipeIdSchema = z.object({
 
 export const duplicateRecipeSchema = recipeIdSchema;
 export const archiveRecipeSchema = recipeIdSchema;
+export const quickPublishRecipeSchema = recipeIdSchema;
+export const unpublishRecipeSchema = recipeIdSchema;
 export const permanentlyDeleteRecipeSchema = recipeIdSchema;
 
 export type RecipeDraftInput = z.infer<typeof recipeDraftInputSchema>;

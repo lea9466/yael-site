@@ -25,9 +25,7 @@ import { cn } from "@/lib/utils/cn";
 
 export type IngredientRepeaterItem = {
   id: string;
-  name: string;
-  quantity: string;
-  unit: string;
+  text: string;
 };
 
 export type StepRepeaterItem = {
@@ -51,9 +49,7 @@ type RecipeSectionsFieldProps = {
 function createEmptyIngredient(): IngredientRepeaterItem {
   return {
     id: createRepeaterItemId(),
-    name: "",
-    quantity: "",
-    unit: "",
+    text: "",
   };
 }
 
@@ -76,12 +72,7 @@ export function createEmptyRecipeSection(): SectionRepeaterItem {
 function sectionHasContent(section: SectionRepeaterItem): boolean {
   return (
     section.title.trim().length > 0 ||
-    section.ingredients.some(
-      (item) =>
-        item.name.trim().length > 0 ||
-        item.quantity.trim().length > 0 ||
-        item.unit.trim().length > 0
-    ) ||
+    section.ingredients.some((item) => item.text.trim().length > 0) ||
     section.steps.some((item) => item.text.trim().length > 0)
   );
 }
@@ -291,57 +282,50 @@ export function RecipeSectionsField({
                 <div id={`recipe-section-ingredients-${index}`}>
                   <RepeaterField
                     label="רכיבים"
-                    description="שם הרכיב חובה. כמות ויחידת מידה אופציונליות."
+                    description="שורת טקסט אחת לכל רכיב. Enter בשורה האחרונה מוסיף רכיב חדש."
                     items={section.ingredients}
                     minItems={0}
                     maxItems={RECIPE_REPEATER_LIMITS.ingredients.max}
                     addLabel="הוספת רכיב"
                     emptyLabel="הוסיפו רכיבים לחלק זה"
                     error={ingredientsError}
+                    addButtonPlacement="bottom"
                     createItem={createEmptyIngredient}
                     onChange={(ingredients) =>
                       updateSection(index, { ...section, ingredients })
                     }
-                    renderFields={(item, _itemIndex, updateItem) => (
-                      <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
-                        <FormField
-                          label="שם הרכיב"
-                          htmlFor={`ingredient-name-${item.id}`}
-                          required
+                    renderFields={(item, _itemIndex, updateItem, helpers) => (
+                      <div className="min-w-0">
+                        <label
+                          htmlFor={`ingredient-text-${item.id}`}
+                          className="sr-only"
                         >
-                          <RepeaterTextField
-                            id={`ingredient-name-${item.id}`}
-                            value={item.name}
-                            placeholder="שם הרכיב"
-                            onChange={(name) => updateItem({ ...item, name })}
-                          />
-                        </FormField>
-                        <FormField
-                          label="כמות"
-                          htmlFor={`ingredient-quantity-${item.id}`}
-                          hint="אופציונלי"
-                        >
-                          <RepeaterTextField
-                            id={`ingredient-quantity-${item.id}`}
-                            value={item.quantity}
-                            placeholder="כמות"
-                            onChange={(quantity) =>
-                              updateItem({ ...item, quantity })
+                          רכיב
+                        </label>
+                        <RepeaterTextField
+                          id={`ingredient-text-${item.id}`}
+                          value={item.text}
+                          placeholder="לדוגמה: 2 כוסות קמח"
+                          className="w-full"
+                          onChange={(text) => updateItem({ ...item, text })}
+                          onKeyDown={(event) => {
+                            if (event.key !== "Enter") {
+                              return;
                             }
-                          />
-                        </FormField>
-                        <FormField
-                          label="יחידה"
-                          htmlFor={`ingredient-unit-${item.id}`}
-                          hint="אופציונלי"
-                        >
-                          <RepeaterTextField
-                            id={`ingredient-unit-${item.id}`}
-                            value={item.unit}
-                            placeholder="יחידה"
-                            onChange={(unit) => updateItem({ ...item, unit })}
-                          />
-                        </FormField>
+
+                            event.preventDefault();
+
+                            if (!helpers.isLast) {
+                              return;
+                            }
+
+                            if (item.text.trim().length === 0) {
+                              return;
+                            }
+
+                            helpers.requestAdd();
+                          }}
+                        />
                       </div>
                     )}
                   />
@@ -350,6 +334,7 @@ export function RecipeSectionsField({
                 <div id={`recipe-section-steps-${index}`}>
                   <RepeaterField
                     label="שלבי הכנה"
+                    description="Enter לירידת שורה. Ctrl/Cmd + Enter מוסיף שלב חדש."
                     variant="article"
                     items={section.steps}
                     minItems={0}
@@ -357,16 +342,32 @@ export function RecipeSectionsField({
                     addLabel="הוספת שלב"
                     emptyLabel="הוסיפו שלבי הכנה לחלק זה"
                     error={stepsError}
+                    addButtonPlacement="bottom"
                     createItem={createEmptyStep}
                     onChange={(steps) =>
                       updateSection(index, { ...section, steps })
                     }
-                    renderFields={(item, _itemIndex, updateItem) => (
+                    renderFields={(item, _itemIndex, updateItem, helpers) => (
                       <RepeaterTextareaField
+                        id={`step-text-${item.id}`}
                         value={item.text}
                         placeholder="כתבי את שלב ההכנה"
-                        className="min-h-36"
+                        autoResize
+                        minHeightPx={64}
+                        maxHeightPx={220}
                         onChange={(text) => updateItem({ ...item, text })}
+                        onKeyDown={(event) => {
+                          if (event.key !== "Enter") {
+                            return;
+                          }
+
+                          if (!(event.ctrlKey || event.metaKey)) {
+                            return;
+                          }
+
+                          event.preventDefault();
+                          helpers.requestAdd();
+                        }}
                       />
                     )}
                   />

@@ -4,16 +4,41 @@ function asTrimmedText(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-export function formatIngredientLine(ingredient: RecipeIngredient): string {
-  const name = asTrimmedText(ingredient.name);
-  const quantity = asTrimmedText(ingredient.quantity);
-  const unit = asTrimmedText(ingredient.unit);
-
-  const prefix = [quantity, unit].filter(Boolean).join(" ");
-
-  if (prefix && name) {
-    return `${prefix} ${name}`.trim();
+/**
+ * Converts a stored ingredient (new `{ text }` or legacy name/quantity/unit)
+ * into a single display/edit line. Does not mutate database content.
+ */
+export function legacyIngredientToText(value: unknown): string {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return "";
   }
 
-  return name || prefix;
+  const record = value as Record<string, unknown>;
+  const text = asTrimmedText(record.text);
+
+  if (text) {
+    return text;
+  }
+
+  const quantity = asTrimmedText(record.quantity);
+  const unit = asTrimmedText(record.unit);
+  const name = asTrimmedText(record.name);
+
+  return [quantity, unit, name].filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
+}
+
+export function formatIngredientLine(
+  ingredient: RecipeIngredient | Record<string, unknown>
+): string {
+  return legacyIngredientToText(ingredient);
+}
+
+export function toRecipeIngredient(value: unknown): RecipeIngredient | null {
+  const text = legacyIngredientToText(value);
+
+  if (!text) {
+    return null;
+  }
+
+  return { text };
 }

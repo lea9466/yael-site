@@ -7,12 +7,18 @@ import {
 } from "react";
 import { GripVertical, Plus, Trash2 } from "lucide-react";
 
+import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { focusRepeaterItemFirstField } from "@/lib/forms/repeater-autofocus";
 import { cn } from "@/lib/utils/cn";
+
+export type RepeaterFieldHelpers = {
+  requestAdd: () => void;
+  isLast: boolean;
+};
 
 type RepeaterFieldProps<T extends { id: string }> = {
   label: string;
@@ -24,12 +30,15 @@ type RepeaterFieldProps<T extends { id: string }> = {
   emptyLabel: string;
   error?: string;
   variant?: "default" | "article";
+  /** Where the primary add control appears. Default keeps legacy top placement. */
+  addButtonPlacement?: "top" | "bottom" | "both";
   onChange: (items: T[]) => void;
   createItem: () => T;
   renderFields: (
     item: T,
     index: number,
-    updateItem: (nextItem: T) => void
+    updateItem: (nextItem: T) => void,
+    helpers: RepeaterFieldHelpers
   ) => React.ReactNode;
 };
 
@@ -43,6 +52,7 @@ export function RepeaterField<T extends { id: string }>({
   emptyLabel,
   error,
   variant = "default",
+  addButtonPlacement = "top",
   onChange,
   createItem,
   renderFields,
@@ -50,6 +60,10 @@ export function RepeaterField<T extends { id: string }>({
   const canAdd = items.length < maxItems;
   const canRemove = items.length > minItems;
   const isArticle = variant === "article";
+  const showTopAdd =
+    addButtonPlacement === "top" || addButtonPlacement === "both";
+  const showBottomAdd =
+    addButtonPlacement === "bottom" || addButtonPlacement === "both";
   const [pendingFocusItemId, setPendingFocusItemId] = useState<string | null>(
     null
   );
@@ -132,6 +146,19 @@ export function RepeaterField<T extends { id: string }>({
   const getItemLabel = (index: number) =>
     isArticle ? `שלב ${index + 1}` : `פריט ${index + 1}`;
 
+  const addButton = (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      disabled={!canAdd}
+      onClick={handleAdd}
+    >
+      <Plus aria-hidden="true" className="size-4" />
+      {addLabel}
+    </Button>
+  );
+
   return (
     <div
       className={cn(
@@ -158,16 +185,7 @@ export function RepeaterField<T extends { id: string }>({
             </p>
           ) : null}
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={!canAdd}
-          onClick={handleAdd}
-        >
-          <Plus aria-hidden="true" className="size-4" />
-          {addLabel}
-        </Button>
+        {showTopAdd ? addButton : null}
       </div>
 
       {items.length === 0 ? (
@@ -178,6 +196,10 @@ export function RepeaterField<T extends { id: string }>({
         <ul className="space-y-3">
           {items.map((item, index) => {
             const itemLabel = getItemLabel(index);
+            const helpers: RepeaterFieldHelpers = {
+              requestAdd: handleAdd,
+              isLast: index === items.length - 1,
+            };
 
             return (
               <li
@@ -222,18 +244,27 @@ export function RepeaterField<T extends { id: string }>({
                     <Trash2 aria-hidden="true" className="size-4" />
                   </IconButton>
                 </div>
-                {renderFields(item, index, (nextItem) => {
-                  onChange(
-                    items.map((current) =>
-                      current.id === item.id ? nextItem : current
-                    )
-                  );
-                })}
+                {renderFields(
+                  item,
+                  index,
+                  (nextItem) => {
+                    onChange(
+                      items.map((current) =>
+                        current.id === item.id ? nextItem : current
+                      )
+                    );
+                  },
+                  helpers
+                )}
               </li>
             );
           })}
         </ul>
       )}
+
+      {showBottomAdd ? (
+        <div className="flex justify-start">{addButton}</div>
+      ) : null}
 
       {error ? (
         <p role="alert" className="text-caption text-[var(--color-error)]">
@@ -251,6 +282,7 @@ export function RepeaterTextField({
   error,
   id,
   className,
+  onKeyDown,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -258,6 +290,7 @@ export function RepeaterTextField({
   error?: boolean;
   id?: string;
   className?: string;
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 }) {
   return (
     <Input
@@ -267,6 +300,7 @@ export function RepeaterTextField({
       error={error}
       className={cn("min-w-0", className)}
       onChange={(event) => onChange(event.target.value)}
+      onKeyDown={onKeyDown}
     />
   );
 }
@@ -278,6 +312,10 @@ export function RepeaterTextareaField({
   error,
   id,
   className,
+  autoResize = false,
+  minHeightPx = 64,
+  maxHeightPx = 220,
+  onKeyDown,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -285,7 +323,30 @@ export function RepeaterTextareaField({
   error?: boolean;
   id?: string;
   className?: string;
+  autoResize?: boolean;
+  minHeightPx?: number;
+  maxHeightPx?: number;
+  onKeyDown?: React.KeyboardEventHandler<HTMLTextAreaElement>;
 }) {
+  if (autoResize) {
+    return (
+      <AutoResizeTextarea
+        id={id}
+        value={value}
+        placeholder={placeholder}
+        error={error}
+        minHeightPx={minHeightPx}
+        maxHeightPx={maxHeightPx}
+        className={cn(
+          "min-w-0 text-base leading-[var(--line-height-relaxed)]",
+          className
+        )}
+        onChange={(event) => onChange(event.target.value)}
+        onKeyDown={onKeyDown}
+      />
+    );
+  }
+
   return (
     <Textarea
       id={id}
@@ -297,6 +358,7 @@ export function RepeaterTextareaField({
         className
       )}
       onChange={(event) => onChange(event.target.value)}
+      onKeyDown={onKeyDown}
     />
   );
 }

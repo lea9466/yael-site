@@ -25,8 +25,10 @@ import {
   mapZodErrors,
   permanentlyDeleteServiceSchema,
   publishServiceSchema,
+  quickPublishServiceSchema,
   restoreServiceSchema,
   servicePublishInputSchema,
+  unpublishServiceSchema,
   updateServiceSchema,
   type ServiceDraftInput,
   type ServicePublishInput,
@@ -403,6 +405,90 @@ export async function duplicateServiceAction(
   return { success: true, data: { id: inserted.id } };
 }
 
+export async function quickPublishServiceAction(
+  input: { id: string }
+): Promise<ServiceActionResult> {
+  const session = await getAdminSupabase();
+
+  if (!session) {
+    return { success: false, error: SERVICE_ERRORS.unauthorized };
+  }
+
+  const parsed = quickPublishServiceSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return { success: false, error: SERVICE_ERRORS.generic };
+  }
+
+  const existing = await fetchServiceById(parsed.data.id);
+
+  if (!existing) {
+    return { success: false, error: SERVICE_ERRORS.notFound };
+  }
+
+  if (existing.status !== "draft") {
+    return { success: false, error: SERVICE_ERRORS.generic };
+  }
+
+  const publishedAt =
+    existing.published_at ?? new Date().toISOString();
+
+  const { error } = await session.supabase
+    .from("services")
+    .update({
+      status: "published",
+      published_at: publishedAt,
+    })
+    .eq("id", parsed.data.id);
+
+  if (error) {
+    return { success: false, error: SERVICE_ERRORS.generic };
+  }
+
+  revalidateServicePaths(parsed.data.id);
+
+  return { success: true };
+}
+
+export async function unpublishServiceAction(
+  input: { id: string }
+): Promise<ServiceActionResult> {
+  const session = await getAdminSupabase();
+
+  if (!session) {
+    return { success: false, error: SERVICE_ERRORS.unauthorized };
+  }
+
+  const parsed = unpublishServiceSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return { success: false, error: SERVICE_ERRORS.generic };
+  }
+
+  const existing = await fetchServiceById(parsed.data.id);
+
+  if (!existing) {
+    return { success: false, error: SERVICE_ERRORS.notFound };
+  }
+
+  if (existing.status !== "published") {
+    return { success: false, error: SERVICE_ERRORS.generic };
+  }
+
+  const { error } = await session.supabase
+    .from("services")
+    .update({ status: "draft" })
+    .eq("id", parsed.data.id);
+
+  if (error) {
+    return { success: false, error: SERVICE_ERRORS.generic };
+  }
+
+  revalidateServicePaths(parsed.data.id);
+
+  return { success: true };
+}
+
 export async function archiveServiceAction(
   input: { id: string }
 ): Promise<ServiceActionResult> {
@@ -495,10 +581,6 @@ export async function permanentlyDeleteServiceAction(
 
   if (!existing) {
     return { success: false, error: SERVICE_ERRORS.notFound };
-  }
-
-  if (existing.status !== "archived") {
-    return { success: false, error: SERVICE_ERRORS.archiveOnlyDelete };
   }
 
   const { error } = await session.supabase

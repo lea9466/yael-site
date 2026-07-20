@@ -219,6 +219,8 @@ export const articleIdSchema = z.object({
 
 export const duplicateArticleSchema = articleIdSchema;
 export const archiveArticleSchema = articleIdSchema;
+export const quickPublishArticleSchema = articleIdSchema;
+export const unpublishArticleSchema = articleIdSchema;
 export const permanentlyDeleteArticleSchema = articleIdSchema;
 
 export type ArticleDraftInput = z.infer<typeof articleDraftInputSchema>;

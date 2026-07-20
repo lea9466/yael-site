@@ -29,7 +29,9 @@ import {
   mapZodErrors,
   permanentlyDeleteRecipeSchema,
   publishRecipeSchema,
+  quickPublishRecipeSchema,
   recipePublishInputSchema,
+  unpublishRecipeSchema,
   updateRecipeSchema,
   type RecipeDraftInput,
   type RecipePublishInput,
@@ -49,7 +51,11 @@ async function getAdminSupabase(): Promise<{
   return { supabase };
 }
 
-function revalidateRecipePaths(recipeId?: string, slug?: string) {
+function revalidateRecipePaths(
+  recipeId?: string,
+  slug?: string,
+  categorySlug?: string | null
+) {
   revalidatePath("/admin/recipes");
   revalidatePath("/recipes", "layout");
 
@@ -60,6 +66,11 @@ function revalidateRecipePaths(recipeId?: string, slug?: string) {
 
   if (slug) {
     revalidatePath(`/recipes/${slug}`);
+
+    if (categorySlug) {
+      revalidatePath(`/recipes/${categorySlug}`);
+      revalidatePath(`/recipes/${categorySlug}/${slug}`);
+    }
   }
 }
 
@@ -424,10 +435,15 @@ export async function updateRecipeAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths(data.id, data.slug);
+  revalidateRecipePaths(data.id, data.slug, existing.category?.slug);
 
   if (existing.slug !== data.slug) {
     revalidatePath(`/recipes/${existing.slug}`);
+    if (existing.category?.slug) {
+      revalidatePath(
+        `/recipes/${existing.category.slug}/${existing.slug}`
+      );
+    }
   }
 
   return { success: true };
@@ -504,10 +520,15 @@ export async function publishRecipeAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths(data.id, data.slug);
+  revalidateRecipePaths(data.id, data.slug, existing.category?.slug);
 
   if (existing.slug !== data.slug) {
     revalidatePath(`/recipes/${existing.slug}`);
+    if (existing.category?.slug) {
+      revalidatePath(
+        `/recipes/${existing.category.slug}/${existing.slug}`
+      );
+    }
   }
 
   return { success: true };
@@ -582,6 +603,98 @@ export async function duplicateRecipeAction(
   return { success: true, data: { id: inserted.id } };
 }
 
+export async function quickPublishRecipeAction(
+  input: { id: string }
+): Promise<RecipeActionResult> {
+  const session = await getAdminSupabase();
+
+  if (!session) {
+    return { success: false, error: RECIPE_ERRORS.unauthorized };
+  }
+
+  const parsed = quickPublishRecipeSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return { success: false, error: RECIPE_ERRORS.generic };
+  }
+
+  const existing = await fetchRecipeById(parsed.data.id);
+
+  if (!existing) {
+    return { success: false, error: RECIPE_ERRORS.notFound };
+  }
+
+  if (existing.status !== "draft") {
+    return { success: false, error: RECIPE_ERRORS.generic };
+  }
+
+  const publishedAt =
+    existing.published_at ?? new Date().toISOString();
+
+  const { error } = await session.supabase
+    .from("recipes")
+    .update({
+      status: "published",
+      published_at: publishedAt,
+    })
+    .eq("id", parsed.data.id);
+
+  if (error) {
+    return { success: false, error: RECIPE_ERRORS.generic };
+  }
+
+  revalidateRecipePaths(
+    parsed.data.id,
+    existing.slug,
+    existing.category?.slug
+  );
+
+  return { success: true };
+}
+
+export async function unpublishRecipeAction(
+  input: { id: string }
+): Promise<RecipeActionResult> {
+  const session = await getAdminSupabase();
+
+  if (!session) {
+    return { success: false, error: RECIPE_ERRORS.unauthorized };
+  }
+
+  const parsed = unpublishRecipeSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return { success: false, error: RECIPE_ERRORS.generic };
+  }
+
+  const existing = await fetchRecipeById(parsed.data.id);
+
+  if (!existing) {
+    return { success: false, error: RECIPE_ERRORS.notFound };
+  }
+
+  if (existing.status !== "published") {
+    return { success: false, error: RECIPE_ERRORS.generic };
+  }
+
+  const { error } = await session.supabase
+    .from("recipes")
+    .update({ status: "draft" })
+    .eq("id", parsed.data.id);
+
+  if (error) {
+    return { success: false, error: RECIPE_ERRORS.generic };
+  }
+
+  revalidateRecipePaths(
+    parsed.data.id,
+    existing.slug,
+    existing.category?.slug
+  );
+
+  return { success: true };
+}
+
 export async function archiveRecipeAction(
   input: { id: string }
 ): Promise<RecipeActionResult> {
@@ -612,7 +725,11 @@ export async function archiveRecipeAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths(parsed.data.id, existing.slug);
+  revalidateRecipePaths(
+    parsed.data.id,
+    existing.slug,
+    existing.category?.slug
+  );
 
   return { success: true };
 }
@@ -647,7 +764,11 @@ export async function restoreRecipeToDraftAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths(parsed.data.id, existing.slug);
+  revalidateRecipePaths(
+    parsed.data.id,
+    existing.slug,
+    existing.category?.slug
+  );
 
   return { success: true };
 }
@@ -688,7 +809,11 @@ export async function restoreAndPublishRecipeAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths(parsed.data.id, existing.slug);
+  revalidateRecipePaths(
+    parsed.data.id,
+    existing.slug,
+    existing.category?.slug
+  );
 
   return { success: true };
 }
@@ -714,10 +839,6 @@ export async function permanentlyDeleteRecipeAction(
     return { success: false, error: RECIPE_ERRORS.notFound };
   }
 
-  if (existing.status !== "archived") {
-    return { success: false, error: RECIPE_ERRORS.archiveOnlyDelete };
-  }
-
   const { error: tagsError } = await session.supabase
     .from("recipe_tags")
     .delete()
@@ -736,7 +857,7 @@ export async function permanentlyDeleteRecipeAction(
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
-  revalidateRecipePaths(undefined, existing.slug);
+  revalidateRecipePaths(undefined, existing.slug, existing.category?.slug);
 
   return { success: true };
 }

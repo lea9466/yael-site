@@ -7,6 +7,7 @@ import {
   Archive,
   Copy,
   Eye,
+  FileMinus,
   MoreVertical,
   Pencil,
   RotateCcw,
@@ -18,8 +19,9 @@ import {
   archiveArticleAction,
   duplicateArticleAction,
   permanentlyDeleteArticleAction,
-  restoreAndPublishArticleAction,
+  quickPublishArticleAction,
   restoreArticleToDraftAction,
+  unpublishArticleAction,
 } from "@/actions/articles";
 import {
   AdminFeaturedBadge,
@@ -61,7 +63,11 @@ export function ArticleRow({ item }: ArticleRowProps) {
 
   const runAction = (
     action: () => Promise<{ success: boolean; error?: string; data?: { id: string } }>,
-    onSuccess?: () => void
+    options?: {
+      onSuccess?: () => void;
+      successMessage?: string;
+      navigateOnDuplicate?: boolean;
+    }
   ) => {
     startTransition(async () => {
       setToast((current) => ({ ...current, open: false }));
@@ -76,11 +82,19 @@ export function ArticleRow({ item }: ArticleRowProps) {
         return;
       }
 
-      onSuccess?.();
+      options?.onSuccess?.();
 
-      if (result.data?.id) {
+      if (options?.navigateOnDuplicate && result.data?.id) {
         router.push(`/admin/articles/${result.data.id}`);
         return;
+      }
+
+      if (options?.successMessage) {
+        setToast({
+          open: true,
+          variant: "success",
+          message: options.successMessage,
+        });
       }
 
       router.refresh();
@@ -148,23 +162,43 @@ export function ArticleRow({ item }: ArticleRowProps) {
                 <Pencil aria-hidden="true" className="size-4" />
                 עריכה
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={() =>
-                  runAction(() => duplicateArticleAction({ id: item.id }))
-                }
-              >
-                <Copy aria-hidden="true" className="size-4" />
-                שכפול
-              </DropdownMenuItem>
 
               {item.status === "draft" ? (
                 <DropdownMenuItem
                   onSelect={() =>
-                    router.push(`/admin/articles/${item.id}?publish=1`)
+                    runAction(() => quickPublishArticleAction({ id: item.id }), {
+                      successMessage: "פורסם בהצלחה",
+                    })
                   }
                 >
                   <Send aria-hidden="true" className="size-4" />
                   פרסום
+                </DropdownMenuItem>
+              ) : null}
+
+              {item.status === "published" ? (
+                <DropdownMenuItem
+                  onSelect={() =>
+                    runAction(() => unpublishArticleAction({ id: item.id }), {
+                      successMessage: "הועבר לטיוטה",
+                    })
+                  }
+                >
+                  <FileMinus aria-hidden="true" className="size-4" />
+                  ביטול פרסום
+                </DropdownMenuItem>
+              ) : null}
+
+              {item.status === "archived" ? (
+                <DropdownMenuItem
+                  onSelect={() =>
+                    runAction(() => restoreArticleToDraftAction({ id: item.id }), {
+                      successMessage: "הועבר לטיוטה",
+                    })
+                  }
+                >
+                  <RotateCcw aria-hidden="true" className="size-4" />
+                  שחזור
                 </DropdownMenuItem>
               ) : null}
 
@@ -175,37 +209,24 @@ export function ArticleRow({ item }: ArticleRowProps) {
                 </DropdownMenuItem>
               ) : null}
 
-              {item.status === "archived" ? (
-                <>
-                  <DropdownMenuItem
-                    onSelect={() =>
-                      runAction(() =>
-                        restoreArticleToDraftAction({ id: item.id })
-                      )
-                    }
-                  >
-                    <RotateCcw aria-hidden="true" className="size-4" />
-                    שחזור כטיוטה
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() =>
-                      runAction(() =>
-                        restoreAndPublishArticleAction({ id: item.id })
-                      )
-                    }
-                  >
-                    <Send aria-hidden="true" className="size-4" />
-                    שחזור ופרסום
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    destructive
-                    onSelect={() => setDeleteOpen(true)}
-                  >
-                    <Trash2 aria-hidden="true" className="size-4" />
-                    מחיקה לצמיתות
-                  </DropdownMenuItem>
-                </>
-              ) : null}
+              <DropdownMenuItem
+                onSelect={() =>
+                  runAction(() => duplicateArticleAction({ id: item.id }), {
+                    navigateOnDuplicate: true,
+                  })
+                }
+              >
+                <Copy aria-hidden="true" className="size-4" />
+                שכפול
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                destructive
+                onSelect={() => setDeleteOpen(true)}
+              >
+                <Trash2 aria-hidden="true" className="size-4" />
+                מחיקה
+              </DropdownMenuItem>
             </DropdownMenu>
           </div>
 
@@ -221,9 +242,10 @@ export function ArticleRow({ item }: ArticleRowProps) {
         loading={isPending}
         onClose={() => setArchiveOpen(false)}
         onConfirm={() =>
-          runAction(() => archiveArticleAction({ id: item.id }), () =>
-            setArchiveOpen(false)
-          )
+          runAction(() => archiveArticleAction({ id: item.id }), {
+            onSuccess: () => setArchiveOpen(false),
+            successMessage: "הועבר לארכיון",
+          })
         }
       />
 
@@ -233,9 +255,10 @@ export function ArticleRow({ item }: ArticleRowProps) {
         loading={isPending}
         onClose={() => setDeleteOpen(false)}
         onConfirm={() =>
-          runAction(() => permanentlyDeleteArticleAction({ id: item.id }), () =>
-            setDeleteOpen(false)
-          )
+          runAction(() => permanentlyDeleteArticleAction({ id: item.id }), {
+            onSuccess: () => setDeleteOpen(false),
+            successMessage: "הפוסט נמחק.",
+          })
         }
       />
     </AdminListItem>

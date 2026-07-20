@@ -7,6 +7,7 @@ import {
   Archive,
   Copy,
   Eye,
+  FileMinus,
   MoreVertical,
   Pencil,
   RotateCcw,
@@ -18,7 +19,9 @@ import {
   archiveServiceAction,
   duplicateServiceAction,
   permanentlyDeleteServiceAction,
+  quickPublishServiceAction,
   restoreServiceAction,
+  unpublishServiceAction,
 } from "@/actions/services";
 import {
   AdminFeaturedBadge,
@@ -31,6 +34,7 @@ import {
   DropdownMenu,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { FormToast } from "@/components/ui/form-toast";
 import { MultilineText } from "@/components/ui/multiline-text";
 import { formatServiceDate } from "@/lib/services/format";
 import type { ServiceListItem } from "@/lib/services/types";
@@ -44,26 +48,50 @@ export function ServiceRow({ item }: ServiceRowProps) {
   const [isPending, startTransition] = useTransition();
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [actionError, setActionError] = useState("");
+  const [toast, setToast] = useState<{
+    open: boolean;
+    variant: "success" | "error";
+    message: string;
+  }>({
+    open: false,
+    variant: "error",
+    message: "",
+  });
 
   const runAction = (
     action: () => Promise<{ success: boolean; error?: string; data?: { id: string } }>,
-    onSuccess?: () => void
+    options?: {
+      onSuccess?: () => void;
+      successMessage?: string;
+      navigateOnDuplicate?: boolean;
+    }
   ) => {
     startTransition(async () => {
-      setActionError("");
+      setToast((current) => ({ ...current, open: false }));
       const result = await action();
 
       if (!result.success) {
-        setActionError(result.error ?? "הפעולה נכשלה.");
+        setToast({
+          open: true,
+          variant: "error",
+          message: result.error ?? "הפעולה נכשלה.",
+        });
         return;
       }
 
-      onSuccess?.();
+      options?.onSuccess?.();
 
-      if (result.data?.id) {
+      if (options?.navigateOnDuplicate && result.data?.id) {
         router.push(`/admin/services/${result.data.id}`);
         return;
+      }
+
+      if (options?.successMessage) {
+        setToast({
+          open: true,
+          variant: "success",
+          message: options.successMessage,
+        });
       }
 
       router.refresh();
@@ -72,6 +100,13 @@ export function ServiceRow({ item }: ServiceRowProps) {
 
   return (
     <AdminListItem>
+      <FormToast
+        open={toast.open}
+        variant={toast.variant}
+        message={toast.message}
+        onClose={() => setToast((current) => ({ ...current, open: false }))}
+      />
+
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
         <div className="relative size-32 shrink-0 overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface-soft)] sm:size-36">
           {item.coverUrl ? (
@@ -123,23 +158,43 @@ export function ServiceRow({ item }: ServiceRowProps) {
                 <Pencil aria-hidden="true" className="size-4" />
                 עריכה
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={() =>
-                  runAction(() => duplicateServiceAction({ id: item.id }))
-                }
-              >
-                <Copy aria-hidden="true" className="size-4" />
-                שכפול
-              </DropdownMenuItem>
 
               {item.status === "draft" ? (
                 <DropdownMenuItem
                   onSelect={() =>
-                    router.push(`/admin/services/${item.id}?publish=1`)
+                    runAction(() => quickPublishServiceAction({ id: item.id }), {
+                      successMessage: "פורסם בהצלחה",
+                    })
                   }
                 >
                   <Send aria-hidden="true" className="size-4" />
                   פרסום
+                </DropdownMenuItem>
+              ) : null}
+
+              {item.status === "published" ? (
+                <DropdownMenuItem
+                  onSelect={() =>
+                    runAction(() => unpublishServiceAction({ id: item.id }), {
+                      successMessage: "הועבר לטיוטה",
+                    })
+                  }
+                >
+                  <FileMinus aria-hidden="true" className="size-4" />
+                  ביטול פרסום
+                </DropdownMenuItem>
+              ) : null}
+
+              {item.status === "archived" ? (
+                <DropdownMenuItem
+                  onSelect={() =>
+                    runAction(() => restoreServiceAction({ id: item.id }), {
+                      successMessage: "הועבר לטיוטה",
+                    })
+                  }
+                >
+                  <RotateCcw aria-hidden="true" className="size-4" />
+                  שחזור
                 </DropdownMenuItem>
               ) : null}
 
@@ -150,36 +205,30 @@ export function ServiceRow({ item }: ServiceRowProps) {
                 </DropdownMenuItem>
               ) : null}
 
-              {item.status === "archived" ? (
-                <>
-                  <DropdownMenuItem
-                    onSelect={() =>
-                      runAction(() => restoreServiceAction({ id: item.id }))
-                    }
-                  >
-                    <RotateCcw aria-hidden="true" className="size-4" />
-                    שחזור
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    destructive
-                    onSelect={() => setDeleteOpen(true)}
-                  >
-                    <Trash2 aria-hidden="true" className="size-4" />
-                    מחיקה לצמיתות
-                  </DropdownMenuItem>
-                </>
-              ) : null}
+              <DropdownMenuItem
+                onSelect={() =>
+                  runAction(() => duplicateServiceAction({ id: item.id }), {
+                    navigateOnDuplicate: true,
+                  })
+                }
+              >
+                <Copy aria-hidden="true" className="size-4" />
+                שכפול
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                destructive
+                onSelect={() => setDeleteOpen(true)}
+              >
+                <Trash2 aria-hidden="true" className="size-4" />
+                מחיקה
+              </DropdownMenuItem>
             </DropdownMenu>
           </div>
 
           <p className="text-caption text-[var(--color-text-muted)]">
             עודכן: {formatServiceDate(item.updated_at)}
           </p>
-          {actionError ? (
-            <p role="alert" className="text-caption text-[var(--color-error)]">
-              {actionError}
-            </p>
-          ) : null}
         </div>
       </div>
 
@@ -189,9 +238,10 @@ export function ServiceRow({ item }: ServiceRowProps) {
         loading={isPending}
         onClose={() => setArchiveOpen(false)}
         onConfirm={() =>
-          runAction(() => archiveServiceAction({ id: item.id }), () =>
-            setArchiveOpen(false)
-          )
+          runAction(() => archiveServiceAction({ id: item.id }), {
+            onSuccess: () => setArchiveOpen(false),
+            successMessage: "הועבר לארכיון",
+          })
         }
       />
 
@@ -201,9 +251,10 @@ export function ServiceRow({ item }: ServiceRowProps) {
         loading={isPending}
         onClose={() => setDeleteOpen(false)}
         onConfirm={() =>
-          runAction(() => permanentlyDeleteServiceAction({ id: item.id }), () =>
-            setDeleteOpen(false)
-          )
+          runAction(() => permanentlyDeleteServiceAction({ id: item.id }), {
+            onSuccess: () => setDeleteOpen(false),
+            successMessage: "השירות נמחק.",
+          })
         }
       />
     </AdminListItem>

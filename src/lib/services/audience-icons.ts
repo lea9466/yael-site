@@ -50,8 +50,7 @@ export const SERVICE_AUDIENCE_ICON_LABELS: Record<
   Scale: "מאזניים",
 };
 
-export const DEFAULT_SERVICE_AUDIENCE_ICON: ServiceAudienceIconName =
-  "CheckCircle";
+export const DEFAULT_SERVICE_AUDIENCE_ICON: ServiceAudienceIconName = "Leaf";
 
 export function isServiceAudienceIconName(
   value: string

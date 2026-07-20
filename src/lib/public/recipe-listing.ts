@@ -28,6 +28,7 @@ export type PublicRecipeListingResult = {
   categories: PublicRecipeCategory[];
   tags: PublicRecipeTag[];
   totalCount: number;
+  heroCount: number;
   totalPages: number;
   query: PublicRecipeListingQuery;
   category: PublicRecipeCategory | null;
@@ -205,6 +206,7 @@ export async function getPublicRecipeListing(options: {
     categories: [],
     tags: [],
     totalCount: 0,
+    heroCount: 0,
     totalPages: 1,
     query: options.query,
     category: null,
@@ -238,6 +240,18 @@ export async function getPublicRecipeListing(options: {
       }
     }
 
+    let heroCountQuery = supabase
+      .from("recipes")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "published");
+
+    if (category) {
+      heroCountQuery = heroCountQuery.eq("category_id", category.id);
+    }
+
+    const { count: heroCountValue } = await heroCountQuery;
+    const heroCount = heroCountValue ?? 0;
+
     let recipeIdsForTag: string[] | null = null;
     const tagFilter = options.query.tag.trim();
 
@@ -252,6 +266,7 @@ export async function getPublicRecipeListing(options: {
           categories,
           tags,
           category,
+          heroCount,
           query: options.query,
         };
       }
@@ -267,6 +282,7 @@ export async function getPublicRecipeListing(options: {
           categories,
           tags,
           category,
+          heroCount,
         };
       }
 
@@ -278,6 +294,7 @@ export async function getPublicRecipeListing(options: {
           categories,
           tags,
           category,
+          heroCount,
           query: options.query,
         };
       }
@@ -330,6 +347,7 @@ export async function getPublicRecipeListing(options: {
         categories,
         tags,
         category,
+        heroCount,
       };
     }
 
@@ -367,6 +385,7 @@ export async function getPublicRecipeListing(options: {
       categories,
       tags,
       totalCount,
+      heroCount,
       totalPages: Math.max(1, Math.ceil(totalCount / PUBLIC_RECIPES_PAGE_SIZE)),
       query: options.query,
       category,

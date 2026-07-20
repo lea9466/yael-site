@@ -23,8 +23,15 @@ type RecipesListingProps = {
 };
 
 export function RecipesListing({ data }: RecipesListingProps) {
-  const { category, recipes, categories, tags, query, totalCount, totalPages } =
-    data;
+  const {
+    category,
+    recipes,
+    categories,
+    tags,
+    query,
+    heroCount,
+    totalPages,
+  } = data;
   const basePath = category
     ? buildRecipeCategoryPath(category.slug)
     : buildRecipesPath();
@@ -45,7 +52,7 @@ export function RecipesListing({ data }: RecipesListingProps) {
         <div className="recipes-section__inner recipes-listing__inner">
           <RecipesListingBreadcrumbs category={category} />
 
-          <RecipesListingHero category={category} totalCount={totalCount} />
+          <RecipesListingHero category={category} totalCount={heroCount} />
 
           {showCategoryPills ? (
             <RecipesCategoryPills categories={categories} />
@@ -83,33 +90,33 @@ export function RecipesListing({ data }: RecipesListingProps) {
             <PublicEmptyState
               icon={ChefHat}
               title={
-                category
-                  ? "עדיין אין מתכונים בקטגוריה הזו"
-                  : hasActiveFilters
-                    ? "לא נמצאו מתכונים"
+                hasActiveFilters
+                  ? "לא נמצאו מתכונים"
+                  : category
+                    ? "עדיין אין מתכונים בקטגוריה הזו"
                     : "עדיין אין מתכונים לפרסום"
               }
               description={
-                category
-                  ? "נשמח לעדכן אותה בקרוב."
-                  : hasActiveFilters
-                    ? "נסי לשנות את החיפוש או את הסינון."
+                hasActiveFilters
+                  ? "נסי לשנות את החיפוש או את הסינון."
+                  : category
+                    ? "נשמח לעדכן אותה בקרוב."
                     : "בקרוב יתווספו כאן מתכונים חדשים."
               }
               action={
-                category ? (
-                  <Link
-                    href={buildRecipesPath()}
-                    className="recipes-listing__empty-action public-focus-ring"
-                  >
-                    לכל המתכונים
-                  </Link>
-                ) : hasActiveFilters ? (
+                hasActiveFilters ? (
                   <Link
                     href={basePath}
                     className="recipes-listing__empty-action public-focus-ring"
                   >
                     איפוס סינון
+                  </Link>
+                ) : category ? (
+                  <Link
+                    href={buildRecipesPath()}
+                    className="recipes-listing__empty-action public-focus-ring"
+                  >
+                    לכל המתכונים
                   </Link>
                 ) : undefined
               }

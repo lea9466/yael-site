@@ -11,10 +11,13 @@ import {
 import { RecipesListingFilters } from "@/components/recipes/public/recipes-listing-filters";
 import { RecipesListingHero } from "@/components/recipes/public/recipes-listing-hero";
 import { RecipesListingPagination } from "@/components/recipes/public/recipes-listing-pagination";
+import { RecipesListingResultsBar } from "@/components/recipes/public/recipes-listing-results-bar";
+import { RecipesListingSearch } from "@/components/recipes/public/recipes-listing-search";
 import {
   buildRecipeCategoryPath,
   buildRecipesPath,
 } from "@/lib/public/recipe-paths";
+import { parseRecipeListingTagSlugs } from "@/lib/public/recipe-listing-ui";
 import type { PublicRecipeListingResult } from "@/lib/public/recipe-listing";
 import { cn } from "@/lib/utils/cn";
 
@@ -30,15 +33,15 @@ export function RecipesListing({ data }: RecipesListingProps) {
     tags,
     query,
     heroCount,
+    totalCount,
     totalPages,
   } = data;
   const basePath = category
     ? buildRecipeCategoryPath(category.slug)
     : buildRecipesPath();
-  const showCategoryPills = !category;
   const hasActiveFilters =
     query.q.length > 0 ||
-    (query.tag !== "all" && query.tag.length > 0) ||
+    parseRecipeListingTagSlugs(query.tag).length > 0 ||
     query.difficulty !== "all";
 
   return (
@@ -54,8 +57,13 @@ export function RecipesListing({ data }: RecipesListingProps) {
 
           <RecipesListingHero category={category} totalCount={heroCount} />
 
-          {showCategoryPills ? (
-            <RecipesCategoryPills categories={categories} />
+          <RecipesListingSearch basePath={basePath} query={query} />
+
+          {categories.length > 0 ? (
+            <RecipesCategoryPills
+              categories={categories}
+              activeSlug={category?.slug}
+            />
           ) : null}
 
           <RecipesListingFilters
@@ -64,11 +72,18 @@ export function RecipesListing({ data }: RecipesListingProps) {
             tags={tags}
           />
 
+          <RecipesListingResultsBar
+            basePath={basePath}
+            query={query}
+            tags={tags}
+            totalCount={totalCount}
+          />
+
           {recipes.length > 0 ? (
             <>
               <ul
                 className={cn(
-                  "recipes-section__grid",
+                  "recipes-section__grid recipes-listing__grid",
                   `recipes-section__grid--count-${Math.min(recipes.length, 3)}`
                 )}
               >

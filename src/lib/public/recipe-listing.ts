@@ -254,13 +254,26 @@ export async function getPublicRecipeListing(options: {
 
     let recipeIdsForTag: string[] | null = null;
     const tagFilter = options.query.tag.trim();
+    const tagSlugs =
+      tagFilter && tagFilter !== "all"
+        ? [
+            ...new Set(
+              tagFilter
+                .split(",")
+                .map((part) => part.trim())
+                .filter((part) => part.length > 0 && part !== "all")
+            ),
+          ]
+        : [];
 
-    if (tagFilter && tagFilter !== "all") {
-      const matchedTag = tags.find(
-        (tag) => tag.slug === tagFilter || tag.id === tagFilter
-      );
+    if (tagSlugs.length > 0) {
+      const matchedTagIds = tags
+        .filter(
+          (tag) => tagSlugs.includes(tag.slug) || tagSlugs.includes(tag.id)
+        )
+        .map((tag) => tag.id);
 
-      if (!matchedTag) {
+      if (matchedTagIds.length === 0) {
         return {
           ...empty,
           categories,
@@ -274,7 +287,7 @@ export async function getPublicRecipeListing(options: {
       const { data: tagRows, error: tagError } = await supabase
         .from("recipe_tags")
         .select("recipe_id")
-        .eq("tag_id", matchedTag.id);
+        .in("tag_id", matchedTagIds);
 
       if (tagError) {
         return {
@@ -286,7 +299,9 @@ export async function getPublicRecipeListing(options: {
         };
       }
 
-      recipeIdsForTag = (tagRows ?? []).map((row) => row.recipe_id as string);
+      recipeIdsForTag = [
+        ...new Set((tagRows ?? []).map((row) => row.recipe_id as string)),
+      ];
 
       if (recipeIdsForTag.length === 0) {
         return {

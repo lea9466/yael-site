@@ -24,6 +24,7 @@ import { AdminFormShell } from "@/components/admin/admin-form-shell";
 import { SlugFormField } from "@/components/admin/slug-form-field";
 import { AdminSeoSection } from "@/components/admin/admin-seo-section";
 import { ServiceArchiveDialog } from "@/components/services/service-archive-dialog";
+import { ServiceAudienceIconPicker } from "@/components/services/service-audience-icon-picker";
 import { ServiceDeleteDialog } from "@/components/services/service-delete-dialog";
 import { ServiceMediaPicker } from "@/components/services/service-media-picker";
 import { ServiceTestimonialsSection } from "@/components/services/service-testimonials-section";
@@ -47,11 +48,7 @@ import {
   getSectionsWithErrors,
   getFieldErrorMessage,
 } from "@/lib/forms/validation-feedback";
-import {
-  normalizeServiceAudienceIcon,
-  SERVICE_AUDIENCE_ICON_LABELS,
-  SERVICE_AUDIENCE_ICON_NAMES,
-} from "@/lib/services/audience-icons";
+import { normalizeServiceAudienceIcon } from "@/lib/services/audience-icons";
 import { SERVICE_REPEATER_LIMITS } from "@/lib/services/constants";
 import { slugifyTitle } from "@/lib/services/slug";
 import type { ServiceDetail } from "@/lib/services/types";
@@ -676,27 +673,17 @@ export function ServiceForm({
                 setContent((current) => ({ ...current, target_audience: items }))
               }
               renderFields={(item, _index, updateItem) => (
-                <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem]">
+                <div className="grid gap-3">
                   <RepeaterTextField
                     value={item.text}
                     placeholder="לדוגמה: נשים בהריון"
                     onChange={(text) => updateItem({ ...item, text })}
                   />
-                  <Select
-                    label="אייקון"
+                  <ServiceAudienceIconPicker
                     id={`audience-icon-${item.id}`}
                     value={item.icon}
-                    onChange={(event) =>
-                      updateItem({ ...item, icon: event.target.value })
-                    }
-                  >
-                    <option value="">ברירת מחדל (CheckCircle)</option>
-                    {SERVICE_AUDIENCE_ICON_NAMES.map((iconName) => (
-                      <option key={iconName} value={iconName}>
-                        {SERVICE_AUDIENCE_ICON_LABELS[iconName]} ({iconName})
-                      </option>
-                    ))}
-                  </Select>
+                    onChange={(icon) => updateItem({ ...item, icon })}
+                  />
                 </div>
               )}
             />

@@ -52,7 +52,7 @@ export function ArticlePublicView({
         <ArticleHero article={article} />
 
         {showContent && hasBlocks ? (
-          <section className="post-article__body">
+          <section className="post-article__body" dir="rtl">
             {article.content.blocks.map((block, index) => {
               const media =
                 block.type === "image"

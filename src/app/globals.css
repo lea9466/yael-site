@@ -2912,7 +2912,7 @@
 
   .post-page__main {
     width: 100%;
-    max-width: 52rem;
+    max-width: 90rem;
     margin-inline: auto;
     padding: 1.5rem 1.25rem 3.5rem;
   }
@@ -2920,8 +2920,14 @@
   .post-article {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: 2rem;
     width: 100%;
+    max-width: 48rem;
+    /* Stick reading column to RTL start (right), not page center */
+    margin-inline-start: 0;
+    margin-inline-end: auto;
+    text-align: right;
   }
 
   .post-article__breadcrumbs {
@@ -2969,7 +2975,9 @@
   .post-article__header {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: 0;
+    text-align: right;
   }
 
   .post-article__category {
@@ -2994,6 +3002,7 @@
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.02em;
+    text-align: right;
     text-wrap: pretty;
   }
 
@@ -3001,11 +3010,13 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: flex-start;
     gap: 0.35rem;
     margin: 0 0 1.75rem;
     color: var(--color-text-muted);
     font-size: 0.875rem;
     line-height: 1.5;
+    text-align: right;
   }
 
   .post-article__meta-sep {
@@ -3028,9 +3039,10 @@
   .post-article__body {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: 1.5rem;
-    max-width: 48rem;
     width: 100%;
+    direction: rtl;
     text-align: right;
   }
 
@@ -3042,9 +3054,12 @@
   .post-article__body ol,
   .post-article__body li,
   .post-article__body blockquote,
+  .post-article__body figure,
   .post-article__body figcaption {
     margin: 0;
-    text-align: right;
+    width: 100%;
+    direction: rtl;
+    text-align: right !important;
   }
 
   .post-article__body h2.article-content {
@@ -3104,7 +3119,7 @@
 
   @media (min-width: 768px) {
     .post-page__main {
-      padding: 2rem 1.5rem 4.5rem;
+      padding: 2rem 5rem 4.5rem;
     }
 
     .post-article {

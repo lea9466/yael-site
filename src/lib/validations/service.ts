@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { CONTENT_STATUSES } from "@/types/content";
+import { normalizeServiceAudienceIcon } from "@/lib/services/audience-icons";
 import { SERVICE_REPEATER_LIMITS } from "@/lib/services/constants";
 import {
   isReservedServiceSlug,
@@ -37,6 +38,21 @@ const textItemSchema = z.object({
     .min(1, "יש להזין טקסט")
     .max(300, "הטקסט ארוך מדי"),
 });
+
+const audienceItemSchema = z
+  .object({
+    text: z
+      .string()
+      .trim()
+      .min(1, "יש להזין טקסט")
+      .max(300, "הטקסט ארוך מדי"),
+    icon: z.string().optional().nullable(),
+  })
+  .transform((item) => {
+    const icon = normalizeServiceAudienceIcon(item.icon);
+
+    return icon ? { text: item.text, icon } : { text: item.text };
+  });
 
 const processStepSchema = z.object({
   title: z
@@ -78,7 +94,7 @@ const slugSchema = z
 
 const serviceContentDraftSchema = z.object({
   target_audience: z
-    .array(textItemSchema)
+    .array(audienceItemSchema)
     .max(SERVICE_REPEATER_LIMITS.target_audience.max),
   benefits: z.array(textItemSchema).max(SERVICE_REPEATER_LIMITS.benefits.max),
   process_steps: z
@@ -94,7 +110,7 @@ const serviceContentDraftSchema = z.object({
 
 const serviceContentPublishSchema = serviceContentDraftSchema.extend({
   target_audience: z
-    .array(textItemSchema)
+    .array(audienceItemSchema)
     .min(
       SERVICE_REPEATER_LIMITS.target_audience.min,
       `יש להוסיף לפחות ${SERVICE_REPEATER_LIMITS.target_audience.min} פריט`

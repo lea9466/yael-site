@@ -1,9 +1,16 @@
 import type { ContentStatus } from "@/types/content";
 
+import type { ServiceAudienceIconName } from "@/lib/services/audience-icons";
 import type { StoredSeo } from "@/lib/seo/types";
 
 export type ServiceTextItem = {
   text: string;
+};
+
+/** Audience item may include an optional Lucide icon name (CMS allowlist). */
+export type ServiceAudienceItem = {
+  text: string;
+  icon?: ServiceAudienceIconName;
 };
 
 export type ServiceProcessStep = {
@@ -19,7 +26,7 @@ export type ServiceFaqItem = {
 export type ServiceCtaLinkType = "internal" | "external";
 
 export type ServiceContent = {
-  target_audience: ServiceTextItem[];
+  target_audience: ServiceAudienceItem[];
   benefits: ServiceTextItem[];
   process_steps: ServiceProcessStep[];
   faq: ServiceFaqItem[];

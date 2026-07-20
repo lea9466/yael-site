@@ -47,6 +47,11 @@ import {
   getSectionsWithErrors,
   getFieldErrorMessage,
 } from "@/lib/forms/validation-feedback";
+import {
+  normalizeServiceAudienceIcon,
+  SERVICE_AUDIENCE_ICON_LABELS,
+  SERVICE_AUDIENCE_ICON_NAMES,
+} from "@/lib/services/audience-icons";
 import { SERVICE_REPEATER_LIMITS } from "@/lib/services/constants";
 import { slugifyTitle } from "@/lib/services/slug";
 import type { ServiceDetail } from "@/lib/services/types";
@@ -63,6 +68,7 @@ import {
 import { cn } from "@/lib/utils/cn";
 
 type TextRepeaterItem = { id: string; text: string };
+type AudienceRepeaterItem = { id: string; text: string; icon: string };
 type ProcessRepeaterItem = { id: string; title: string; description: string };
 type FaqRepeaterItem = { id: string; question: string; answer: string };
 
@@ -74,7 +80,7 @@ type ServiceFormProps = {
 };
 
 type FormContentState = {
-  target_audience: TextRepeaterItem[];
+  target_audience: AudienceRepeaterItem[];
   benefits: TextRepeaterItem[];
   process_steps: ProcessRepeaterItem[];
   faq: FaqRepeaterItem[];
@@ -90,6 +96,7 @@ function toRepeaterContent(content: ServiceDraftInput["content"]): FormContentSt
     target_audience: content.target_audience.map((item) => ({
       id: createRepeaterItemId(),
       text: item.text,
+      icon: item.icon?.trim() ?? "",
     })),
     benefits: content.benefits.map((item) => ({
       id: createRepeaterItemId(),
@@ -117,7 +124,13 @@ function toSubmitContent(content: FormContentState): ServiceDraftInput["content"
   return {
     target_audience: content.target_audience
       .filter((item) => item.text.trim().length > 0)
-      .map(({ text }) => ({ text: text.trim() })),
+      .map(({ text, icon }) => {
+        const normalizedIcon = normalizeServiceAudienceIcon(icon);
+
+        return normalizedIcon
+          ? { text: text.trim(), icon: normalizedIcon }
+          : { text: text.trim() };
+      }),
     benefits: content.benefits
       .filter((item) => item.text.trim().length > 0)
       .map(({ text }) => ({ text: text.trim() })),
@@ -647,23 +660,44 @@ export function ServiceForm({
           >
             <RepeaterField
               label="למי מתאים"
-              description="רשימת קהלי יעד"
+              description="רשימת קהלי יעד עם אייקון אופציונלי"
               items={content.target_audience}
               minItems={SERVICE_REPEATER_LIMITS.target_audience.min}
               maxItems={SERVICE_REPEATER_LIMITS.target_audience.max}
               addLabel="הוספת קהל יעד"
               emptyLabel="הוסיפו לפחות פריט אחד לפני פרסום"
               error={getFieldErrorMessage(fieldErrors, "content.target_audience")}
-              createItem={() => ({ id: createRepeaterItemId(), text: "" })}
+              createItem={() => ({
+                id: createRepeaterItemId(),
+                text: "",
+                icon: "",
+              })}
               onChange={(items) =>
                 setContent((current) => ({ ...current, target_audience: items }))
               }
               renderFields={(item, _index, updateItem) => (
-                <RepeaterTextField
-                  value={item.text}
-                  placeholder="לדוגמה: נשים בהריון"
-                  onChange={(text) => updateItem({ ...item, text })}
-                />
+                <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem]">
+                  <RepeaterTextField
+                    value={item.text}
+                    placeholder="לדוגמה: נשים בהריון"
+                    onChange={(text) => updateItem({ ...item, text })}
+                  />
+                  <Select
+                    label="אייקון"
+                    id={`audience-icon-${item.id}`}
+                    value={item.icon}
+                    onChange={(event) =>
+                      updateItem({ ...item, icon: event.target.value })
+                    }
+                  >
+                    <option value="">ברירת מחדל (CheckCircle)</option>
+                    {SERVICE_AUDIENCE_ICON_NAMES.map((iconName) => (
+                      <option key={iconName} value={iconName}>
+                        {SERVICE_AUDIENCE_ICON_LABELS[iconName]} ({iconName})
+                      </option>
+                    ))}
+                  </Select>
+                </div>
               )}
             />
           </section>

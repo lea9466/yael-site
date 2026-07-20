@@ -3,6 +3,11 @@ import { getAboutPageContent } from "@/lib/about/queries";
 import { getHomepageContent as fetchHomepageContent } from "@/lib/homepage/queries";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
 import {
+  createDefaultServiceSeo,
+  normalizeServiceContent,
+} from "@/lib/services/content";
+import type { ServiceDetail, ServiceRecord } from "@/lib/services/types";
+import {
   BUSINESS_PROFILE_SITE_CONTENT_KEY,
   SITE_SETTINGS_SITE_CONTENT_KEY,
 } from "@/lib/settings/constants";
@@ -34,6 +39,9 @@ const MEDIA_SELECT_COLUMNS =
 
 const SERVICE_PUBLIC_COLUMNS =
   "id, title, slug, short_description, cover_media_id, featured, published_at, updated_at";
+
+const SERVICE_DETAIL_COLUMNS =
+  "id, title, slug, short_description, full_introduction, cover_media_id, seo_og_media_id, content, seo, featured, status, published_at, created_at, updated_at";
 
 const RECIPE_PUBLIC_COLUMNS =
   "id, title, slug, description, cover_media_id, category_id, prep_duration, servings, difficulty, featured, published_at, updated_at";
@@ -279,6 +287,53 @@ export async function getPublishedServices(): Promise<PublicServiceSummary[]> {
     });
   } catch {
     return [];
+  }
+}
+
+export async function getPublishedServiceBySlug(
+  slug: string
+): Promise<ServiceDetail | null> {
+  if (!isSupabaseConfigured() || !slug) {
+    return null;
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("services")
+      .select(SERVICE_DETAIL_COLUMNS)
+      .eq("status", "published")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    if (error || !data) {
+      return null;
+    }
+
+    const record = data as ServiceRecord;
+    const mediaIds = [record.cover_media_id];
+
+    if (record.seo_og_media_id) {
+      mediaIds.push(record.seo_og_media_id);
+    }
+
+    const mediaMap = await fetchCoverMediaMap(mediaIds);
+    const cover = mediaMap.get(record.cover_media_id);
+    const og = record.seo_og_media_id
+      ? mediaMap.get(record.seo_og_media_id)
+      : undefined;
+
+    return {
+      ...record,
+      content: normalizeServiceContent(record.content),
+      seo: record.seo ?? createDefaultServiceSeo(),
+      coverUrl: cover?.url ?? null,
+      coverAlt: cover?.alt ?? null,
+      ogUrl: og?.url ?? null,
+      ogAlt: og?.alt ?? null,
+    };
+  } catch {
+    return null;
   }
 }
 

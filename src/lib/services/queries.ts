@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/auth/session";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
+import { normalizeServiceContent } from "@/lib/services/content";
 import { SERVICES_PAGE_SIZE } from "@/lib/services/constants";
 import type {
   ServiceDetail,
@@ -168,6 +169,7 @@ export async function fetchServiceById(
 
     return {
       ...record,
+      content: normalizeServiceContent(record.content),
       coverUrl: cover ? getPublicMediaUrl(cover.storage_path) : null,
       coverAlt: cover?.alt_text ?? null,
       ogUrl: og ? getPublicMediaUrl(og.storage_path) : null,

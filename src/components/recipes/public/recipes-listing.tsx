@@ -19,7 +19,6 @@ import {
 } from "@/lib/public/recipe-paths";
 import { parseRecipeListingTagSlugs } from "@/lib/public/recipe-listing-ui";
 import type { PublicRecipeListingResult } from "@/lib/public/recipe-listing";
-import { cn } from "@/lib/utils/cn";
 
 type RecipesListingProps = {
   data: PublicRecipeListingResult;
@@ -82,12 +81,7 @@ export function RecipesListing({ data }: RecipesListingProps) {
 
           {recipes.length > 0 ? (
             <>
-              <ul
-                className={cn(
-                  "recipes-section__grid recipes-listing__grid",
-                  `recipes-section__grid--count-${Math.min(recipes.length, 3)}`
-                )}
-              >
+              <ul className="recipes-section__grid recipes-listing__grid recipes-section__grid--count-2">
                 {recipes.map((recipe) => (
                   <li key={recipe.id} className="recipes-section__item">
                     <RecipeCard recipe={recipe} />

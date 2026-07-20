@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowLeft, ChevronDown, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 
 import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { ServiceAudienceIcon } from "@/components/services/service-audience-icon";
+import { ServiceFaqItem } from "@/components/services/service-faq-item";
 import { ServiceProcessTimeline } from "@/components/services/service-process-timeline";
 import { MultilineText } from "@/components/ui/multiline-text";
 import { escapeHtml, formatServiceParagraphs } from "@/lib/services/sanitize";
@@ -16,8 +17,7 @@ type ServicePublicViewProps = {
   mode?: "public" | "preview";
 };
 
-const AUDIENCE_TONES = 4;
-const BENEFIT_VARIANTS = ["a", "b", "c", "d"] as const;
+const PASTEL_TONES = 3;
 
 function ServiceCtaLink({
   href,
@@ -187,7 +187,7 @@ export function ServicePublicView({
                     <div
                       className={cn(
                         "service-page__audience-card",
-                        `service-page__audience-card--tone-${index % AUDIENCE_TONES}`
+                        `service-page__audience-card--tone-${index % PASTEL_TONES}`
                       )}
                     >
                       <span
@@ -234,17 +234,16 @@ export function ServicePublicView({
               </div>
             </HomepageReveal>
 
-            <ul className="service-page__benefits-bento">
+            <ul className="service-page__benefits-row">
               {service.content.benefits.map((item, index) => (
-                <li
-                  key={`${item.text}-${index}`}
-                  className={cn(
-                    "service-page__benefit-item",
-                    `service-page__benefit-item--${BENEFIT_VARIANTS[index % BENEFIT_VARIANTS.length]}`
-                  )}
-                >
+                <li key={`${item.text}-${index}`} className="service-page__benefit-item">
                   <HomepageReveal delayMs={Math.min(index * 60, 240)}>
-                    <div className="service-page__benefit-card">
+                    <div
+                      className={cn(
+                        "service-page__benefit-card",
+                        `service-page__benefit-card--tone-${index % PASTEL_TONES}`
+                      )}
+                    >
                       <span
                         className="service-page__benefit-index"
                         aria-hidden="true"
@@ -286,23 +285,11 @@ export function ServicePublicView({
                   key={`${item.question}-${index}`}
                   delayMs={Math.min(index * 50, 200)}
                 >
-                  <details className="service-page__faq-item">
-                    <summary className="service-page__faq-summary">
-                      <span className="service-page__faq-index" aria-hidden="true">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                      <span className="service-page__faq-question">
-                        {escapeHtml(item.question)}
-                      </span>
-                      <ChevronDown
-                        aria-hidden="true"
-                        className="service-page__faq-chevron"
-                      />
-                    </summary>
-                    <div className="service-page__faq-answer">
-                      <p>{escapeHtml(item.answer)}</p>
-                    </div>
-                  </details>
+                  <ServiceFaqItem
+                    index={index}
+                    question={escapeHtml(item.question)}
+                    answer={escapeHtml(item.answer)}
+                  />
                 </HomepageReveal>
               ))}
             </div>

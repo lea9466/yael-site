@@ -235,7 +235,7 @@ export function ArticleBlockRenderer({
             className="w-full rounded-[var(--radius-xl)] object-cover"
           />
           {block.caption ? (
-            <figcaption className="text-center text-sm text-[var(--color-text-muted)]">
+            <figcaption className="text-sm text-[var(--color-text-muted)]">
               {escapeHtml(block.caption)}
             </figcaption>
           ) : null}

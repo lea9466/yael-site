@@ -10,7 +10,6 @@ import {
   buildBlogCategoryPath,
   buildBlogPath,
 } from "@/lib/public/blog-paths";
-import { shortenForSeoDescription } from "@/lib/seo/resolve";
 import { cn } from "@/lib/utils/cn";
 
 type ArticleHeroProps = {
@@ -19,9 +18,6 @@ type ArticleHeroProps = {
 };
 
 export function ArticleHero({ article, className }: ArticleHeroProps) {
-  const excerpt = article.body.trim()
-    ? shortenForSeoDescription(article.body, 220)
-    : null;
   const categoryHref = article.category?.slug
     ? buildBlogCategoryPath(article.category.slug)
     : buildBlogPath();
@@ -45,8 +41,6 @@ export function ArticleHero({ article, className }: ArticleHeroProps) {
       ) : null}
 
       <h1 className="post-article__title">{article.title}</h1>
-
-      {excerpt ? <p className="post-article__excerpt">{excerpt}</p> : null}
 
       {(publishedLabel || readingLabel) ? (
         <p className="post-article__meta">

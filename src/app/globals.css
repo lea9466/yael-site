@@ -2997,14 +2997,6 @@
     text-wrap: pretty;
   }
 
-  .post-article__excerpt {
-    margin: 0 0 1.25rem;
-    max-width: 40rem;
-    color: var(--color-text-muted);
-    font-size: 1.125rem;
-    line-height: 1.75;
-  }
-
   .post-article__meta {
     display: flex;
     flex-wrap: wrap;
@@ -3039,10 +3031,20 @@
     gap: 1.5rem;
     max-width: 48rem;
     width: 100%;
+    text-align: right;
   }
 
-  .post-article__body .article-content {
+  .post-article__body .article-content,
+  .post-article__body p,
+  .post-article__body h2,
+  .post-article__body h3,
+  .post-article__body ul,
+  .post-article__body ol,
+  .post-article__body li,
+  .post-article__body blockquote,
+  .post-article__body figcaption {
     margin: 0;
+    text-align: right;
   }
 
   .post-article__body h2.article-content {

@@ -1,15 +1,15 @@
 import Image from "next/image";
 
 import { AdminFeaturedBadge } from "@/components/admin/admin-status-badge";
-import { ArticleBlockRenderer } from "@/lib/articles/render";
+import { ArticleBreadcrumbs } from "@/components/articles/public/article-breadcrumbs";
+import { ArticleHero } from "@/components/articles/public/article-hero";
+import { TAG_PILL_CLASSES } from "@/lib/articles/constants";
 import {
   formatArticleDate,
   formatReadingTimeLabel,
 } from "@/lib/articles/format";
+import { ArticleBlockRenderer } from "@/lib/articles/render";
 import type { ArticleDetail } from "@/lib/articles/types";
-import { ArticleBreadcrumbs } from "@/components/articles/public/article-breadcrumbs";
-import { ArticleHero } from "@/components/articles/public/article-hero";
-import { TAG_PILL_CLASSES } from "@/lib/articles/constants";
 import { escapeHtml } from "@/lib/services/sanitize";
 import { cn } from "@/lib/utils/cn";
 
@@ -41,7 +41,7 @@ export function ArticlePublicView({
 
   if (!isPreview) {
     return (
-      <article className="recipe-detail">
+      <article className="post-article">
         {showBreadcrumbs ? (
           <ArticleBreadcrumbs
             postTitle={article.title}
@@ -51,51 +51,60 @@ export function ArticlePublicView({
 
         <ArticleHero article={article} />
 
-        {showContent ? (
-          <section className="recipe-detail__body space-y-6">
-            {hasBlocks ? (
-              article.content.blocks.map((block, index) => {
-                const media =
-                  block.type === "image"
-                    ? article.blockMediaUrls.get(block.media_id)
-                    : undefined;
+        {showContent && hasBlocks ? (
+          <section className="post-article__body">
+            {article.content.blocks.map((block, index) => {
+              const media =
+                block.type === "image"
+                  ? article.blockMediaUrls.get(block.media_id)
+                  : undefined;
 
-                return (
-                  <ArticleBlockRenderer
-                    key={`${index}-${block.type}`}
-                    block={block}
-                    imageUrl={media?.url}
-                    imageAlt={media?.alt}
-                  />
-                );
-              })
-            ) : null}
+              return (
+                <ArticleBlockRenderer
+                  key={`${index}-${block.type}`}
+                  block={block}
+                  imageUrl={media?.url}
+                  imageAlt={media?.alt}
+                />
+              );
+            })}
           </section>
         ) : null}
 
-        {showGallery ? (
-          <section className="space-y-4">
-            <h2 className="text-section-title">גלריה</h2>
-            {hasGalleryImages ? (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {article.galleryUrls.map((item) =>
-                  item.url ? (
-                    <div
-                      key={item.media_id}
-                      className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface-soft)]"
-                    >
-                      <Image
-                        src={item.url}
-                        alt={item.alt ?? article.title}
-                        fill
-                        sizes="(max-width: 1024px) 50vw, 33vw"
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : null
-                )}
-              </div>
-            ) : null}
+        {article.tags.length > 0 ? (
+          <ul className="post-article__tags" aria-label="תגיות">
+            {article.tags.map((tag, index) => (
+              <li key={tag.id}>
+                <span
+                  className={cn(
+                    "post-article__tag",
+                    TAG_PILL_CLASSES[index % TAG_PILL_CLASSES.length]
+                  )}
+                >
+                  {tag.name}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+
+        {showGallery && hasGalleryImages ? (
+          <section className="post-article__gallery" aria-label="גלריה">
+            <div className="post-article__gallery-grid">
+              {article.galleryUrls.map((item) =>
+                item.url ? (
+                  <div key={item.media_id} className="post-article__gallery-item">
+                    <Image
+                      src={item.url}
+                      alt={item.alt ?? article.title}
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 33vw"
+                      className="object-cover"
+                    />
+                  </div>
+                ) : null
+              )}
+            </div>
           </section>
         ) : null}
       </article>

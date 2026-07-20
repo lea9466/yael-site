@@ -2900,6 +2900,220 @@
     }
   }
 
+  /* ------------------------------------------------------------------ */
+  /* Public post (article) detail page                                  */
+  /* ------------------------------------------------------------------ */
+
+  .post-page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .post-page__main {
+    width: 100%;
+    max-width: 52rem;
+    margin-inline: auto;
+    padding: 1.5rem 1.25rem 3.5rem;
+  }
+
+  .post-article {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+  }
+
+  .post-article__breadcrumbs {
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .post-article__breadcrumbs-list {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: max-content;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .post-article__breadcrumbs-sep {
+    color: #b7b3ab;
+  }
+
+  .post-article__breadcrumbs-link {
+    color: inherit;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-base);
+  }
+
+  .post-article__breadcrumbs-link:hover {
+    color: var(--color-primary);
+  }
+
+  .post-article__breadcrumbs-current {
+    color: var(--color-text);
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .post-article__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .post-article__category {
+    align-self: flex-start;
+    margin-bottom: 0.875rem;
+    color: var(--color-secondary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+  }
+
+  .post-article__category:hover {
+    color: var(--color-primary);
+  }
+
+  .post-article__title {
+    margin: 0 0 1rem;
+    color: var(--color-primary);
+    font-size: clamp(2rem, 5.5vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    text-wrap: pretty;
+  }
+
+  .post-article__excerpt {
+    margin: 0 0 1.25rem;
+    max-width: 40rem;
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+    line-height: 1.75;
+  }
+
+  .post-article__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0 0 1.75rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .post-article__meta-sep {
+    color: #b7b3ab;
+  }
+
+  .post-article__cover {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    background: var(--color-fresh-green-soft);
+  }
+
+  .post-article__cover-image {
+    object-fit: cover;
+  }
+
+  .post-article__body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 48rem;
+    width: 100%;
+  }
+
+  .post-article__body .article-content {
+    margin: 0;
+  }
+
+  .post-article__body h2.article-content {
+    margin-top: 1rem;
+  }
+
+  .post-article__body h3.article-content {
+    margin-top: 0.5rem;
+  }
+
+  .post-article__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .post-article__tag {
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-full);
+    padding: 0.35rem 0.85rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .post-article__gallery {
+    margin-top: 0.5rem;
+  }
+
+  .post-article__gallery-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+  }
+
+  .post-article__gallery-item {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-soft);
+  }
+
+  .related-posts {
+    padding-block: var(--spacing-2xl) var(--spacing-3xl);
+  }
+
+  @media (min-width: 640px) {
+    .post-article__gallery-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 768px) {
+    .post-page__main {
+      padding: 2rem 1.5rem 4.5rem;
+    }
+
+    .post-article {
+      gap: 2.5rem;
+    }
+
+    .post-article__gallery-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
   .recipes-section {
     overflow: hidden;
     background-color: #f0fff4;

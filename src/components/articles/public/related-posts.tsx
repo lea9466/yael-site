@@ -17,28 +17,30 @@ export function RelatedPosts({ posts, className }: RelatedPostsProps) {
   return (
     <section
       aria-labelledby="related-posts-title"
-      className={cn("related-recipes", className)}
+      className={cn("posts-section related-posts", className)}
     >
-      <PublicSectionHeader
-        className="related-recipes__header"
-        titleId="related-posts-title"
-        title="פוסטים נוספים"
-        actionLabel="לכל הפוסטים"
-        actionHref={buildBlogPath()}
-      />
+      <div className="posts-section__inner">
+        <PublicSectionHeader
+          className="posts-section__header"
+          titleId="related-posts-title"
+          title="פוסטים נוספים"
+          actionLabel="לכל הפוסטים"
+          actionHref={buildBlogPath()}
+        />
 
-      <ul
-        className={cn(
-          "related-recipes__grid",
-          `related-recipes__grid--count-${posts.length}`
-        )}
-      >
-        {posts.map((post) => (
-          <li key={post.id} className="related-recipes__item">
-            <PostCard post={post} />
-          </li>
-        ))}
-      </ul>
+        <ul
+          className={cn(
+            "posts-section__grid",
+            `posts-section__grid--count-${posts.length}`
+          )}
+        >
+          {posts.map((post) => (
+            <li key={post.id} className="posts-section__item">
+              <PostCard post={post} />
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

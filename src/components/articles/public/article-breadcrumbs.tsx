@@ -1,10 +1,10 @@
 import Link from "next/link";
 
+import type { ArticleCategorySummary } from "@/lib/articles/types";
 import {
   buildBlogCategoryPath,
   buildBlogPath,
 } from "@/lib/public/blog-paths";
-import type { ArticleCategorySummary } from "@/lib/articles/types";
 import { cn } from "@/lib/utils/cn";
 
 type ArticleBreadcrumbsProps = {
@@ -25,45 +25,45 @@ export function ArticleBreadcrumbs({
   return (
     <nav
       aria-label="ניווט פירורי לחם"
-      className={cn("recipe-breadcrumbs", className)}
+      className={cn("post-article__breadcrumbs", className)}
     >
-      <ol className="recipe-breadcrumbs__list">
-        <li className="recipe-breadcrumbs__item">
-          <Link href="/" className="recipe-breadcrumbs__link public-focus-ring">
+      <ol className="post-article__breadcrumbs-list">
+        <li>
+          <Link href="/" className="post-article__breadcrumbs-link public-focus-ring">
             בית
           </Link>
         </li>
-        <li aria-hidden="true" className="recipe-breadcrumbs__separator">
+        <li aria-hidden="true" className="post-article__breadcrumbs-sep">
           /
         </li>
-        <li className="recipe-breadcrumbs__item">
+        <li>
           <Link
             href={buildBlogPath()}
-            className="recipe-breadcrumbs__link public-focus-ring"
+            className="post-article__breadcrumbs-link public-focus-ring"
           >
             בלוג
           </Link>
         </li>
         {category ? (
           <>
-            <li aria-hidden="true" className="recipe-breadcrumbs__separator">
+            <li aria-hidden="true" className="post-article__breadcrumbs-sep">
               /
             </li>
-            <li className="recipe-breadcrumbs__item">
+            <li>
               <Link
                 href={categoryHref}
-                className="recipe-breadcrumbs__link public-focus-ring"
+                className="post-article__breadcrumbs-link public-focus-ring"
               >
                 {category.name}
               </Link>
             </li>
           </>
         ) : null}
-        <li aria-hidden="true" className="recipe-breadcrumbs__separator">
+        <li aria-hidden="true" className="post-article__breadcrumbs-sep">
           /
         </li>
-        <li className="recipe-breadcrumbs__item">
-          <span aria-current="page" className="recipe-breadcrumbs__current">
+        <li>
+          <span aria-current="page" className="post-article__breadcrumbs-current">
             {postTitle}
           </span>
         </li>

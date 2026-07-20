@@ -114,8 +114,8 @@ export default async function PublicPostDetailPage({
         category={article.category}
       />
 
-      <div className="recipe-page">
-        <div className="recipe-page__main">
+      <div className="post-page">
+        <div className="post-page__main">
           <ArticlePublicView article={article} mode="public" />
         </div>
 

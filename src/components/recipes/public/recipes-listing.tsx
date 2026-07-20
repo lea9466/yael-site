@@ -57,7 +57,14 @@ export function RecipesListing({ data }: RecipesListingProps) {
 
           <RecipesListingHero category={category} totalCount={heroCount} />
 
-          <RecipesListingSearch basePath={basePath} query={query} />
+          <div className="recipes-listing-toolbar">
+            <RecipesListingSearch basePath={basePath} query={query} />
+            <RecipesListingFilters
+              basePath={basePath}
+              query={query}
+              tags={tags}
+            />
+          </div>
 
           {categories.length > 0 ? (
             <RecipesCategoryPills
@@ -65,12 +72,6 @@ export function RecipesListing({ data }: RecipesListingProps) {
               activeSlug={category?.slug}
             />
           ) : null}
-
-          <RecipesListingFilters
-            basePath={basePath}
-            query={query}
-            tags={tags}
-          />
 
           <RecipesListingResultsBar
             basePath={basePath}

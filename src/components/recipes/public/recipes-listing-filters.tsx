@@ -125,7 +125,7 @@ export function RecipesListingFilters({
         aria-expanded={drawerOpen}
       >
         <SlidersHorizontal aria-hidden="true" className="size-4" />
-        <span>סינון מתקדם</span>
+        <span>סינון</span>
         {activeFilterCount > 0 ? (
           <span className="recipes-listing-filter-trigger__badge">
             {activeFilterCount}

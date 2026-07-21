@@ -4,11 +4,11 @@ export type PublicNavLink = {
 };
 
 export const PUBLIC_PRIMARY_NAV: PublicNavLink[] = [
+  { label: "בית", href: "/" },
   { label: "אודות", href: "/about" },
   { label: "שירותים", href: "/services" },
   { label: "מתכונים", href: "/recipes" },
-  { label: "מאמרים", href: "/blog" },
-  { label: "המלצות", href: "/testimonials" },
+  { label: "פוסטים", href: "/blog" },
   { label: "תעודות", href: "/certificates" },
 ];
 
@@ -25,6 +25,6 @@ export const PUBLIC_CTA = {
 } as const;
 
 export const PUBLIC_STATIC_ROUTES: PublicNavLink[] = [
-  { label: "דף הבית", href: "/" },
   ...PUBLIC_FOOTER_NAV,
+  { label: "המלצות", href: "/testimonials" },
 ];

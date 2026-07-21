@@ -95,7 +95,7 @@ export default async function PublicServiceDetailPage({
   return (
     <>
       <ServicePublicView service={service} mode="public" />
-      <div className="service-page__contact">
+      <div id="service-contact" className="service-page__contact">
         <ContactCtaSection
           content={homepage.contact_cta}
           settings={settings}

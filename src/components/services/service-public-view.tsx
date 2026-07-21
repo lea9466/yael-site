@@ -64,7 +64,7 @@ export function ServicePublicView({
     Boolean(service.content.cta_link_url?.trim());
   const heroCtaHref = hasCtaButton
     ? service.content.cta_link_url
-    : "#service-cta";
+    : "#service-contact";
   const heroCtaLabel = hasCtaButton
     ? service.content.cta_button_label
     : "לפרטים נוספים";
@@ -297,71 +297,7 @@ export function ServicePublicView({
         </section>
       ) : null}
 
-      {service.content.cta_title ? (
-        <section
-          id="service-cta"
-          className="service-page__section service-page__cta"
-          aria-labelledby="service-cta-heading"
-        >
-          <div className="service-page__container">
-            <HomepageReveal>
-              <div className="service-page__cta-stage">
-                <div
-                  className="service-page__cta-atmosphere"
-                  aria-hidden="true"
-                >
-                  <span className="service-page__blob service-page__blob--cta-a" />
-                  <span className="service-page__blob service-page__blob--cta-b" />
-                  <span className="service-page__cta-pattern" />
-                </div>
-
-                <div className="service-page__cta-content">
-                  <div className="service-page__cta-copy">
-                    <h2
-                      id="service-cta-heading"
-                      className="service-page__cta-title"
-                    >
-                      {escapeHtml(service.content.cta_title)}
-                    </h2>
-                    {service.content.cta_text ? (
-                      <p className="service-page__cta-text">
-                        {escapeHtml(service.content.cta_text)}
-                      </p>
-                    ) : null}
-                    {hasCtaButton ? (
-                      <ServiceCtaLink
-                        href={service.content.cta_link_url}
-                        linkType={service.content.cta_link_type}
-                        className="service-page__cta-button public-focus-ring"
-                      >
-                        <span>
-                          {escapeHtml(service.content.cta_button_label)}
-                        </span>
-                        <ArrowLeft
-                          aria-hidden="true"
-                          className="service-page__cta-arrow"
-                        />
-                      </ServiceCtaLink>
-                    ) : null}
-                  </div>
-
-                  {service.coverUrl ? (
-                    <div className="service-page__cta-media relative overflow-hidden">
-                      <Image
-                        src={service.coverUrl}
-                        alt=""
-                        fill
-                        sizes="(max-width: 767px) 40vw, 220px"
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </HomepageReveal>
-          </div>
-        </section>
-      ) : null}
+      {/* Service-specific CTA card temporarily hidden */}
 
       {ogImageUrl ? (
         <div className="sr-only" aria-hidden="true">

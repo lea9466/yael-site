@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { ContactCtaSection } from "@/components/homepage/sections/contact-cta-section";
 import { ServicePublicView } from "@/components/services/service-public-view";
-import { getDefaultHomepageData } from "@/lib/homepage/defaults";
 import {
-  getHomepageContent,
   getPublishedServiceBySlug,
   getWebsiteSettings,
 } from "@/lib/public/queries";
@@ -82,27 +79,11 @@ export default async function PublicServiceDetailPage({
 }: ServiceDetailPageProps) {
   const { slug: rawSlug } = await params;
   const slug = normalizeRouteSlug(rawSlug);
-  const [service, settings, homepageContent] = await Promise.all([
-    getPublishedServiceBySlug(slug),
-    getWebsiteSettings(),
-    getHomepageContent(),
-  ]);
+  const service = await getPublishedServiceBySlug(slug);
 
   if (!service) {
     notFound();
   }
 
-  const homepage = homepageContent ?? getDefaultHomepageData();
-
-  return (
-    <>
-      <ServicePublicView service={service} mode="public" />
-      <div id="service-contact" className="service-page__contact">
-        <ContactCtaSection
-          content={homepage.contact_cta}
-          settings={settings}
-        />
-      </div>
-    </>
-  );
+  return <ServicePublicView service={service} mode="public" />;
 }

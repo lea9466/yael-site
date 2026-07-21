@@ -304,15 +304,29 @@ export function ServicePublicView({
 
       {hasCtaSection ? (
         <section
-          className="service-page__section service-page__cta"
+          className="service-page__cta"
           aria-labelledby={ctaTitle ? "service-cta-heading" : undefined}
         >
-          <div className="service-page__container">
+          <div className="service-page__cta-inner">
             <HomepageReveal>
               <div className="service-page__cta-stage">
-                <div className="service-page__cta-atmosphere" aria-hidden="true">
-                  <span className="service-page__cta-pattern" />
-                </div>
+                <div
+                  aria-hidden="true"
+                  className="service-page__cta-glow service-page__cta-glow--start"
+                />
+                <div
+                  aria-hidden="true"
+                  className="service-page__cta-glow service-page__cta-glow--end"
+                />
+                <div
+                  aria-hidden="true"
+                  className="service-page__cta-shape service-page__cta-shape--one"
+                />
+                <div
+                  aria-hidden="true"
+                  className="service-page__cta-shape service-page__cta-shape--two"
+                />
+
                 <div className="service-page__cta-content">
                   <div className="service-page__cta-copy">
                     {ctaTitle ? (
@@ -333,7 +347,7 @@ export function ServicePublicView({
                     <ServiceCtaLink
                       href={ctaLinkUrl}
                       linkType={service.content.cta_link_type}
-                      className="service-page__hero-cta service-page__cta-button public-focus-ring"
+                      className="service-page__cta-button public-focus-ring"
                     >
                       <span>{escapeHtml(ctaButtonLabel)}</span>
                       <ArrowLeft

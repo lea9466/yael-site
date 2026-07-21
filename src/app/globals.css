@@ -7498,14 +7498,51 @@
     gap: 2.5rem;
   }
 
+  .about-page__hero-copy {
+    align-items: center;
+    text-align: center;
+    max-width: none;
+    width: 100%;
+  }
+
   .about-page__hero-media-wrap {
     max-width: 26rem;
     justify-self: center;
     width: min(100%, 26rem);
   }
 
-  .about-page__title {
+  .about-page__title,
+  .about-page__intro {
     max-width: none;
+    text-align: center;
+  }
+
+  .about-page__reading,
+  .about-page__prose-stack,
+  .about-page__heading,
+  .about-page__paragraph {
+    text-align: center;
+  }
+
+  .about-page__list {
+    padding-inline: 0;
+    list-style-position: inside;
+    text-align: center;
+  }
+
+  .about-page__quote-inner,
+  .about-page__quote {
+    text-align: center;
+  }
+
+  .about-page__quote-rule {
+    display: none;
+  }
+
+  .about-page__quote-mark {
+    inset-inline: 0;
+    margin-inline: auto;
+    text-align: center;
   }
 
   .about-page__split-grid {
@@ -7525,7 +7562,15 @@
   }
 
   .about-page__split-prose {
+    align-items: center;
     max-width: none;
+    text-align: center;
+  }
+
+  .about-page__gallery-head {
+    align-items: center;
+    margin-inline: auto;
+    text-align: center;
   }
 
   .about-page__gallery-item--hero,
@@ -7539,9 +7584,16 @@
   }
 
   .about-page__image-feature--inset-start,
-  .about-page__image-feature--inset-end {
+  .about-page__image-feature--inset-end,
+  .about-page__image-feature--portrait {
     margin-inline: auto;
     max-width: 40rem;
+  }
+
+  .about-page__cta-copy {
+    align-items: center;
+    max-width: none;
+    text-align: center;
   }
 }
 

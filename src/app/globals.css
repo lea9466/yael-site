@@ -1957,19 +1957,6 @@
     transform: translateX(-4px);
   }
 
-  /* Slight alternate lean for middle card rhythm */
-  .services-section__item:nth-child(2n) .service-card--pathway {
-    border-radius: 0.7rem 2.75rem 0.7rem 2.75rem;
-  }
-
-  .services-section__item:nth-child(2n) .service-card--pathway .service-card__media {
-    border-radius: 0.45rem 2.35rem 0.45rem 1.85rem;
-  }
-
-  .services-section__item:nth-child(2n) .service-card--pathway:hover {
-    transform: translateY(-5px) rotate(0.4deg);
-  }
-
   @media (min-width: 768px) {
     .services-section__inner {
       padding-inline: 5rem;
@@ -2012,8 +1999,7 @@
     }
 
     .service-card:hover,
-    .service-card--pathway:hover,
-    .services-section__item:nth-child(2n) .service-card--pathway:hover {
+    .service-card--pathway:hover {
       transform: none;
     }
 

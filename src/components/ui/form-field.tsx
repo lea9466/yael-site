@@ -5,6 +5,7 @@ type FormFieldProps = {
   htmlFor?: string;
   required?: boolean;
   error?: string;
+  errorId?: string;
   hint?: string;
   children: React.ReactNode;
   className?: string;
@@ -15,6 +16,7 @@ export function FormField({
   htmlFor,
   required = false,
   error,
+  errorId,
   hint,
   children,
   className,
@@ -30,7 +32,11 @@ export function FormField({
         <p className="text-caption text-[var(--color-text-muted)]">{hint}</p>
       ) : null}
       {error ? (
-        <p role="alert" className="text-caption font-medium text-[var(--color-error)]">
+        <p
+          id={errorId}
+          role="alert"
+          className="text-caption font-medium text-[var(--color-error)]"
+        >
           {error}
         </p>
       ) : null}

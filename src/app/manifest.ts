@@ -16,7 +16,14 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
           purpose: "any",
         },
       ]
-    : undefined;
+    : [
+        {
+          src: "/icon.svg",
+          sizes: "any",
+          type: "image/svg+xml",
+          purpose: "any",
+        },
+      ];
 
   return {
     name: businessProfile.business_name,

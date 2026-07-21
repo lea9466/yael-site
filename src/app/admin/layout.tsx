@@ -3,6 +3,8 @@ import NextDynamic from "next/dynamic";
 
 import { PostSaveToastHost } from "@/components/admin/post-save-toast-host";
 import { requireAdmin } from "@/lib/auth/session";
+import { getWebsiteSettings } from "@/lib/public/queries";
+import { buildSiteMetadata } from "@/lib/seo/metadata";
 
 const AdminShell = NextDynamic(
   () =>
@@ -18,13 +20,19 @@ const AdminShell = NextDynamic(
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "מערכת ניהול",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getWebsiteSettings();
+  const siteMetadata = buildSiteMetadata(settings, { noIndex: true });
+
+  return {
+    title: "מערכת ניהול",
+    icons: siteMetadata.icons,
+    robots: {
+      index: false,
+      follow: false,
+    },
+  };
+}
 
 export default async function AdminLayout({
   children,

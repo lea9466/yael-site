@@ -96,6 +96,21 @@ export function buildWhatsAppHref(phone: string): string | null {
   return `https://wa.me/${normalized}`;
 }
 
+/** Accepts a phone number or a full WhatsApp / http(s) URL from business profile. */
+export function buildBusinessWhatsAppHref(value: string): string | null {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+
+  return buildWhatsAppHref(trimmed);
+}
+
 export function buildMailtoHref(email: string): string {
   return `mailto:${email.trim()}`;
 }

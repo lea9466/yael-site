@@ -1,18 +1,26 @@
 import type { Metadata, Viewport } from "next";
 
 import { editorialDisplayFont, mainFont } from "@/lib/theme/fonts";
+import { getWebsiteSettings } from "@/lib/public/queries";
+import { buildDefaultSiteMetadata } from "@/lib/seo/metadata";
 import { SITE_ORIGIN } from "@/lib/site/constants";
 
 import "./globals.css";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_ORIGIN),
-  title: {
-    default: "יעל קנייבסקי | ליווי תזונתי ואכילה מקושרת",
-    template: "%s | יעל קנייבסקי",
-  },
-  description: "ליווי תזונתי ואכילה מקושרת עם יעל קנייבסקי.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getWebsiteSettings();
+  const siteMetadata = buildDefaultSiteMetadata(settings);
+
+  return {
+    metadataBase: new URL(SITE_ORIGIN),
+    title: {
+      default: "יעל קנייבסקי | ליווי תזונתי ואכילה מקושרת",
+      template: "%s | יעל קנייבסקי",
+    },
+    description: "ליווי תזונתי ואכילה מקושרת עם יעל קנייבסקי.",
+    icons: siteMetadata.icons,
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#3f5f47",

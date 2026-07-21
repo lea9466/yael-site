@@ -68,8 +68,8 @@ export function ServicePublicView({
   const hasCtaButton = Boolean(ctaButtonLabel && ctaLinkUrl);
   const hasCtaSection = Boolean(ctaTitle || ctaText || hasCtaButton);
   const hasCover = Boolean(service.coverUrl);
-  const heroCtaHref = hasCtaButton ? ctaLinkUrl : "#service-contact";
-  const heroCtaLabel = hasCtaButton ? ctaButtonLabel : "לפרטים נוספים";
+  const heroCtaHref = hasCtaButton ? ctaLinkUrl : "/contact";
+  const heroCtaLabel = hasCtaButton ? ctaButtonLabel : "יצירת קשר";
   const heroCtaType = hasCtaButton
     ? service.content.cta_link_type
     : "internal";

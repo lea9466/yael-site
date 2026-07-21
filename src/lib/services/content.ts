@@ -15,9 +15,9 @@ export function createDefaultServiceContent(): ServiceContent {
     faq: [],
     cta_title: "",
     cta_text: "",
-    cta_button_label: "",
+    cta_button_label: "יצירת קשר",
     cta_link_type: "internal",
-    cta_link_url: "",
+    cta_link_url: "/contact",
   };
 }
 

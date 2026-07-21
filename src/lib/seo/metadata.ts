@@ -52,6 +52,60 @@ function resolveOgImage(
   return imageUrl;
 }
 
+function guessIconMimeType(url: string): string | undefined {
+  const pathname = url.split("?")[0]?.toLowerCase() ?? "";
+
+  if (pathname.endsWith(".svg")) {
+    return "image/svg+xml";
+  }
+
+  if (pathname.endsWith(".png")) {
+    return "image/png";
+  }
+
+  if (pathname.endsWith(".jpg") || pathname.endsWith(".jpeg")) {
+    return "image/jpeg";
+  }
+
+  if (pathname.endsWith(".webp")) {
+    return "image/webp";
+  }
+
+  if (pathname.endsWith(".ico")) {
+    return "image/x-icon";
+  }
+
+  return undefined;
+}
+
+function resolveFaviconIcons(
+  settings: WebsiteSettingsPublic
+): Metadata["icons"] {
+  const faviconUrl = settings.favicon?.url?.trim();
+
+  if (faviconUrl) {
+    const type = guessIconMimeType(faviconUrl);
+    const iconEntry = type ? { url: faviconUrl, type } : { url: faviconUrl };
+
+    return {
+      icon: [
+        { url: "/favicon.ico" },
+        iconEntry,
+      ],
+      shortcut: [{ url: "/favicon.ico" }],
+      apple: [{ url: faviconUrl }],
+    };
+  }
+
+  return {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: [{ url: "/favicon.ico" }],
+  };
+}
+
 export function buildSiteMetadata(
   settings: WebsiteSettingsPublic,
   input: PageMetadataInput = {}
@@ -70,6 +124,7 @@ export function buildSiteMetadata(
     metadataBase: new URL(SITE_ORIGIN),
     title,
     description,
+    icons: resolveFaviconIcons(settings),
     alternates: {
       canonical: canonicalUrl,
     },

@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { MessageCircle, Phone } from "lucide-react";
 
+import {
+  buildBusinessWhatsAppHref,
+  buildTelHref,
+} from "@/lib/contact-messages/format";
 import type { HomepageData } from "@/lib/validations/homepage-hero";
 import type { WebsiteSettingsPublic } from "@/lib/public/types";
 
@@ -9,18 +13,11 @@ type ContactCtaSectionProps = {
   settings: WebsiteSettingsPublic;
 };
 
-function buildWhatsAppHref(value: string): string {
-  if (value.startsWith("http")) {
-    return value;
-  }
-
-  return `https://wa.me/${value.replace(/\D/g, "")}`;
-}
-
 export function ContactCtaSection({ content, settings }: ContactCtaSectionProps) {
   const phone = settings.businessProfile.phone?.trim() ?? "";
   const whatsapp = settings.businessProfile.social.whatsapp?.trim() ?? "";
-  const phoneHref = phone ? `tel:${phone.replace(/\s/g, "")}` : null;
+  const phoneHref = phone ? buildTelHref(phone) : null;
+  const whatsappHref = whatsapp ? buildBusinessWhatsAppHref(whatsapp) : null;
 
   return (
     <section
@@ -63,9 +60,9 @@ export function ContactCtaSection({ content, settings }: ContactCtaSectionProps)
                 </Link>
               ) : null}
 
-              {whatsapp ? (
+              {whatsappHref ? (
                 <a
-                  href={buildWhatsAppHref(whatsapp)}
+                  href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="contact-cta-section__secondary public-focus-ring"

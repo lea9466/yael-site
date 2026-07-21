@@ -1,16 +1,13 @@
 import type { PublicBlogCategory } from "@/lib/public/blog-listing";
-import { formatBlogListingCount } from "@/lib/public/blog-listing-ui";
 import { cn } from "@/lib/utils/cn";
 
 type BlogListingHeroProps = {
   category?: PublicBlogCategory | null;
-  totalCount: number;
   className?: string;
 };
 
 export function BlogListingHero({
   category,
-  totalCount,
   className,
 }: BlogListingHeroProps) {
   const title = category ? category.name : "פוסטים";
@@ -27,10 +24,6 @@ export function BlogListingHero({
       {description ? (
         <p className="recipes-listing-hero__description">{description}</p>
       ) : null}
-
-      <p className="recipes-listing-hero__count">
-        {formatBlogListingCount(totalCount)}
-      </p>
     </header>
   );
 }

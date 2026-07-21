@@ -3,27 +3,29 @@ import { PublicSectionHeader } from "@/components/homepage/public-section-header
 import { TestimonialCarousel } from "@/components/homepage/testimonial-carousel";
 import type { PublicTestimonialSummary } from "@/lib/public/types";
 
-type TestimonialsSectionProps = {
+type ServiceTestimonialsPublicSectionProps = {
   testimonials: PublicTestimonialSummary[];
 };
 
-export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) {
+export function ServiceTestimonialsPublicSection({
+  testimonials,
+}: ServiceTestimonialsPublicSectionProps) {
   if (testimonials.length === 0) {
     return null;
   }
 
   return (
     <section
-      aria-labelledby="homepage-testimonials-title"
-      className="testimonials-section"
+      aria-labelledby="service-testimonials-heading"
+      className="testimonials-section service-page__testimonials"
     >
       <div className="testimonials-section__inner">
         <HomepageReveal>
           <PublicSectionHeader
             className="testimonials-section__header"
-            titleId="homepage-testimonials-title"
+            titleId="service-testimonials-heading"
             eyebrow="המלצות"
-            title="מה אומרים על הליווי"
+            title="ממי שכבר חוותה את זה"
           />
         </HomepageReveal>
 

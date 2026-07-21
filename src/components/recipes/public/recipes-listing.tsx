@@ -31,7 +31,6 @@ export function RecipesListing({ data }: RecipesListingProps) {
     categories,
     tags,
     query,
-    heroCount,
     totalCount,
     totalPages,
   } = data;
@@ -54,7 +53,7 @@ export function RecipesListing({ data }: RecipesListingProps) {
         <div className="recipes-section__inner recipes-listing__inner">
           <RecipesListingBreadcrumbs category={category} />
 
-          <RecipesListingHero category={category} totalCount={heroCount} />
+          <RecipesListingHero category={category} />
 
           <div className="recipes-listing-toolbar">
             <RecipesListingSearch basePath={basePath} query={query} />

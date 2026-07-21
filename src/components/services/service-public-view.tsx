@@ -7,13 +7,16 @@ import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { ServiceAudienceIcon } from "@/components/services/service-audience-icon";
 import { ServiceFaqItem } from "@/components/services/service-faq-item";
 import { ServiceProcessTimeline } from "@/components/services/service-process-timeline";
+import { ServiceTestimonialsPublicSection } from "@/components/services/service-testimonials-public-section";
 import { MultilineText } from "@/components/ui/multiline-text";
+import type { PublicTestimonialSummary } from "@/lib/public/types";
 import { escapeHtml, formatServiceParagraphs } from "@/lib/services/sanitize";
 import type { ServiceDetail } from "@/lib/services/types";
 import { cn } from "@/lib/utils/cn";
 
 type ServicePublicViewProps = {
   service: ServiceDetail;
+  testimonials?: PublicTestimonialSummary[];
   mode?: "public" | "preview";
 };
 
@@ -52,6 +55,7 @@ function ServiceCtaLink({
 
 export function ServicePublicView({
   service,
+  testimonials = [],
   mode = "public",
 }: ServicePublicViewProps) {
   const isPreview = mode === "preview";
@@ -301,6 +305,8 @@ export function ServicePublicView({
           </div>
         </section>
       ) : null}
+
+      <ServiceTestimonialsPublicSection testimonials={testimonials} />
 
       {hasCtaSection ? (
         <section

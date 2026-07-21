@@ -19,7 +19,7 @@ export function SearchInput({
     <div className={cn("relative w-full", className)}>
       <Search
         aria-hidden="true"
-        className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-text-muted)]"
+        className="pointer-events-none absolute start-auto end-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-text-muted)]"
       />
       <input
         type="search"
@@ -28,7 +28,7 @@ export function SearchInput({
         aria-label={ariaLabel}
         aria-disabled={disabled}
         className={cn(
-          "h-11 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] pe-4 ps-10 text-sm text-[var(--color-text)]",
+          "h-11 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] ps-4 pe-10 text-sm text-[var(--color-text)]",
           "placeholder:text-[var(--color-text-muted)]",
           "hover:border-[var(--color-border-strong)]",
           "focus-visible:border-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/15",

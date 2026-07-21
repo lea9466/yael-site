@@ -540,6 +540,43 @@ export async function getPublishedTestimonials(): Promise<
   }
 }
 
+export async function getPublishedTestimonialsByServiceId(
+  serviceId: string
+): Promise<PublicTestimonialSummary[]> {
+  if (!isSupabaseConfigured() || !serviceId) {
+    return [];
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("testimonials")
+      .select(TESTIMONIAL_PUBLIC_COLUMNS)
+      .eq("is_published", true)
+      .eq("service_id", serviceId)
+      .order("featured", { ascending: false })
+      .order("updated_at", { ascending: false });
+
+    if (error || !data) {
+      return [];
+    }
+
+    const serviceTitles = await fetchServiceTitles([serviceId]);
+    const serviceTitle = serviceTitles.get(serviceId) ?? null;
+
+    return data.map((row) => ({
+      id: row.id,
+      name: row.name,
+      city: row.city,
+      content: row.content,
+      serviceTitle,
+      featured: row.featured,
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export async function getPublishedServiceSlugs(): Promise<PublicContentSlug[]> {
   if (!isSupabaseConfigured()) {
     return [];

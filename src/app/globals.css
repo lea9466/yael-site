@@ -3244,7 +3244,7 @@
   .recipes-listing-search__icon {
     position: absolute;
     top: 50%;
-    right: 0.95rem;
+    inset-inline-end: 0.95rem;
     width: 1rem;
     height: 1rem;
     color: var(--color-text-muted);
@@ -6312,6 +6312,11 @@
 
 .service-page__faq-answer p {
   margin: 0;
+}
+
+/* —— Related testimonials: reuses homepage testimonials-section styles —— */
+.service-page__testimonials.testimonials-section {
+  padding-block: clamp(3.5rem, 7vw, 5.5rem);
 }
 
 /* —— CTA story ending (same proportions as contact-cta, coral brand) —— */

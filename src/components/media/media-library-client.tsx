@@ -262,7 +262,7 @@ export function MediaLibraryClient({ data }: MediaLibraryClientProps) {
             </label>
             <Search
               aria-hidden="true"
-              className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-text-muted)]"
+              className="pointer-events-none absolute start-auto end-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-text-muted)]"
             />
             <input
               id="media-search"
@@ -270,7 +270,7 @@ export function MediaLibraryClient({ data }: MediaLibraryClientProps) {
               value={searchValue}
               placeholder="חיפוש לפי שם קובץ או טקסט חלופי"
               className={cn(
-                "h-11 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-soft)] pe-4 ps-10 text-sm",
+                "h-11 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-soft)] ps-4 pe-10 text-sm",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/20"
               )}
               onChange={(event) => setSearchValue(event.target.value)}

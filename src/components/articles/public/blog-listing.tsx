@@ -32,7 +32,6 @@ export function BlogListing({ data }: BlogListingProps) {
     categories,
     tags,
     query,
-    heroCount,
     totalCount,
     totalPages,
   } = data;
@@ -53,7 +52,7 @@ export function BlogListing({ data }: BlogListingProps) {
         <div className="recipes-section__inner recipes-listing__inner">
           <BlogListingBreadcrumbs category={category} />
 
-          <BlogListingHero category={category} totalCount={heroCount} />
+          <BlogListingHero category={category} />
 
           <div className="recipes-listing-toolbar">
             <BlogListingSearch basePath={basePath} query={query} />

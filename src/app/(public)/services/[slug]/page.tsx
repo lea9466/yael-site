@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ServicePublicView } from "@/components/services/service-public-view";
 import {
   getPublishedServiceBySlug,
+  getPublishedTestimonialsByServiceId,
   getWebsiteSettings,
 } from "@/lib/public/queries";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
@@ -85,5 +86,13 @@ export default async function PublicServiceDetailPage({
     notFound();
   }
 
-  return <ServicePublicView service={service} mode="public" />;
+  const testimonials = await getPublishedTestimonialsByServiceId(service.id);
+
+  return (
+    <ServicePublicView
+      service={service}
+      testimonials={testimonials}
+      mode="public"
+    />
+  );
 }

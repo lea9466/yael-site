@@ -119,14 +119,14 @@ export function AttachTestimonialDialog({
             <div className="relative">
               <Search
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-inline-start-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-text-muted)]"
+                className="pointer-events-none absolute inset-inline-end-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-text-muted)]"
               />
               <Input
                 id="attach-testimonial-search"
                 type="search"
                 value={searchValue}
                 placeholder="הקלידי שם לקוח..."
-                className="ps-10"
+                className="pe-10"
                 onChange={(event) => setSearchValue(event.target.value)}
               />
             </div>

@@ -59,22 +59,28 @@ export function ServicePublicView({
   const paragraphs = formatServiceParagraphs(service.full_introduction);
   const leadParagraph = paragraphs[0] ?? null;
   const restParagraphs = paragraphs.slice(1);
-  const hasCtaButton =
-    Boolean(service.content.cta_button_label?.trim()) &&
-    Boolean(service.content.cta_link_url?.trim());
-  const heroCtaHref = hasCtaButton
-    ? service.content.cta_link_url
-    : "#service-contact";
-  const heroCtaLabel = hasCtaButton
-    ? service.content.cta_button_label
-    : "לפרטים נוספים";
+  const shortDescription = service.short_description.trim();
+  const displayTitle = service.title.trim();
+  const ctaTitle = service.content.cta_title.trim();
+  const ctaText = service.content.cta_text.trim();
+  const ctaButtonLabel = service.content.cta_button_label.trim();
+  const ctaLinkUrl = service.content.cta_link_url.trim();
+  const hasCtaButton = Boolean(ctaButtonLabel && ctaLinkUrl);
+  const hasCtaSection = Boolean(ctaTitle || ctaText || hasCtaButton);
+  const hasCover = Boolean(service.coverUrl);
+  const heroCtaHref = hasCtaButton ? ctaLinkUrl : "#service-contact";
+  const heroCtaLabel = hasCtaButton ? ctaButtonLabel : "לפרטים נוספים";
   const heroCtaType = hasCtaButton
     ? service.content.cta_link_type
     : "internal";
 
   return (
     <article
-      className={cn("service-page", isPreview && "service-page--preview")}
+      className={cn(
+        "service-page",
+        isPreview && "service-page--preview",
+        !hasCover && "service-page--no-cover"
+      )}
     >
       <header className="service-page__hero">
         <div className="service-page__hero-atmosphere" aria-hidden="true">
@@ -90,10 +96,14 @@ export function ServicePublicView({
               <Sparkles aria-hidden="true" className="service-page__eyebrow-icon" />
               שירות אישי
             </p>
-            <h1 className="service-page__title">{escapeHtml(service.title)}</h1>
-            <MultilineText as="p" className="service-page__lead">
-              {service.short_description}
-            </MultilineText>
+            {displayTitle ? (
+              <h1 className="service-page__title">{escapeHtml(displayTitle)}</h1>
+            ) : null}
+            {shortDescription ? (
+              <MultilineText as="p" className="service-page__lead">
+                {shortDescription}
+              </MultilineText>
+            ) : null}
             <ServiceCtaLink
               href={heroCtaHref}
               linkType={heroCtaType}
@@ -104,30 +114,25 @@ export function ServicePublicView({
             </ServiceCtaLink>
           </HomepageReveal>
 
-          <HomepageReveal className="service-page__hero-media-wrap" delayMs={140}>
-            <div className="service-page__hero-media-glow" aria-hidden="true" />
-            <div className="service-page__hero-media relative overflow-hidden">
-              {service.coverUrl ? (
+          {hasCover ? (
+            <HomepageReveal className="service-page__hero-media-wrap" delayMs={140}>
+              <div className="service-page__hero-media-glow" aria-hidden="true" />
+              <div className="service-page__hero-media relative overflow-hidden">
                 <Image
-                  src={service.coverUrl}
-                  alt={service.coverAlt ?? service.title}
+                  src={service.coverUrl!}
+                  alt={service.coverAlt ?? displayTitle}
                   fill
                   priority
                   sizes="(max-width: 1024px) 100vw, 54vw"
                   className="service-page__hero-image object-cover"
                 />
-              ) : (
-                <div
-                  className="service-page__hero-media-fallback"
-                  aria-hidden="true"
-                />
-              )}
-            </div>
-            <span
-              className="service-page__hero-orbit"
-              aria-hidden="true"
-            />
-          </HomepageReveal>
+              </div>
+              <span
+                className="service-page__hero-orbit"
+                aria-hidden="true"
+              />
+            </HomepageReveal>
+          ) : null}
         </div>
       </header>
 
@@ -297,7 +302,52 @@ export function ServicePublicView({
         </section>
       ) : null}
 
-      {/* Service-specific CTA card temporarily hidden */}
+      {hasCtaSection ? (
+        <section
+          className="service-page__section service-page__cta"
+          aria-labelledby={ctaTitle ? "service-cta-heading" : undefined}
+        >
+          <div className="service-page__container">
+            <HomepageReveal>
+              <div className="service-page__cta-stage">
+                <div className="service-page__cta-atmosphere" aria-hidden="true">
+                  <span className="service-page__cta-pattern" />
+                </div>
+                <div className="service-page__cta-content">
+                  <div className="service-page__cta-copy">
+                    {ctaTitle ? (
+                      <h2
+                        id="service-cta-heading"
+                        className="service-page__cta-title"
+                      >
+                        {escapeHtml(ctaTitle)}
+                      </h2>
+                    ) : null}
+                    {ctaText ? (
+                      <p className="service-page__cta-text">
+                        {escapeHtml(ctaText)}
+                      </p>
+                    ) : null}
+                  </div>
+                  {hasCtaButton ? (
+                    <ServiceCtaLink
+                      href={ctaLinkUrl}
+                      linkType={service.content.cta_link_type}
+                      className="service-page__hero-cta service-page__cta-button public-focus-ring"
+                    >
+                      <span>{escapeHtml(ctaButtonLabel)}</span>
+                      <ArrowLeft
+                        aria-hidden="true"
+                        className="service-page__cta-arrow"
+                      />
+                    </ServiceCtaLink>
+                  ) : null}
+                </div>
+              </div>
+            </HomepageReveal>
+          </div>
+        </section>
+      ) : null}
 
       {ogImageUrl ? (
         <div className="sr-only" aria-hidden="true">

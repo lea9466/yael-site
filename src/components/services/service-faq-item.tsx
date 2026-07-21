@@ -20,6 +20,9 @@ export function ServiceFaqItem({
   const panelId = useId();
   const buttonId = useId();
 
+  const hasQuestion = question.trim().length > 0;
+  const hasAnswer = answer.trim().length > 0;
+
   return (
     <div className={cn("service-page__faq-item", open && "is-open")}>
       <button
@@ -33,25 +36,29 @@ export function ServiceFaqItem({
         <span className="service-page__faq-index" aria-hidden="true">
           {String(index + 1).padStart(2, "0")}
         </span>
-        <span className="service-page__faq-question">{question}</span>
+        <span className="service-page__faq-question">
+          {hasQuestion ? question : "שאלה"}
+        </span>
         <ChevronDown
           aria-hidden="true"
           className="service-page__faq-chevron"
         />
       </button>
 
-      <div
-        id={panelId}
-        role="region"
-        aria-labelledby={buttonId}
-        className="service-page__faq-panel"
-      >
-        <div className="service-page__faq-panel-inner">
-          <div className="service-page__faq-answer">
-            <p>{answer}</p>
+      {hasAnswer ? (
+        <div
+          id={panelId}
+          role="region"
+          aria-labelledby={buttonId}
+          className="service-page__faq-panel"
+        >
+          <div className="service-page__faq-panel-inner">
+            <div className="service-page__faq-answer">
+              <p>{answer}</p>
+            </div>
           </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

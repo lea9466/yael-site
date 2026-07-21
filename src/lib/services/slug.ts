@@ -6,7 +6,20 @@ import {
 } from "@/lib/slug/hebrew-slug";
 
 export function slugifyTitle(title: string): string {
-  return slugifyHebrewTitle(title, "service");
+  const trimmed = title.trim();
+
+  if (!trimmed) {
+    return "";
+  }
+
+  return slugifyHebrewTitle(trimmed, "service");
+}
+
+/** Technical slug for drafts saved without a title yet. */
+export function createDraftServiceSlugBase(): string {
+  const token = crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+
+  return `service-${token}`;
 }
 
 export function isValidServiceSlug(slug: string): boolean {

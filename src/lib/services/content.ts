@@ -87,7 +87,7 @@ export function normalizeServiceContent(value: unknown): ServiceContent {
         const description =
           typeof item.description === "string" ? item.description.trim() : "";
 
-        return title && description ? [{ title, description }] : [];
+        return title || description ? [{ title, description }] : [];
       })
     : [];
 
@@ -102,7 +102,7 @@ export function normalizeServiceContent(value: unknown): ServiceContent {
         const answer =
           typeof item.answer === "string" ? item.answer.trim() : "";
 
-        return question && answer ? [{ question, answer }] : [];
+        return question || answer ? [{ question, answer }] : [];
       })
     : [];
 

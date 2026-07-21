@@ -68,7 +68,9 @@ function toServiceListItem(
   record: ServiceRecord,
   mediaMap: Map<string, MediaJoinRow>
 ): ServiceListItem {
-  const cover = mediaMap.get(record.cover_media_id);
+  const cover = record.cover_media_id
+    ? mediaMap.get(record.cover_media_id)
+    : undefined;
 
   return {
     ...record,
@@ -113,7 +115,9 @@ export async function fetchServicesList(
 
     const records = (data ?? []) as ServiceRecord[];
     const mediaMap = await fetchMediaMap(
-      records.map((record) => record.cover_media_id)
+      records
+        .map((record) => record.cover_media_id)
+        .filter((id): id is string => Boolean(id))
     );
 
     const filteredCount = count ?? 0;
@@ -155,14 +159,20 @@ export async function fetchServiceById(
     }
 
     const record = data as ServiceRecord;
-    const mediaIds = [record.cover_media_id];
+    const mediaIds: string[] = [];
+
+    if (record.cover_media_id) {
+      mediaIds.push(record.cover_media_id);
+    }
 
     if (record.seo_og_media_id) {
       mediaIds.push(record.seo_og_media_id);
     }
 
     const mediaMap = await fetchMediaMap(mediaIds);
-    const cover = mediaMap.get(record.cover_media_id);
+    const cover = record.cover_media_id
+      ? mediaMap.get(record.cover_media_id)
+      : undefined;
     const og = record.seo_og_media_id
       ? mediaMap.get(record.seo_og_media_id)
       : undefined;

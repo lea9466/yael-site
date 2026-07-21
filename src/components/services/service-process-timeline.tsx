@@ -68,13 +68,22 @@ function ProcessStepItem({ step, index }: ProcessStepItemProps) {
       </div>
 
       <div className="service-process__card">
-        <h3 className="service-process__card-title">
-          <span className="sr-only">שלב {stepNumber}: </span>
-          {escapeHtml(step.title)}
-        </h3>
-        <p className="service-process__card-description">
-          {escapeHtml(step.description)}
-        </p>
+        {step.title.trim() ? (
+          <h3 className="service-process__card-title">
+            <span className="sr-only">שלב {stepNumber}: </span>
+            {escapeHtml(step.title)}
+          </h3>
+        ) : (
+          <h3 className="service-process__card-title">
+            <span className="sr-only">שלב {stepNumber}</span>
+            <span aria-hidden="true">שלב {stepNumber}</span>
+          </h3>
+        )}
+        {step.description.trim() ? (
+          <p className="service-process__card-description">
+            {escapeHtml(step.description)}
+          </p>
+        ) : null}
       </div>
     </li>
   );

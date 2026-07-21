@@ -11,4 +11,5 @@ export const SERVICE_ERRORS = {
   invalidStatus: "סטטוס השירות אינו תקין.",
   archiveOnlyDelete: "ניתן למחוק לצמיתות רק שירות בארכיון.",
   duplicateFailed: "שכפול השירות נכשל.",
+  publishRequirements: "יש להזין כותרת וכתובת שירות לפני פרסום.",
 } as const;

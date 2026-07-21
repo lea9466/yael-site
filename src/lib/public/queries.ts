@@ -268,11 +268,14 @@ export async function getPublishedServices(): Promise<PublicServiceSummary[]> {
     }
 
     const mediaMap = await fetchCoverMediaMap(
-      data.map((row) => row.cover_media_id as string)
+      data
+        .map((row) => row.cover_media_id as string | null)
+        .filter((id): id is string => Boolean(id))
     );
 
     return data.map((row) => {
-      const cover = mediaMap.get(row.cover_media_id as string);
+      const coverId = row.cover_media_id as string | null;
+      const cover = coverId ? mediaMap.get(coverId) : undefined;
 
       return {
         id: row.id,
@@ -311,14 +314,20 @@ export async function getPublishedServiceBySlug(
     }
 
     const record = data as ServiceRecord;
-    const mediaIds = [record.cover_media_id];
+    const mediaIds: string[] = [];
+
+    if (record.cover_media_id) {
+      mediaIds.push(record.cover_media_id);
+    }
 
     if (record.seo_og_media_id) {
       mediaIds.push(record.seo_og_media_id);
     }
 
     const mediaMap = await fetchCoverMediaMap(mediaIds);
-    const cover = mediaMap.get(record.cover_media_id);
+    const cover = record.cover_media_id
+      ? mediaMap.get(record.cover_media_id)
+      : undefined;
     const og = record.seo_og_media_id
       ? mediaMap.get(record.seo_og_media_id)
       : undefined;

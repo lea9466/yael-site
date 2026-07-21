@@ -14,6 +14,7 @@ import {
   buildDuplicateSlugBase,
   buildDuplicateTitle,
   buildUniqueServiceSlug,
+  createDraftServiceSlugBase,
 } from "@/lib/services/slug";
 import type {
   ServiceActionResult,
@@ -28,6 +29,7 @@ import {
   quickPublishServiceSchema,
   restoreServiceSchema,
   servicePublishInputSchema,
+  serviceRecordToPublishInput,
   unpublishServiceSchema,
   updateServiceSchema,
   type ServiceDraftInput,
@@ -60,17 +62,8 @@ function revalidateServicePaths(serviceId?: string) {
 
 async function validateMediaIds(
   coverMediaId: string | null,
-  ogMediaId: string | null,
-  requireCover: boolean
+  ogMediaId: string | null
 ): Promise<ServiceActionResult> {
-  if (requireCover && !coverMediaId) {
-    return {
-      success: false,
-      error: SERVICE_ERRORS.coverRequiredPublish,
-      fieldErrors: { cover_media_id: SERVICE_ERRORS.coverRequiredPublish },
-    };
-  }
-
   if (coverMediaId) {
     const coverExists = await verifyMediaExists(coverMediaId);
 
@@ -115,13 +108,45 @@ async function validateSlugAvailability(
   return { success: true };
 }
 
+async function resolveServiceSlugForSave(
+  slug: string,
+  options?: {
+    excludeId?: string;
+    existingSlug?: string | null;
+  }
+): Promise<ServiceActionResult<string>> {
+  const trimmed = slug.trim();
+
+  if (trimmed) {
+    const availability = await validateSlugAvailability(
+      trimmed,
+      options?.excludeId
+    );
+
+    if (!availability.success) {
+      return availability;
+    }
+
+    return { success: true, data: trimmed };
+  }
+
+  const existingSlug = options?.existingSlug?.trim();
+
+  if (existingSlug) {
+    return { success: true, data: existingSlug };
+  }
+
+  const uniqueSlug = await buildUniqueServiceSlug(
+    createDraftServiceSlugBase(),
+    (candidate) => isServiceSlugTaken(candidate, options?.excludeId)
+  );
+
+  return { success: true, data: uniqueSlug };
+}
+
 function toServiceInsertRow(
   input: ServiceDraftInput | ServicePublishInput
 ) {
-  if (!input.cover_media_id) {
-    throw new Error("cover_media_id is required by database schema");
-  }
-
   return {
     title: input.title,
     slug: input.slug,
@@ -141,10 +166,6 @@ function toServiceUpdateRow(
   input: ServiceDraftInput | ServicePublishInput,
   existingPublishedAt: string | null
 ) {
-  if (!input.cover_media_id) {
-    throw new Error("cover_media_id is required by database schema");
-  }
-
   const isPublishing = input.status === "published";
   const publishedAt =
     isPublishing && !existingPublishedAt
@@ -189,35 +210,38 @@ export async function createServiceAction(
   }
 
   const data = parsed.data;
-  const requireCover = data.status === "published";
-
-  if (!data.cover_media_id) {
-    return {
-      success: false,
-      error: SERVICE_ERRORS.coverRequired,
-      fieldErrors: { cover_media_id: SERVICE_ERRORS.coverRequired },
-    };
-  }
 
   const mediaValidation = await validateMediaIds(
     data.cover_media_id,
-    data.seo_og_media_id,
-    requireCover
+    data.seo_og_media_id
   );
 
   if (!mediaValidation.success) {
     return mediaValidation;
   }
 
-  const slugValidation = await validateSlugAvailability(data.slug);
+  const slugResolution = await resolveServiceSlugForSave(data.slug);
 
-  if (!slugValidation.success) {
-    return slugValidation;
+  if (!slugResolution.success) {
+    return {
+      success: false,
+      error: slugResolution.error,
+      fieldErrors: slugResolution.fieldErrors,
+    };
   }
+
+  if (!slugResolution.data) {
+    return { success: false, error: SERVICE_ERRORS.generic };
+  }
+
+  const rowInput = {
+    ...data,
+    slug: slugResolution.data,
+  } as ServiceDraftInput | ServicePublishInput;
 
   const { data: inserted, error } = await session.supabase
     .from("services")
-    .insert(toServiceInsertRow(parsed.data as ServiceDraftInput | ServicePublishInput))
+    .insert(toServiceInsertRow(rowInput))
     .select("id")
     .single();
 
@@ -239,12 +263,18 @@ export async function updateServiceAction(
     return { success: false, error: SERVICE_ERRORS.unauthorized };
   }
 
-  const parsed = updateServiceSchema.safeParse(input);
+  const parsed =
+    input.status === "published"
+      ? publishServiceSchema.safeParse({ ...input, status: "published" })
+      : updateServiceSchema.safeParse(input);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: SERVICE_ERRORS.generic,
+      error:
+        input.status === "published"
+          ? SERVICE_ERRORS.publishRequirements
+          : SERVICE_ERRORS.generic,
       fieldErrors: mapZodErrors(parsed.error),
     };
   }
@@ -257,33 +287,40 @@ export async function updateServiceAction(
 
   const data = parsed.data;
 
-  if (!data.cover_media_id) {
-    return {
-      success: false,
-      error: SERVICE_ERRORS.coverRequired,
-      fieldErrors: { cover_media_id: SERVICE_ERRORS.coverRequired },
-    };
-  }
-
   const mediaValidation = await validateMediaIds(
     data.cover_media_id,
-    data.seo_og_media_id,
-    data.status === "published"
+    data.seo_og_media_id
   );
 
   if (!mediaValidation.success) {
     return mediaValidation;
   }
 
-  const slugValidation = await validateSlugAvailability(data.slug, data.id);
+  const slugResolution = await resolveServiceSlugForSave(data.slug, {
+    excludeId: data.id,
+    existingSlug: existing.slug,
+  });
 
-  if (!slugValidation.success) {
-    return slugValidation;
+  if (!slugResolution.success) {
+    return {
+      success: false,
+      error: slugResolution.error,
+      fieldErrors: slugResolution.fieldErrors,
+    };
   }
+
+  if (!slugResolution.data) {
+    return { success: false, error: SERVICE_ERRORS.generic };
+  }
+
+  const rowInput = {
+    ...data,
+    slug: slugResolution.data,
+  };
 
   const { error } = await session.supabase
     .from("services")
-    .update(toServiceUpdateRow(data, existing.published_at))
+    .update(toServiceUpdateRow(rowInput, existing.published_at))
     .eq("id", data.id);
 
   if (error) {
@@ -323,8 +360,7 @@ export async function publishServiceAction(
   const data = parsed.data;
   const mediaValidation = await validateMediaIds(
     data.cover_media_id,
-    data.seo_og_media_id,
-    true
+    data.seo_og_media_id
   );
 
   if (!mediaValidation.success) {
@@ -428,6 +464,18 @@ export async function quickPublishServiceAction(
 
   if (existing.status !== "draft") {
     return { success: false, error: SERVICE_ERRORS.generic };
+  }
+
+  const publishCheck = servicePublishInputSchema.safeParse(
+    serviceRecordToPublishInput(existing)
+  );
+
+  if (!publishCheck.success) {
+    return {
+      success: false,
+      error: SERVICE_ERRORS.publishRequirements,
+      fieldErrors: mapZodErrors(publishCheck.error),
+    };
   }
 
   const publishedAt =
@@ -540,6 +588,21 @@ export async function restoreServiceAction(
   }
 
   const nextStatus = parsed.data.publish ? "published" : "draft";
+
+  if (nextStatus === "published") {
+    const publishCheck = servicePublishInputSchema.safeParse(
+      serviceRecordToPublishInput(existing)
+    );
+
+    if (!publishCheck.success) {
+      return {
+        success: false,
+        error: SERVICE_ERRORS.publishRequirements,
+        fieldErrors: mapZodErrors(publishCheck.error),
+      };
+    }
+  }
+
   const publishedAt =
     nextStatus === "published" && !existing.published_at
       ? new Date().toISOString()

@@ -10,6 +10,7 @@ type SlugFormFieldProps = {
   value: string;
   hint?: string;
   error?: string;
+  required?: boolean;
   onChange: (value: string) => void;
   onManualEdit: () => void;
   onResetFromTitle: () => void;
@@ -21,12 +22,19 @@ export function SlugFormField({
   value,
   hint = "נוצר אוטומטית מהכותרת. ניתן לעריכה ידנית.",
   error,
+  required = true,
   onChange,
   onManualEdit,
   onResetFromTitle,
 }: SlugFormFieldProps) {
   return (
-    <FormField label={label} htmlFor={htmlFor} required hint={hint} error={error}>
+    <FormField
+      label={label}
+      htmlFor={htmlFor}
+      required={required}
+      hint={hint}
+      error={error}
+    >
       <div className="space-y-2">
         <Input
           id={htmlFor}

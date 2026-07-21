@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FormToast } from "@/components/ui/form-toast";
 import { MultilineText } from "@/components/ui/multiline-text";
+import { SERVICE_UNTITLED_LABEL } from "@/lib/services/constants";
 import { formatServiceDate } from "@/lib/services/format";
 import type { ServiceListItem } from "@/lib/services/types";
 
@@ -127,15 +128,20 @@ export function ServiceRow({ item }: ServiceRowProps) {
         <div className="min-w-0 flex-1 space-y-3">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 space-y-2.5">
-              <h3 className="truncate text-card-title" title={item.title}>
-                {item.title}
-              </h3>
-              <MultilineText
-                as="p"
-                className="line-clamp-2 text-sm text-[var(--color-text-muted)]"
+              <h3
+                className="truncate text-card-title"
+                title={item.title.trim() || SERVICE_UNTITLED_LABEL}
               >
-                {item.short_description}
-              </MultilineText>
+                {item.title.trim() || SERVICE_UNTITLED_LABEL}
+              </h3>
+              {item.short_description.trim() ? (
+                <MultilineText
+                  as="p"
+                  className="line-clamp-2 text-sm text-[var(--color-text-muted)]"
+                >
+                  {item.short_description}
+                </MultilineText>
+              ) : null}
               <div className="flex flex-wrap gap-2">
                 <AdminStatusBadge status={item.status} />
                 {item.featured ? <AdminFeaturedBadge /> : null}

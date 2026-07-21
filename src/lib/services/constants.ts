@@ -22,11 +22,13 @@ export const RESERVED_SERVICE_SLUGS = [
 ] as const;
 
 export const SERVICE_REPEATER_LIMITS = {
-  target_audience: { min: 1, max: 20 },
-  benefits: { min: 1, max: 20 },
-  process_steps: { min: 1, max: 15 },
+  target_audience: { min: 0, max: 20 },
+  benefits: { min: 0, max: 20 },
+  process_steps: { min: 0, max: 15 },
   faq: { min: 0, max: 20 },
 } as const;
+
+export const SERVICE_UNTITLED_LABEL = "שירות ללא כותרת";
 
 export const STATUS_LABELS: Record<ContentStatus, string> = {
   draft: "טיוטה",

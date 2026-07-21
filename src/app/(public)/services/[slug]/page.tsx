@@ -53,12 +53,14 @@ export async function generateMetadata({
     service.ogUrl ?? service.coverUrl ?? settings.ogImage?.url ?? null;
   const ogImageAlt = service.ogAlt ?? service.coverAlt ?? service.title;
 
+  const resolvedDescription =
+    seo.description.trim() ||
+    shortenForSeoDescription(service.short_description);
+
   const metadata = buildSiteMetadata(settings, {
     path: buildContentPath("/services", service.slug),
-    title: seo.title,
-    description:
-      seo.description ||
-      shortenForSeoDescription(service.short_description),
+    title: seo.title.trim() || service.title.trim() || undefined,
+    description: resolvedDescription || undefined,
     ogImage,
     ogImageAlt,
   });

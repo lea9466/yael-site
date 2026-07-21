@@ -45,7 +45,7 @@ export type ServiceRecord = {
   slug: string;
   short_description: string;
   full_introduction: string;
-  cover_media_id: string;
+  cover_media_id: string | null;
   seo_og_media_id: string | null;
   content: ServiceContent;
   seo: ServiceSeo;

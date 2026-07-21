@@ -133,7 +133,8 @@ function toSubmitContent(content: FormContentState): ServiceDraftInput["content"
       .map(({ text }) => ({ text: text.trim() })),
     process_steps: content.process_steps
       .filter(
-        (item) => item.title.trim().length > 0 && item.description.trim().length > 0
+        (item) =>
+          item.title.trim().length > 0 || item.description.trim().length > 0
       )
       .map(({ title, description }) => ({
         title: title.trim(),
@@ -141,17 +142,18 @@ function toSubmitContent(content: FormContentState): ServiceDraftInput["content"
       })),
     faq: content.faq
       .filter(
-        (item) => item.question.trim().length > 0 && item.answer.trim().length > 0
+        (item) =>
+          item.question.trim().length > 0 || item.answer.trim().length > 0
       )
       .map(({ question, answer }) => ({
         question: question.trim(),
         answer: answer.trim(),
       })),
-    cta_title: content.cta_title,
-    cta_text: content.cta_text,
-    cta_button_label: content.cta_button_label,
+    cta_title: content.cta_title.trim(),
+    cta_text: content.cta_text.trim(),
+    cta_button_label: content.cta_button_label.trim(),
     cta_link_type: content.cta_link_type,
-    cta_link_url: content.cta_link_url,
+    cta_link_url: content.cta_link_url.trim(),
   };
 }
 
@@ -176,7 +178,7 @@ export function ServiceForm({
   const [values, setValues] = useState(initialValues);
   const [content, setContent] = useState(() => toRepeaterContent(initialValues.content));
   const [coverPreview, setCoverPreview] = useState(
-    initialService?.coverUrl
+    initialService?.coverUrl && initialService.cover_media_id
       ? {
           id: initialService.cover_media_id,
           url: initialService.coverUrl,
@@ -311,12 +313,20 @@ export function ServiceForm({
       const statusToKeep =
         mode === "create" ? "draft" : (initialService?.status ?? values.status);
       const payload = buildPayload(statusToKeep);
-      const parsed = serviceDraftInputSchema.safeParse(payload);
+      const parsed =
+        statusToKeep === "published"
+          ? servicePublishInputSchema.safeParse({
+              ...payload,
+              status: "published",
+            })
+          : serviceDraftInputSchema.safeParse(payload);
 
       if (!parsed.success) {
         showValidationFeedback(
           mapZodErrors(parsed.error),
-          "יש לתקן את השדות המסומנים."
+          statusToKeep === "published"
+            ? "יש להשלים כותרת וכתובת שירות לפני שמירת שירות מפורסם."
+            : "יש לתקן את השדות המסומנים."
         );
         return;
       }
@@ -557,7 +567,7 @@ export function ServiceForm({
             <FormField
               label="כותרת"
               htmlFor="service-title"
-              required
+              hint="אופציונלי בטיוטה · נדרשת לפרסום"
               error={fieldErrors.title}
             >
               <Input
@@ -572,6 +582,8 @@ export function ServiceForm({
             <SlugFormField
               label="כתובת שירות (slug)"
               htmlFor="service-slug"
+              required={false}
+              hint="נוצרת אוטומטית מהכותרת. אופציונלית בטיוטה · נדרשת לפרסום"
               value={values.slug}
               error={fieldErrors.slug}
               onChange={(slug) => setField("slug", slug)}
@@ -582,8 +594,7 @@ export function ServiceForm({
             <FormField
               label="תיאור קצר"
               htmlFor="service-short-description"
-              required
-              hint={`${values.short_description.length}/300 · ניתן להוסיף שורות חדשות`}
+              hint={`${values.short_description.length}/300 · אופציונלי`}
               error={fieldErrors.short_description}
             >
               <Textarea
@@ -599,8 +610,7 @@ export function ServiceForm({
 
             <ServiceMediaPicker
               label="תמונת כיסוי"
-              description="נדרשת לשמירה. חובה לפרסום."
-              required
+              description="אופציונלי"
               value={values.cover_media_id}
               preview={coverPreview}
               error={fieldErrors.cover_media_id}
@@ -631,8 +641,7 @@ export function ServiceForm({
             <FormField
               label="הקדמה מלאה"
               htmlFor="service-full-introduction"
-              required
-              hint="טקסט רציף. יוצג בפסקאות נפרדות באתר."
+              hint="אופציונלי · טקסט רציף. יוצג בפסקאות נפרדות באתר."
               error={fieldErrors.full_introduction}
             >
               <Textarea
@@ -657,12 +666,12 @@ export function ServiceForm({
           >
             <RepeaterField
               label="למי מתאים"
-              description="רשימת קהלי יעד עם אייקון אופציונלי"
+              description="אופציונלי · רשימת קהלי יעד עם אייקון אופציונלי"
               items={content.target_audience}
               minItems={SERVICE_REPEATER_LIMITS.target_audience.min}
               maxItems={SERVICE_REPEATER_LIMITS.target_audience.max}
               addLabel="הוספת קהל יעד"
-              emptyLabel="הוסיפו לפחות פריט אחד לפני פרסום"
+              emptyLabel="לא נוספו קהלי יעד"
               error={getFieldErrorMessage(fieldErrors, "content.target_audience")}
               createItem={() => ({
                 id: createRepeaterItemId(),
@@ -699,11 +708,12 @@ export function ServiceForm({
           >
             <RepeaterField
               label="יתרונות"
+              description="אופציונלי"
               items={content.benefits}
               minItems={SERVICE_REPEATER_LIMITS.benefits.min}
               maxItems={SERVICE_REPEATER_LIMITS.benefits.max}
               addLabel="הוספת יתרון"
-              emptyLabel="הוסיפו יתרונות לשירות"
+              emptyLabel="לא נוספו יתרונות"
               error={getFieldErrorMessage(fieldErrors, "content.benefits")}
               createItem={() => ({ id: createRepeaterItemId(), text: "" })}
               onChange={(items) =>
@@ -729,11 +739,12 @@ export function ServiceForm({
           >
             <RepeaterField
               label="שלבי התהליך"
+              description="אופציונלי"
               items={content.process_steps}
               minItems={SERVICE_REPEATER_LIMITS.process_steps.min}
               maxItems={SERVICE_REPEATER_LIMITS.process_steps.max}
               addLabel="הוספת שלב"
-              emptyLabel="הוסיפו שלבי תהליך"
+              emptyLabel="לא נוספו שלבי תהליך"
               error={getFieldErrorMessage(fieldErrors, "content.process_steps")}
               createItem={() => ({
                 id: createRepeaterItemId(),
@@ -813,11 +824,11 @@ export function ServiceForm({
             )}
           >
             <h2 className="text-section-title">הנעה לפעולה</h2>
+            <p className="text-sm text-[var(--color-text-muted)]">אופציונלי</p>
 
             <FormField
               label="כותרת"
               htmlFor="field-cta-title"
-              required
               error={fieldErrors["content.cta_title"]}
             >
               <Input
@@ -837,7 +848,6 @@ export function ServiceForm({
             <FormField
               label="טקסט"
               htmlFor="field-cta-text"
-              required
               error={fieldErrors["content.cta_text"]}
             >
               <Textarea
@@ -857,7 +867,6 @@ export function ServiceForm({
             <FormField
               label="תווית כפתור"
               htmlFor="field-cta-button-label"
-              required
               error={fieldErrors["content.cta_button_label"]}
             >
               <Input
@@ -891,7 +900,6 @@ export function ServiceForm({
             <FormField
               label="כתובת קישור"
               htmlFor="field-cta-link-url"
-              required
               error={fieldErrors["content.cta_link_url"]}
             >
               <Input

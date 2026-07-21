@@ -5774,6 +5774,11 @@
   text-align: center;
 }
 
+.service-page--no-cover .service-page__hero-inner {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+
 .service-page__hero-copy {
   display: flex;
   flex-direction: column;

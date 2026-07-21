@@ -3,6 +3,12 @@ import { z } from "zod";
 import { CONTENT_STATUSES } from "@/types/content";
 import { normalizeServiceAudienceIcon } from "@/lib/services/audience-icons";
 import { SERVICE_REPEATER_LIMITS } from "@/lib/services/constants";
+import type {
+  ServiceAudienceItem,
+  ServiceFaqItem,
+  ServiceProcessStep,
+  ServiceTextItem,
+} from "@/lib/services/types";
 import {
   isReservedServiceSlug,
   isValidServiceSlug,
@@ -31,76 +37,125 @@ export type ServiceSortValue = (typeof SERVICE_SORT_VALUES)[number];
 
 const uuidSchema = z.string().uuid("מזהה אינו תקין");
 
-const textItemSchema = z.object({
-  text: z
-    .string()
-    .trim()
-    .min(1, "יש להזין טקסט")
-    .max(300, "הטקסט ארוך מדי"),
+const optionalUuidSchema = z
+  .union([uuidSchema, z.literal(""), z.null()])
+  .transform((value) => (value && value.length > 0 ? value : null));
+
+const audienceItemSchema = z.object({
+  text: z.string().trim().max(300, "הטקסט ארוך מדי"),
+  icon: z.string().optional().nullable(),
 });
 
-const audienceItemSchema = z
-  .object({
-    text: z
-      .string()
-      .trim()
-      .min(1, "יש להזין טקסט")
-      .max(300, "הטקסט ארוך מדי"),
-    icon: z.string().optional().nullable(),
-  })
-  .transform((item) => {
-    const icon = normalizeServiceAudienceIcon(item.icon);
-
-    return icon ? { text: item.text, icon } : { text: item.text };
-  });
+const textItemSchema = z.object({
+  text: z.string().trim().max(300, "הטקסט ארוך מדי"),
+});
 
 const processStepSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(1, "יש להזין כותרת")
-    .max(120, "הכותרת ארוכה מדי"),
-  description: z
-    .string()
-    .trim()
-    .min(1, "יש להזין תיאור")
-    .max(1000, "התיאור ארוך מדי"),
+  title: z.string().trim().max(120, "הכותרת ארוכה מדי"),
+  description: z.string().trim().max(1000, "התיאור ארוך מדי"),
 });
 
 const faqItemSchema = z.object({
-  question: z
-    .string()
-    .trim()
-    .min(1, "יש להזין שאלה")
-    .max(200, "השאלה ארוכה מדי"),
-  answer: z
-    .string()
-    .trim()
-    .min(1, "יש להזין תשובה")
-    .max(2000, "התשובה ארוכה מדי"),
+  question: z.string().trim().max(200, "השאלה ארוכה מדי"),
+  answer: z.string().trim().max(2000, "התשובה ארוכה מדי"),
 });
 
-const slugSchema = z
+function filterAudienceItems(
+  items: Array<{ text: string; icon?: string | null }>
+): ServiceAudienceItem[] {
+  return items.flatMap((item) => {
+    const text = item.text.trim();
+
+    if (!text) {
+      return [];
+    }
+
+    const icon = normalizeServiceAudienceIcon(item.icon);
+
+    return icon ? [{ text, icon }] : [{ text }];
+  });
+}
+
+function filterTextItems(items: Array<{ text: string }>): ServiceTextItem[] {
+  return items.flatMap((item) => {
+    const text = item.text.trim();
+
+    return text ? [{ text }] : [];
+  });
+}
+
+function filterProcessSteps(
+  items: Array<{ title: string; description: string }>
+): ServiceProcessStep[] {
+  return items.flatMap((item) => {
+    const title = item.title.trim();
+    const description = item.description.trim();
+
+    if (!title && !description) {
+      return [];
+    }
+
+    return [{ title, description }];
+  });
+}
+
+function filterFaqItems(
+  items: Array<{ question: string; answer: string }>
+): ServiceFaqItem[] {
+  return items.flatMap((item) => {
+    const question = item.question.trim();
+    const answer = item.answer.trim();
+
+    if (!question && !answer) {
+      return [];
+    }
+
+    return [{ question, answer }];
+  });
+}
+
+const optionalSlugSchema = z
+  .string()
+  .trim()
+  .max(120, "כתובת השירות ארוכה מדי")
+  .refine((value) => value.length === 0 || isValidServiceSlug(value), {
+    message:
+      "כתובת השירות יכולה להכיל אותיות בעברית או באנגלית, מספרים ומקפים בלבד",
+  })
+  .refine((value) => value.length === 0 || !isReservedServiceSlug(value), {
+    message: "כתובת זו שמורה למערכת",
+  });
+
+const requiredSlugSchema = z
   .string()
   .trim()
   .min(1, "יש להזין כתובת שירות")
   .max(120, "כתובת השירות ארוכה מדי")
   .refine((value) => isValidServiceSlug(value), {
-    message: "כתובת השירות יכולה להכיל אותיות בעברית או באנגלית, מספרים ומקפים בלבד",
+    message:
+      "כתובת השירות יכולה להכיל אותיות בעברית או באנגלית, מספרים ומקפים בלבד",
   })
   .refine((value) => !isReservedServiceSlug(value), {
     message: "כתובת זו שמורה למערכת",
   });
 
-const serviceContentDraftSchema = z.object({
+const serviceContentSchema = z.object({
   target_audience: z
     .array(audienceItemSchema)
-    .max(SERVICE_REPEATER_LIMITS.target_audience.max),
-  benefits: z.array(textItemSchema).max(SERVICE_REPEATER_LIMITS.benefits.max),
+    .max(SERVICE_REPEATER_LIMITS.target_audience.max)
+    .transform(filterAudienceItems),
+  benefits: z
+    .array(textItemSchema)
+    .max(SERVICE_REPEATER_LIMITS.benefits.max)
+    .transform(filterTextItems),
   process_steps: z
     .array(processStepSchema)
-    .max(SERVICE_REPEATER_LIMITS.process_steps.max),
-  faq: z.array(faqItemSchema).max(SERVICE_REPEATER_LIMITS.faq.max),
+    .max(SERVICE_REPEATER_LIMITS.process_steps.max)
+    .transform(filterProcessSteps),
+  faq: z
+    .array(faqItemSchema)
+    .max(SERVICE_REPEATER_LIMITS.faq.max)
+    .transform(filterFaqItems),
   cta_title: z.string().trim().max(120, "כותרת ההנעה ארוכה מדי"),
   cta_text: z.string().trim().max(500, "טקסט ההנעה ארוך מדי"),
   cta_button_label: z.string().trim().max(60, "תווית הכפתור ארוכה מדי"),
@@ -108,115 +163,95 @@ const serviceContentDraftSchema = z.object({
   cta_link_url: z.string().trim().max(500, "הקישור ארוך מדי"),
 });
 
-const serviceContentPublishSchema = serviceContentDraftSchema.extend({
-  target_audience: z
-    .array(audienceItemSchema)
-    .min(
-      SERVICE_REPEATER_LIMITS.target_audience.min,
-      `יש להוסיף לפחות ${SERVICE_REPEATER_LIMITS.target_audience.min} פריט`
-    )
-    .max(SERVICE_REPEATER_LIMITS.target_audience.max),
-  benefits: z
-    .array(textItemSchema)
-    .min(
-      SERVICE_REPEATER_LIMITS.benefits.min,
-      `יש להוסיף לפחות ${SERVICE_REPEATER_LIMITS.benefits.min} יתרון`
-    )
-    .max(SERVICE_REPEATER_LIMITS.benefits.max),
-  process_steps: z
-    .array(processStepSchema)
-    .min(
-      SERVICE_REPEATER_LIMITS.process_steps.min,
-      `יש להוסיף לפחות ${SERVICE_REPEATER_LIMITS.process_steps.min} שלב`
-    )
-    .max(SERVICE_REPEATER_LIMITS.process_steps.max),
-  cta_title: z
-    .string()
-    .trim()
-    .min(1, "יש להזין כותרת להנעה לפעולה")
-    .max(120, "כותרת ההנעה ארוכה מדי"),
-  cta_text: z
-    .string()
-    .trim()
-    .min(1, "יש להזין טקסט להנעה לפעולה")
-    .max(500, "טקסט ההנעה ארוך מדי"),
-  cta_button_label: z
-    .string()
-    .trim()
-    .min(1, "יש להזין תווית לכפתור")
-    .max(60, "תווית הכפתור ארוכה מדי"),
-  cta_link_url: z
-    .string()
-    .trim()
-    .min(1, "יש להזין קישור")
-    .max(500, "הקישור ארוך מדי"),
-});
+function refineCtaLinkUrl(
+  value: {
+    content: {
+      cta_link_type: "internal" | "external";
+      cta_link_url: string;
+    };
+  },
+  ctx: z.RefinementCtx
+) {
+  const url = value.content.cta_link_url.trim();
+
+  if (!url) {
+    return;
+  }
+
+  if (value.content.cta_link_type === "external") {
+    if (!/^https?:\/\/.+/i.test(url)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "קישור חיצוני חייב להתחיל ב-http:// או https://",
+        path: ["content", "cta_link_url"],
+      });
+    }
+
+    return;
+  }
+
+  if (!url.startsWith("/")) {
+    ctx.addIssue({
+      code: "custom",
+      message: "קישור פנימי חייב להתחיל ב-/",
+      path: ["content", "cta_link_url"],
+    });
+  }
+}
 
 const serviceSeoSchema = z.object({
   title: z.string().trim().max(70, "כותרת SEO ארוכה מדי"),
   description: z.string().trim().max(160, "תיאור SEO ארוך מדי"),
 });
 
-const serviceBaseFieldsSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(2, "יש להזין לפחות 2 תווים בכותרת")
-    .max(120, "הכותרת ארוכה מדי"),
-  slug: slugSchema,
+const serviceSharedFieldsSchema = z.object({
   short_description: z
     .string()
     .max(300, "התיאור הקצר ארוך מדי")
-    .transform(normalizeMultilineText)
-    .pipe(z.string().min(1, "יש להזין תיאור קצר")),
-  full_introduction: z
-    .string()
-    .trim()
-    .min(1, "יש להזין הקדמה מלאה")
-    .max(10000, "ההקדמה ארוכה מדי"),
-  cover_media_id: uuidSchema.nullable(),
-  seo_og_media_id: uuidSchema.nullable(),
+    .transform(normalizeMultilineText),
+  full_introduction: z.string().trim().max(10000, "ההקדמה ארוכה מדי"),
+  cover_media_id: optionalUuidSchema,
+  seo_og_media_id: optionalUuidSchema,
   featured: z.boolean(),
-  content: serviceContentDraftSchema,
+  content: serviceContentSchema,
   seo: serviceSeoSchema,
 });
 
-export const serviceDraftInputSchema = serviceBaseFieldsSchema.extend({
+const serviceDraftObjectSchema = serviceSharedFieldsSchema.extend({
+  title: z.string().trim().max(120, "הכותרת ארוכה מדי"),
+  slug: optionalSlugSchema,
   status: z.enum(CONTENT_STATUSES).default("draft"),
 });
 
-export const servicePublishInputSchema = serviceBaseFieldsSchema
-  .extend({
-    status: z.literal("published"),
-    content: serviceContentPublishSchema,
-    cover_media_id: uuidSchema,
-  })
-  .superRefine((value, ctx) => {
-    if (value.content.cta_link_type === "external") {
-      if (!/^https?:\/\/.+/i.test(value.content.cta_link_url)) {
-        ctx.addIssue({
-          code: "custom",
-          message: "קישור חיצוני חייב להתחיל ב-http:// או https://",
-          path: ["content", "cta_link_url"],
-        });
-      }
-    } else if (!value.content.cta_link_url.startsWith("/")) {
-      ctx.addIssue({
-        code: "custom",
-        message: "קישור פנימי חייב להתחיל ב-/",
-        path: ["content", "cta_link_url"],
-      });
-    }
-  });
+const servicePublishObjectSchema = serviceSharedFieldsSchema.extend({
+  title: z
+    .string()
+    .trim()
+    .min(1, "יש להזין כותרת לפני פרסום")
+    .max(120, "הכותרת ארוכה מדי"),
+  slug: requiredSlugSchema,
+  status: z.literal("published"),
+});
+
+export const serviceDraftInputSchema =
+  serviceDraftObjectSchema.superRefine(refineCtaLinkUrl);
+
+export const servicePublishInputSchema =
+  servicePublishObjectSchema.superRefine(refineCtaLinkUrl);
 
 export const createServiceSchema = serviceDraftInputSchema;
-export const updateServiceSchema = serviceDraftInputSchema.extend({
-  id: uuidSchema,
-});
 
-export const publishServiceSchema = servicePublishInputSchema.extend({
-  id: uuidSchema,
-});
+export const updateServiceSchema = serviceDraftObjectSchema
+  .extend({
+    id: uuidSchema,
+  })
+  .superRefine(refineCtaLinkUrl);
+
+export const publishServiceSchema = servicePublishObjectSchema
+  .extend({
+    id: uuidSchema,
+  })
+  .superRefine(refineCtaLinkUrl);
 
 export const listServicesQuerySchema = z.object({
   q: z
@@ -269,4 +304,30 @@ export function mapZodErrors(
   }
 
   return fieldErrors;
+}
+
+/** Build a publish-shaped payload from a stored service for quick-publish checks. */
+export function serviceRecordToPublishInput(service: {
+  title: string;
+  slug: string;
+  short_description: string;
+  full_introduction: string;
+  cover_media_id: string | null;
+  seo_og_media_id: string | null;
+  featured: boolean;
+  content: ServiceDraftInput["content"];
+  seo: ServiceDraftInput["seo"];
+}): ServicePublishInput {
+  return {
+    title: service.title,
+    slug: service.slug,
+    short_description: service.short_description,
+    full_introduction: service.full_introduction,
+    cover_media_id: service.cover_media_id,
+    seo_og_media_id: service.seo_og_media_id,
+    featured: service.featured,
+    content: service.content,
+    seo: service.seo,
+    status: "published",
+  };
 }

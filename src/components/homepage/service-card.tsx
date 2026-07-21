@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 import { PublicHighlightPill } from "@/components/homepage/public-highlight-pill";
 import { MultilineText } from "@/components/ui/multiline-text";
@@ -14,6 +15,10 @@ type ServiceCardProps = {
   service: PublicServiceSummary;
   surface?: ServiceCardSurface;
   isPrimaryFeatured?: boolean;
+  /** Pathway layout for homepage; media layout for /services listing. */
+  variant?: "pathway" | "media";
+  /** 1-based ordinal shown on pathway cards (01, 02…). */
+  ordinal?: number;
   className?: string;
 };
 
@@ -23,19 +28,27 @@ const surfaceClasses: Record<ServiceCardSurface, string> = {
   cream: "service-card--cream",
 };
 
+function formatOrdinal(ordinal: number): string {
+  return String(ordinal).padStart(2, "0");
+}
+
 export function ServiceCard({
   service,
   surface = "white",
   isPrimaryFeatured = false,
+  variant = "media",
+  ordinal,
   className,
 }: ServiceCardProps) {
   const badge = getServiceCardBadge(service, isPrimaryFeatured);
   const href = `/services/${service.slug}`;
+  const isPathway = variant === "pathway";
 
   return (
     <article
       className={cn(
         "service-card group",
+        isPathway ? "service-card--pathway" : "service-card--media",
         surfaceClasses[surface],
         className
       )}
@@ -49,28 +62,43 @@ export function ServiceCard({
         />
       ) : null}
 
-      <Link
-        href={href}
-        className="service-card__media public-focus-ring"
-        aria-label={service.title}
-      >
-        {service.coverUrl ? (
-          <Image
-            src={service.coverUrl}
-            alt={service.coverAlt ?? service.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="service-card__image"
-          />
-        ) : (
-          <div className="service-card__media-fallback">{service.title}</div>
-        )}
-      </Link>
+      <div className="service-card__media-wrap">
+        {isPathway && ordinal != null ? (
+          <span aria-hidden="true" className="service-card__ordinal">
+            {formatOrdinal(ordinal)}
+          </span>
+        ) : null}
+
+        <Link
+          href={href}
+          className="service-card__media public-focus-ring"
+          aria-label={service.title}
+        >
+          {service.coverUrl ? (
+            <Image
+              src={service.coverUrl}
+              alt={service.coverAlt ?? service.title}
+              fill
+              sizes={
+                isPathway
+                  ? "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              }
+              className="service-card__image"
+            />
+          ) : (
+            <div className="service-card__media-fallback">{service.title}</div>
+          )}
+        </Link>
+      </div>
 
       <div className="service-card__body">
         <div className="service-card__copy">
           <h3 className="service-card__title">
-            <Link href={href} className="public-focus-ring rounded-[var(--radius-sm)]">
+            <Link
+              href={href}
+              className="public-focus-ring rounded-[var(--radius-sm)]"
+            >
               {service.title}
             </Link>
           </h3>
@@ -79,8 +107,19 @@ export function ServiceCard({
           </MultilineText>
         </div>
 
-        <Link href={href} className="hero-btn hero-btn--secondary service-card__cta public-focus-ring">
-          לפרטים
+        <Link
+          href={href}
+          className={cn(
+            "service-card__cta public-focus-ring",
+            isPathway
+              ? "service-card__cta--pathway"
+              : "hero-btn hero-btn--secondary"
+          )}
+        >
+          <span>לפרטים</span>
+          {isPathway ? (
+            <ArrowLeft aria-hidden="true" className="service-card__cta-icon" />
+          ) : null}
         </Link>
       </div>
     </article>

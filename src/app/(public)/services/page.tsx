@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { ServiceCard } from "@/components/homepage/service-card";
+import { getServiceCardSurface } from "@/lib/homepage/service-card-display";
 import {
   getPublishedServices,
   getWebsiteSettings,
@@ -19,6 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PublicServicesPage() {
   const services = await getPublishedServices();
+  const primaryFeaturedId =
+    services.find((service) => service.featured)?.id ?? null;
 
   return (
     <div className="mx-auto w-full max-w-[90rem] px-5 py-12 md:px-20 md:py-16">
@@ -34,12 +37,15 @@ export default async function PublicServicesPage() {
           אין שירותים מפורסמים כרגע.
         </p>
       ) : (
-        <ul className="grid list-none gap-6 p-0 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="services-listing-grid grid list-none gap-8 p-0 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service, index) => (
-            <li key={service.id}>
+            <li key={service.id} className="services-section__item">
               <ServiceCard
                 service={service}
-                isPrimaryFeatured={index === 0 && service.featured}
+                variant="pathway"
+                ordinal={index + 1}
+                surface={getServiceCardSurface(index)}
+                isPrimaryFeatured={service.id === primaryFeaturedId}
               />
             </li>
           ))}

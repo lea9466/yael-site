@@ -39,6 +39,8 @@ export function ServicesSection({ services }: ServicesSectionProps) {
               <HomepageReveal delayMs={index * 90} className="h-full">
                 <ServiceCard
                   service={service}
+                  variant="pathway"
+                  ordinal={index + 1}
                   surface={getServiceCardSurface(index)}
                   isPrimaryFeatured={service.id === primaryFeaturedId}
                 />

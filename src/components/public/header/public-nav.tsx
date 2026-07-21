@@ -17,7 +17,7 @@ export function PublicNav({ links, className, onNavigate }: PublicNavProps) {
 
   return (
     <nav aria-label="ניווט ראשי" className={className}>
-      <ul className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-1">
+      <ul className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-8 xl:gap-10">
         {links.map((link) => {
           const isActive =
             link.href === "/"

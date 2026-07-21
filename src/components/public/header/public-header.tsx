@@ -116,20 +116,19 @@ export function PublicHeader({ settings }: PublicHeaderProps) {
             : "public-header--transparent border-b border-transparent bg-transparent"
         )}
       >
-        <Container
-          className={cn(
-            "flex h-[var(--public-header-height)] items-center justify-between gap-4",
-            !isScrolled &&
-              "max-w-[90rem] px-5 md:px-20 lg:max-w-[90rem] lg:px-20"
-          )}
-        >
-          <PublicLogo settings={settings} priority />
+        <Container className="grid h-[var(--public-header-height)] max-w-[1700px] grid-cols-[1fr_auto] items-center gap-4 px-5 sm:px-6 lg:grid-cols-[1fr_auto_1fr] lg:gap-10 lg:px-12 xl:px-16">
+          <div className="justify-self-start">
+            <PublicLogo settings={settings} priority />
+          </div>
 
-          <div className="hidden items-center gap-2 lg:flex">
+          <div className="hidden justify-self-center lg:block">
             <PublicNav links={PUBLIC_PRIMARY_NAV} />
+          </div>
+
+          <div className="hidden justify-self-end lg:block">
             <Link
               href={PUBLIC_CTA.href}
-              className="public-focus-ring ms-2 inline-flex h-10 items-center justify-center rounded-[var(--radius-md)] bg-[image:var(--gradient-warm)] px-4 text-sm font-medium text-[var(--color-text-on-primary)] shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-[var(--transition-base)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]"
+              className="public-focus-ring inline-flex h-10 items-center justify-center rounded-[var(--radius-md)] bg-[image:var(--gradient-warm)] px-4 text-sm font-medium text-[var(--color-text-on-primary)] shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-[var(--transition-base)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]"
             >
               {PUBLIC_CTA.label}
             </Link>
@@ -137,7 +136,7 @@ export function PublicHeader({ settings }: PublicHeaderProps) {
 
           <button
             type="button"
-            className="public-focus-ring inline-flex size-11 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-primary)] hover:bg-[var(--color-surface-soft)] lg:hidden"
+            className="public-focus-ring inline-flex size-11 items-center justify-center justify-self-end rounded-[var(--radius-md)] text-[var(--color-primary)] hover:bg-[var(--color-surface-soft)] lg:hidden"
             aria-expanded={menuOpen}
             aria-controls="public-mobile-menu"
             aria-label={menuOpen ? "סגירת תפריט" : "פתיחת תפריט"}

@@ -9,11 +9,11 @@ export const PUBLIC_PRIMARY_NAV: PublicNavLink[] = [
   { label: "מתכונים", href: "/recipes" },
   { label: "מאמרים", href: "/blog" },
   { label: "המלצות", href: "/testimonials" },
+  { label: "תעודות", href: "/certificates" },
 ];
 
 export const PUBLIC_FOOTER_NAV: PublicNavLink[] = [
   ...PUBLIC_PRIMARY_NAV,
-  { label: "תעודות והסמכות", href: "/certificates" },
   { label: "יצירת קשר", href: "/contact" },
   { label: "מדיניות פרטיות", href: "/privacy" },
   { label: "תנאי שימוש", href: "/terms" },

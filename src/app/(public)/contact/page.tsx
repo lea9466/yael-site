@@ -19,8 +19,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PublicContactPage() {
   const settings = await getWebsiteSettings();
   const links = resolvePublicContactLinks(settings.businessProfile);
-  const businessName =
-    settings.businessProfile.business_name?.trim() || "יעל";
 
-  return <ContactPageView businessName={businessName} links={links} />;
+  return <ContactPageView links={links} />;
 }

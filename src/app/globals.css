@@ -7693,55 +7693,43 @@
   --contact-secondary: #6f8e6e;
   --contact-accent: #e3c7a6;
   --contact-coral: #d98a80;
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
   color: var(--contact-text);
   background: var(--contact-soft);
 }
 
 .contact-page__hero {
   position: relative;
-  overflow: hidden;
-  background: var(--contact-soft);
-  padding: 3.5rem 1.5rem 3rem;
+  z-index: 1;
+  background: transparent;
+  padding: 3.5rem 1.5rem 0.25rem;
 }
 
 .contact-page__blob {
   position: absolute;
+  z-index: 0;
   border-radius: 42% 58% 60% 40% / 45% 42% 58% 55%;
-  filter: blur(32px);
-  opacity: 0.55;
+  filter: blur(40px);
+  opacity: 0.5;
   pointer-events: none;
 }
 
 .contact-page__blob--a {
-  top: -5rem;
-  inset-inline-end: -3rem;
-  width: 18rem;
-  height: 18rem;
-  background: rgba(227, 199, 166, 0.55);
+  top: -4rem;
+  inset-inline-end: -4rem;
+  width: 22rem;
+  height: 22rem;
+  background: rgba(227, 199, 166, 0.5);
 }
 
 .contact-page__blob--b {
-  bottom: -4rem;
-  inset-inline-start: -4rem;
-  width: 16rem;
-  height: 16rem;
-  background: rgba(111, 142, 110, 0.28);
-}
-
-.contact-page__hero-line {
-  position: absolute;
-  inset-inline: 50%;
-  bottom: 0;
-  width: min(12rem, 40%);
-  height: 2px;
-  transform: translateX(50%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--contact-accent),
-    transparent
-  );
-  pointer-events: none;
+  top: 8rem;
+  inset-inline-start: -5rem;
+  width: 20rem;
+  height: 20rem;
+  background: rgba(111, 142, 110, 0.22);
 }
 
 .contact-page__hero-inner {
@@ -7775,11 +7763,12 @@
 .contact-page__title {
   margin: 0;
   color: var(--contact-primary);
-  font-family: var(--font-editorial-display), "Playfair Display", Georgia, serif;
-  font-size: clamp(2.25rem, 6vw, 3.75rem);
+  font-family: var(--font-primary), sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 600;
   line-height: 1.15;
   letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 .contact-page__lead {
@@ -7791,9 +7780,10 @@
 }
 
 .contact-page__main {
+  position: relative;
+  z-index: 1;
   padding: 0 1.5rem 3.5rem;
-  background:
-    linear-gradient(180deg, var(--contact-soft) 0%, var(--contact-sage) 100%);
+  background: transparent;
 }
 
 .contact-page__main-inner {
@@ -7807,11 +7797,13 @@
 }
 
 .contact-page__form-panel {
-  border: 1px solid var(--contact-border);
-  border-radius: 1.75rem;
-  background: #fff;
-  padding: 1.75rem 1.35rem;
-  box-shadow: 0 18px 40px rgba(46, 58, 49, 0.05);
+  position: relative;
+  z-index: 1;
+  border: none;
+  border-radius: 0 0 2rem 2rem;
+  background: transparent;
+  padding: 1.25rem 1.35rem 1.75rem;
+  box-shadow: none;
 }
 
 .contact-page__form {
@@ -7827,8 +7819,8 @@
 .contact-page__form-title {
   margin: 0;
   color: var(--contact-primary);
-  font-family: var(--font-editorial-display), "Playfair Display", Georgia, serif;
-  font-size: 1.625rem;
+  font-family: var(--font-primary), sans-serif;
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
@@ -7931,7 +7923,7 @@
 .contact-page__success-title {
   margin: 0;
   color: var(--contact-primary);
-  font-family: var(--font-editorial-display), "Playfair Display", Georgia, serif;
+  font-family: var(--font-primary), sans-serif;
   font-size: 1.75rem;
   font-weight: 600;
 }
@@ -7992,12 +7984,13 @@
 
 .contact-page__details-card {
   position: relative;
+  z-index: 1;
   overflow: hidden;
-  border-radius: 1.9rem;
+  border-radius: 2rem;
   background: linear-gradient(160deg, #3f5f47 0%, #547658 55%, #6f8e6e 100%);
   color: #fff;
   padding: 2.5rem 1.75rem;
-  box-shadow: 0 22px 48px rgba(63, 95, 71, 0.22);
+  box-shadow: 0 14px 36px rgba(63, 95, 71, 0.16);
 }
 
 .contact-page__details-shape {
@@ -8038,7 +8031,7 @@
 
 .contact-page__details-title {
   margin: 0;
-  font-family: var(--font-editorial-display), "Playfair Display", Georgia, serif;
+  font-family: var(--font-primary), sans-serif;
   font-size: 1.65rem;
   font-weight: 600;
   line-height: 1.3;
@@ -8154,7 +8147,7 @@
 .contact-page__steps-title {
   margin: 0;
   color: var(--contact-primary);
-  font-family: var(--font-editorial-display), "Playfair Display", Georgia, serif;
+  font-family: var(--font-primary), sans-serif;
   font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 600;
 }
@@ -8253,7 +8246,7 @@
   position: relative;
   margin: 0;
   color: var(--contact-primary);
-  font-family: var(--font-editorial-display), "Playfair Display", Georgia, serif;
+  font-family: var(--font-primary), sans-serif;
   font-size: 1.5rem;
   font-weight: 600;
 }
@@ -8303,7 +8296,7 @@
 
 @media (min-width: 768px) {
   .contact-page__hero {
-    padding: 5rem 2rem 4rem;
+    padding: 5rem 2rem 0.5rem;
   }
 
   .contact-page__main {
@@ -8338,7 +8331,7 @@
 
 @media (min-width: 1024px) {
   .contact-page__hero {
-    padding: 5.5rem 3rem 4.25rem;
+    padding: 5.5rem 3rem 0.75rem;
   }
 
   .contact-page__main {

@@ -8,12 +8,10 @@ import {
 
 type ContactDetailsCardProps = {
   links: PublicContactLinks;
-  businessName: string;
 };
 
 export function ContactDetailsCard({
   links,
-  businessName,
 }: ContactDetailsCardProps) {
   if (links.items.length === 0) {
     return null;
@@ -31,7 +29,7 @@ export function ContactDetailsCard({
             אפשר גם לפנות ישירות
           </h2>
           <p className="contact-page__details-text">
-            אם נוח לכם יותר בטלפון או בוואטסאפ — הפרטים של {businessName} כאן.
+            אם נוח לכם יותר בטלפון או באימייל — הפרטים שלי כאן.
           </p>
 
           <ul className="contact-page__details-list">

@@ -3859,7 +3859,7 @@
     display: grid;
     width: 100%;
     overflow: hidden;
-    border-radius: 1.25rem;
+    border-radius: 0;
     background-color: #ffffff;
     box-shadow:
       0 4px 6px -1px rgba(63, 95, 71, 0.1),

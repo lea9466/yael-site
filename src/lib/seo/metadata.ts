@@ -52,57 +52,18 @@ function resolveOgImage(
   return imageUrl;
 }
 
-function guessIconMimeType(url: string): string | undefined {
-  const pathname = url.split("?")[0]?.toLowerCase() ?? "";
-
-  if (pathname.endsWith(".svg")) {
-    return "image/svg+xml";
-  }
-
-  if (pathname.endsWith(".png")) {
-    return "image/png";
-  }
-
-  if (pathname.endsWith(".jpg") || pathname.endsWith(".jpeg")) {
-    return "image/jpeg";
-  }
-
-  if (pathname.endsWith(".webp")) {
-    return "image/webp";
-  }
-
-  if (pathname.endsWith(".ico")) {
-    return "image/x-icon";
-  }
-
-  return undefined;
-}
-
-function resolveFaviconIcons(
-  settings: WebsiteSettingsPublic
-): Metadata["icons"] {
-  const faviconUrl = settings.favicon?.url?.trim();
-
-  if (faviconUrl) {
-    const type = guessIconMimeType(faviconUrl);
-    const iconEntry = type ? { url: faviconUrl, type } : { url: faviconUrl };
-
-    return {
-      icon: [
-        { url: "/favicon.ico" },
-        iconEntry,
-      ],
-      shortcut: [{ url: "/favicon.ico" }],
-      apple: [{ url: faviconUrl }],
-    };
-  }
+function resolveFaviconIcons(): Metadata["icons"] {
+  // Served by src/app/icon.tsx and src/app/apple-icon.tsx from the CMS
+  // favicon (with a brand fallback). Cache-bust so browsers drop the old
+  // default Next/React favicon.ico they may have cached.
+  const version = "v2";
 
   return {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/icon.svg", type: "image/svg+xml" },
+    icon: [{ url: `/icon?${version}`, type: "image/png", sizes: "32x32" }],
+    shortcut: [{ url: `/icon?${version}`, type: "image/png" }],
+    apple: [
+      { url: `/apple-icon?${version}`, type: "image/png", sizes: "180x180" },
     ],
-    shortcut: [{ url: "/favicon.ico" }],
   };
 }
 
@@ -124,7 +85,7 @@ export function buildSiteMetadata(
     metadataBase: new URL(SITE_ORIGIN),
     title,
     description,
-    icons: resolveFaviconIcons(settings),
+    icons: resolveFaviconIcons(),
     alternates: {
       canonical: canonicalUrl,
     },

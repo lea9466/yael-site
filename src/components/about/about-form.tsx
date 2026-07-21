@@ -30,6 +30,7 @@ import { useUnsavedChangesWarning } from "@/lib/hooks/use-unsaved-changes-warnin
 import {
   aboutPageDataToFormState,
   formStateToAboutPageData,
+  parseFormStateToAboutPageData,
   type AboutFormState,
 } from "@/lib/validations/about";
 
@@ -156,15 +157,21 @@ export function AboutForm({ detail }: AboutFormProps) {
       setFieldErrors({});
       setFormError("");
 
-      const payload = {
-        data: formStateToAboutPageData(formState, {
-          blocks: editorBlocksToArticleBlocks(blocks),
-          gallery: [],
-        }),
-        updatedAt,
-      };
+      const parsed = parseFormStateToAboutPageData(formState, {
+        blocks: editorBlocksToArticleBlocks(blocks),
+        gallery: [],
+      });
 
-      const result = await saveAboutPageAction(payload);
+      if (!parsed.success) {
+        setFieldErrors(parsed.fieldErrors);
+        setFormError("יש לתקן את השגיאות בטופס לפני השמירה.");
+        return;
+      }
+
+      const result = await saveAboutPageAction({
+        data: parsed.data,
+        updatedAt,
+      });
 
       if (!result.success) {
         setFormError(result.error);
@@ -282,7 +289,23 @@ export function AboutForm({ detail }: AboutFormProps) {
               blocks={blocks}
               error={contentError}
               readingTimeLabel={readingTimeLabel}
-              onChange={setBlocks}
+              onChange={(nextBlocks) => {
+                setBlocks(nextBlocks);
+                setFieldErrors((current) => {
+                  const next = { ...current };
+                  delete next.content;
+                  delete next["content.blocks"];
+
+                  for (const key of Object.keys(next)) {
+                    if (key.startsWith("content.")) {
+                      delete next[key];
+                    }
+                  }
+
+                  return next;
+                });
+                setFormError("");
+              }}
             />
           </section>
 

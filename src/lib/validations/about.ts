@@ -219,13 +219,17 @@ export function aboutPageDataToFormState(data: AboutPageData): AboutFormState {
   };
 }
 
+/**
+ * Assembles form values for live preview without throwing.
+ * Full validation belongs in parseFormStateToAboutPageData / server actions.
+ */
 export function formStateToAboutPageData(
   state: AboutFormState,
   content: ArticleContent
 ): AboutPageData {
-  return aboutPageDataSchema.parse({
+  return {
     title: state.title,
-    intro_text: state.subtitle || null,
+    intro_text: state.subtitle.trim().length > 0 ? state.subtitle : null,
     cover_media_id: state.coverMediaId,
     content,
     cta: {
@@ -234,7 +238,27 @@ export function formStateToAboutPageData(
       button_label: state.ctaButtonLabel,
       button_url: state.ctaButtonUrl,
     },
-  });
+  };
+}
+
+export function parseFormStateToAboutPageData(
+  state: AboutFormState,
+  content: ArticleContent
+):
+  | { success: true; data: AboutPageData }
+  | { success: false; fieldErrors: Record<string, string> } {
+  const parsed = aboutPageDataSchema.safeParse(
+    formStateToAboutPageData(state, content)
+  );
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      fieldErrors: mapZodErrors(parsed.error),
+    };
+  }
+
+  return { success: true, data: parsed.data };
 }
 
 export function collectAboutContentMediaIds(content: ArticleContent): string[] {

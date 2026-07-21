@@ -46,13 +46,11 @@ export default async function PublicAboutPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[90rem] px-5 py-12 md:px-20 md:py-16">
-      <AboutPublicView
-        data={detail.data}
-        coverPreview={detail.coverPreview}
-        blockMediaUrls={detail.blockMediaUrls}
-        mode="public"
-      />
-    </div>
+    <AboutPublicView
+      data={detail.data}
+      coverPreview={detail.coverPreview}
+      blockMediaUrls={detail.blockMediaUrls}
+      mode="public"
+    />
   );
 }

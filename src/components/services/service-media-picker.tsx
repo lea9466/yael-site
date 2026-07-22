@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { ImageIcon, Upload, X } from "lucide-react";
+import { FileText, ImageIcon, Upload, X } from "lucide-react";
 
 import { MediaPreviewRender } from "@/components/media/media-preview-render";
 import { searchMediaPickerAction } from "@/actions/media";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import type { MediaListItem } from "@/lib/media/media-types";
+import type { MediaMimeFilter } from "@/lib/validations/media";
 import { cn } from "@/lib/utils/cn";
 
 type SelectedMedia = {
@@ -29,6 +30,14 @@ type ServiceMediaPickerProps = {
   required?: boolean;
   error?: string;
   variant?: "default" | "minimal";
+  /** Filter library results. Defaults to all (existing behavior). */
+  mimeFilter?: MediaMimeFilter;
+  emptyTitle?: string;
+  emptyDescription?: string;
+  selectLabel?: string;
+  replaceLabel?: string;
+  dialogTitle?: string;
+  dialogDescription?: string;
   onChange: (mediaId: string | null, preview: SelectedMedia | null) => void;
 };
 
@@ -41,6 +50,13 @@ export function ServiceMediaPicker({
   required = false,
   error,
   variant = "default",
+  mimeFilter = "all",
+  emptyTitle = "בחרו תמונת כיסוי",
+  emptyDescription = "בחרו מספריית המדיה או העלו תמונה חדשה",
+  selectLabel = "בחירת תמונה",
+  replaceLabel = "החלפת תמונה",
+  dialogTitle = "בחירת תמונה מספריית המדיה",
+  dialogDescription = "בחרו תמונה קיימת מהספרייה",
   onChange,
 }: ServiceMediaPickerProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -51,14 +67,47 @@ export function ServiceMediaPicker({
   const [totalPages, setTotalPages] = useState(1);
   const [loadError, setLoadError] = useState("");
   const [isLoading, startLoading] = useTransition();
+  const isPdfMode = mimeFilter === "pdf";
+  const EmptyIcon = isPdfMode ? FileText : ImageIcon;
+
+  useEffect(() => {
+    if (!pickerOpen) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      startLoading(async () => {
+        setLoadError("");
+        const result = await searchMediaPickerAction(
+          searchValue,
+          1,
+          mimeFilter
+        );
+
+        if (!result.success) {
+          setLoadError(result.error ?? "לא ניתן לטעון קבצים.");
+          setItems([]);
+          return;
+        }
+
+        setItems(result.items);
+        setTotalPages(result.totalPages);
+        setPage(1);
+      });
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [searchValue, pickerOpen, mimeFilter]);
 
   const loadItems = (query: string, nextPage: number) => {
     startLoading(async () => {
       setLoadError("");
-      const result = await searchMediaPickerAction(query, nextPage);
+      const result = await searchMediaPickerAction(query, nextPage, mimeFilter);
 
       if (!result.success) {
-        setLoadError(result.error ?? "לא ניתן לטעון תמונות.");
+        setLoadError(result.error ?? "לא ניתן לטעון קבצים.");
         setItems([]);
         return;
       }
@@ -68,20 +117,6 @@ export function ServiceMediaPicker({
       setPage(nextPage);
     });
   };
-
-  useEffect(() => {
-    if (!pickerOpen) {
-      return;
-    }
-
-    const timeout = window.setTimeout(() => {
-      loadItems(searchValue, 1);
-    }, 300);
-
-    return () => {
-      window.clearTimeout(timeout);
-    };
-  }, [searchValue, pickerOpen]);
 
   const handleSelect = (item: MediaListItem) => {
     onChange(item.id, {
@@ -118,7 +153,7 @@ export function ServiceMediaPicker({
               <MediaPreviewRender
                 url={preview.url}
                 alt={preview.alt}
-                mimeType={preview.mimeType ?? "image/webp"}
+                mimeType={preview.mimeType ?? (isPdfMode ? "application/pdf" : "image/webp")}
                 sizes="(max-width: 768px) 100vw, 672px"
               />
             </div>
@@ -128,7 +163,7 @@ export function ServiceMediaPicker({
                 variant="outline"
                 onClick={() => setPickerOpen(true)}
               >
-                החלפת תמונה
+                {replaceLabel}
               </Button>
               <Button
                 type="button"
@@ -143,20 +178,20 @@ export function ServiceMediaPicker({
         ) : (
           <div className="admin-interactive group flex w-full max-w-2xl flex-col items-center justify-center gap-4 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)] px-6 py-14 text-center hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-surface-soft)]/50">
             <div className="flex size-14 items-center justify-center rounded-[var(--radius-full)] bg-[var(--color-primary)]/8 text-[var(--color-primary)] transition-transform group-hover:scale-105">
-              <ImageIcon aria-hidden="true" className="size-6" strokeWidth={1.5} />
+              <EmptyIcon aria-hidden="true" className="size-6" strokeWidth={1.5} />
             </div>
             <div className="space-y-1">
               <p className="text-sm font-medium text-[var(--color-text)]">
-                בחרו תמונת כיסוי
+                {emptyTitle}
               </p>
               <p className="text-caption text-[var(--color-text-muted)]">
-                בחרו מספריית המדיה או העלו תמונה חדשה
+                {emptyDescription}
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-2 pt-1">
               <Button type="button" onClick={() => setPickerOpen(true)}>
-                <ImageIcon aria-hidden="true" className="size-4" />
-                בחירת תמונה
+                <EmptyIcon aria-hidden="true" className="size-4" />
+                {selectLabel}
               </Button>
               <Button
                 type="button"
@@ -181,8 +216,8 @@ export function ServiceMediaPicker({
       <Dialog
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
-        title="בחירת תמונה מספריית המדיה"
-        description="בחרו תמונה קיימת מהספרייה"
+        title={dialogTitle}
+        description={dialogDescription}
         className="p-3 sm:p-6"
         panelClassName="max-h-[min(90dvh,760px)] w-[min(960px,calc(100vw-32px))]"
       >
@@ -229,7 +264,7 @@ export function ServiceMediaPicker({
 
           {items.length === 0 && !isLoading ? (
             <p className="text-sm text-[var(--color-text-muted)]">
-              לא נמצאו תמונות.
+              {isPdfMode ? "לא נמצאו קבצי PDF." : "לא נמצאו תמונות."}
             </p>
           ) : null}
 

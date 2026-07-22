@@ -53,6 +53,16 @@ export async function fetchMediaLibrary(
       );
     }
 
+    if (query.mime === "image") {
+      listQuery = listQuery.in("mime_type", [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+      ]);
+    } else if (query.mime === "pdf") {
+      listQuery = listQuery.eq("mime_type", "application/pdf");
+    }
+
     const { data, error, count } = await listQuery
       .order(sort.column, { ascending: sort.ascending })
       .range(from, to);
@@ -97,6 +107,7 @@ export async function fetchMediaLibrary(
         q: query.q,
         sort: query.sort,
         page: query.page,
+        mime: query.mime,
       },
     };
   } catch {

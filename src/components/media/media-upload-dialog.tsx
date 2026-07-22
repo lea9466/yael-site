@@ -29,7 +29,7 @@ type MediaUploadDialogProps = {
   onSuccess: () => void;
 };
 
-const ACCEPTED_EXTENSIONS = ".jpg,.jpeg,.png,.webp,.mp4,.webm";
+const ACCEPTED_EXTENSIONS = ".jpg,.jpeg,.png,.webp,.mp4,.webm,.pdf";
 const BATCH_LIMIT_MESSAGE = "ניתן להעלות עד 10 קבצים בכל פעם.";
 
 const UPLOAD_DIALOG_PANEL_CLASS =

@@ -13,6 +13,8 @@ import {
   processImageByProfile,
   sanitizeOriginalFileName,
 } from "@/lib/media/process-image";
+import { isPdfMimeType } from "@/lib/media/mime";
+import { processPdfBuffer } from "@/lib/media/process-pdf";
 import {
   isHeroVideoMimeType,
   processHeroVideoBuffer,
@@ -70,6 +72,22 @@ export async function uploadMediaFromFile({
       }
 
       const processed = await processHeroVideoBuffer(inputBuffer, file.type);
+
+      if (!processed.success) {
+        return { success: false, error: processed.error };
+      }
+
+      return persistProcessedMedia(
+        supabase,
+        adminId,
+        file.name,
+        parsedMeta.data,
+        processed.image
+      );
+    }
+
+    if (isPdfMimeType(file.type)) {
+      const processed = await processPdfBuffer(inputBuffer, file.type);
 
       if (!processed.success) {
         return { success: false, error: processed.error };

@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Mail,
   MessageCircleHeart,
+  Newspaper,
   Settings,
   Tag,
   UserRound,
@@ -19,6 +20,7 @@ export type AdminModuleId =
   | "recipes"
   | "services"
   | "articles"
+  | "press"
   | "about"
   | "categories"
   | "tags"
@@ -87,6 +89,18 @@ export const ADMIN_MODULE_THEMES: Record<AdminModuleId, ModuleTheme> = {
       "linear-gradient(135deg, var(--color-sky-blue-soft) 0%, var(--color-light-sage-soft) 100%)",
     iconGradient:
       "linear-gradient(135deg, var(--color-sky-blue) 0%, var(--color-primary) 100%)",
+  },
+  press: {
+    id: "press",
+    icon: Newspaper,
+    emoji: "📰",
+    accent: "var(--color-warm-gold)",
+    accentSoft: "var(--color-warm-gold-soft)",
+    accentRing: "var(--color-warm-gold)",
+    gradient:
+      "linear-gradient(135deg, var(--color-warm-gold-soft) 0%, var(--color-cream) 100%)",
+    iconGradient:
+      "linear-gradient(135deg, var(--color-warm-gold) 0%, var(--color-primary) 100%)",
   },
   about: {
     id: "about",

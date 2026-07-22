@@ -74,9 +74,13 @@ function formatWorkingHours(businessProfile: BusinessProfileData): string[] {
 
 type PublicFooterProps = {
   settings: WebsiteSettingsPublic;
+  navLinks?: PublicNavLink[];
 };
 
-export function PublicFooter({ settings }: PublicFooterProps) {
+export function PublicFooter({
+  settings,
+  navLinks = PUBLIC_FOOTER_NAV,
+}: PublicFooterProps) {
   const { businessProfile } = settings;
   const currentYear = new Date().getFullYear();
   const workingHours = formatWorkingHours(businessProfile);
@@ -178,7 +182,7 @@ export function PublicFooter({ settings }: PublicFooterProps) {
             <h2 className="text-sm font-semibold text-[var(--color-primary)]">
               ניווט
             </h2>
-            <FooterNavColumn links={PUBLIC_FOOTER_NAV} />
+            <FooterNavColumn links={navLinks} />
           </div>
 
           <div className="space-y-4">

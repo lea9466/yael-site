@@ -4,6 +4,7 @@ export const ADMIN_LIST_PATHS = {
   service: "/admin/services",
   recipe: "/admin/recipes",
   article: "/admin/articles",
+  press: "/admin/press",
   testimonial: "/admin/testimonials",
 } as const;
 

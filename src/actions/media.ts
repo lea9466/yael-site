@@ -240,7 +240,8 @@ export async function updateMediaAltTextAction(
 
 export async function searchMediaPickerAction(
   q = "",
-  page = 1
+  page = 1,
+  mime: "all" | "image" | "pdf" = "all"
 ): Promise<{
   success: boolean;
   items: MediaListItem[];
@@ -253,7 +254,7 @@ export async function searchMediaPickerAction(
     return { success: false, items: [], totalPages: 1, error: MEDIA_ERRORS.unauthorized };
   }
 
-  const parsed = listMediaQuerySchema.safeParse({ q, page, sort: "newest" });
+  const parsed = listMediaQuerySchema.safeParse({ q, page, sort: "newest", mime });
 
   if (!parsed.success) {
     return { success: false, items: [], totalPages: 1, error: MEDIA_ERRORS.generic };

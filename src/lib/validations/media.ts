@@ -15,7 +15,10 @@ export const MEDIA_SORT_VALUES = [
   "size",
 ] as const;
 
+export const MEDIA_MIME_FILTERS = ["all", "image", "pdf"] as const;
+
 export type MediaSortValue = (typeof MEDIA_SORT_VALUES)[number];
+export type MediaMimeFilter = (typeof MEDIA_MIME_FILTERS)[number];
 
 export const listMediaQuerySchema = z.object({
   q: z
@@ -26,6 +29,7 @@ export const listMediaQuerySchema = z.object({
     .pipe(z.string().max(100, "חיפוש ארוך מדי")),
   sort: z.enum(MEDIA_SORT_VALUES).optional().default("newest"),
   page: z.coerce.number().int().min(1).max(10_000).optional().default(1),
+  mime: z.enum(MEDIA_MIME_FILTERS).optional().default("all"),
 });
 
 export const deleteMediaSchema = z.object({

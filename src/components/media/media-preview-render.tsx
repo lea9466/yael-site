@@ -1,6 +1,7 @@
 import Image from "next/image";
+import { FileText } from "lucide-react";
 
-import { isVideoMimeType } from "@/lib/media/mime";
+import { isPdfMimeType, isVideoMimeType } from "@/lib/media/mime";
 import { cn } from "@/lib/utils/cn";
 
 type MediaPreviewVariant = "preview" | "hero";
@@ -52,6 +53,25 @@ export function MediaPreviewRender({
         )}
       >
         {emptyLabel}
+      </div>
+    );
+  }
+
+  if (isPdfMimeType(mimeType)) {
+    return (
+      <div
+        className={cn(
+          "flex size-full flex-col items-center justify-center gap-2 bg-[var(--color-surface-soft)] text-[var(--color-primary)]",
+          fill ? "absolute inset-0" : undefined,
+          className
+        )}
+        role="img"
+        aria-label={alt || "קובץ PDF"}
+      >
+        <FileText aria-hidden="true" className="size-10" strokeWidth={1.5} />
+        <span className="max-w-[90%] truncate px-3 text-caption text-[var(--color-text-muted)]">
+          {alt || "PDF"}
+        </span>
       </div>
     );
   }

@@ -34,6 +34,10 @@ function resolvePathLabel(path: string): string {
     return "עריכת פוסט";
   }
 
+  if (/^\/admin\/press\/[^/]+$/.test(path)) {
+    return "עריכת כתבה";
+  }
+
   if (path === "/admin/about/preview") {
     return "תצוגה מקדימה";
   }

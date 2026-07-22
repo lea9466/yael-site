@@ -5,6 +5,11 @@ import { PublicHeader } from "@/components/public/header/public-header";
 import { SkipToContent } from "@/components/public/layout/skip-to-content";
 import { PublicScrollRestoration } from "@/components/public/scroll-restoration";
 import { OrganizationJsonLd } from "@/components/public/seo/organization-json-ld";
+import {
+  buildPublicFooterNav,
+  buildPublicPrimaryNav,
+} from "@/constants/public-navigation";
+import { hasPublishedPressArticles } from "@/lib/press/queries";
 import { getWebsiteSettings } from "@/lib/public/queries";
 import { buildDefaultSiteMetadata } from "@/lib/seo/metadata";
 
@@ -19,13 +24,19 @@ export default async function PublicLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getWebsiteSettings();
+  const [settings, includePress] = await Promise.all([
+    getWebsiteSettings(),
+    hasPublishedPressArticles(),
+  ]);
+
+  const primaryNav = buildPublicPrimaryNav({ includePress });
+  const footerNav = buildPublicFooterNav({ includePress });
 
   return (
     <div className="public-layout flex min-h-full flex-col">
       <SkipToContent />
       <OrganizationJsonLd settings={settings} />
-      <PublicHeader settings={settings} />
+      <PublicHeader settings={settings} navLinks={primaryNav} />
       <main
         id="main-content"
         tabIndex={-1}
@@ -33,7 +44,7 @@ export default async function PublicLayout({
       >
         {children}
       </main>
-      <PublicFooter settings={settings} />
+      <PublicFooter settings={settings} navLinks={footerNav} />
       <PublicScrollRestoration />
     </div>
   );

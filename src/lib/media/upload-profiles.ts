@@ -44,7 +44,7 @@ export type UploadProfileUiMeta = {
 export const UPLOAD_PROFILE_UI: Record<UploadProfile, UploadProfileUiMeta> = {
   normal: {
     title: "תמונה רגילה",
-    description: "מתכונים, פוסטים, שירותים, קטגוריות ותעודות.",
+    description: "מתכונים, פוסטים, שירותים, קטגוריות, תעודות וקבצי PDF.",
     icon: ImageIcon,
   },
   hero: {

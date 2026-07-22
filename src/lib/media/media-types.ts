@@ -1,5 +1,5 @@
 import type { UploadProfile } from "@/lib/media/constants";
-import type { MediaSortValue } from "@/lib/validations/media";
+import type { MediaMimeFilter, MediaSortValue } from "@/lib/validations/media";
 
 export type MediaRecord = {
   id: string;
@@ -40,6 +40,7 @@ export type MediaLibraryData = {
     q: string;
     sort: MediaSortValue;
     page: number;
+    mime: MediaMimeFilter;
   };
 };
 

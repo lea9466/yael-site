@@ -40,6 +40,10 @@ export const VIDEO_EXTENSION_BY_MIME: Record<HeroVideoMimeType, string> = {
   "video/webm": "webm",
 };
 
+export const PDF_MIME_TYPE = "application/pdf" as const;
+
+export const DOCUMENT_MIME_TYPES = [PDF_MIME_TYPE] as const;
+
 /** MIME types allowed in the public-media bucket. */
 export const ALLOWED_STORAGE_MIME_TYPES = [
   "image/jpeg",
@@ -47,6 +51,7 @@ export const ALLOWED_STORAGE_MIME_TYPES = [
   "image/webp",
   "video/mp4",
   "video/webm",
+  PDF_MIME_TYPE,
 ] as const;
 
 export const OUTPUT_MIME_TYPE = "image/webp";

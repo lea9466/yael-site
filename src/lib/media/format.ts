@@ -43,6 +43,8 @@ export function formatMimeType(mimeType: string): string {
       return "MP4";
     case "video/webm":
       return "WebM";
+    case "application/pdf":
+      return "PDF";
     default:
       return "—";
   }

@@ -68,6 +68,18 @@ async function findHardForeignKeyUsages(
       label: "קטגוריה — תמונה",
       nameColumn: "name",
     },
+    {
+      table: "press_articles",
+      column: "cover_media_id",
+      label: "כתבה — תמונת שער",
+      nameColumn: "title",
+    },
+    {
+      table: "press_articles",
+      column: "pdf_media_id",
+      label: "כתבה — קובץ PDF",
+      nameColumn: "title",
+    },
   ] as const;
 
   for (const check of checks) {

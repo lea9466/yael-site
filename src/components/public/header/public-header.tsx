@@ -92,9 +92,10 @@ function MobileMenu({ open, onClose, links }: MobileMenuProps) {
 
 type PublicHeaderProps = {
   settings: WebsiteSettingsPublic;
+  navLinks?: PublicNavLink[];
 };
 
-export function PublicHeader({ settings }: PublicHeaderProps) {
+export function PublicHeader({ settings, navLinks = PUBLIC_PRIMARY_NAV }: PublicHeaderProps) {
   const isScrolled = useScrolledHeader();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -122,7 +123,7 @@ export function PublicHeader({ settings }: PublicHeaderProps) {
           </div>
 
           <div className="hidden justify-self-center lg:block">
-            <PublicNav links={PUBLIC_PRIMARY_NAV} />
+            <PublicNav links={navLinks} />
           </div>
 
           <div className="hidden justify-self-end lg:block">
@@ -147,7 +148,7 @@ export function PublicHeader({ settings }: PublicHeaderProps) {
         </Container>
       </header>
 
-      <MobileMenu open={menuOpen} onClose={closeMenu} links={PUBLIC_PRIMARY_NAV} />
+      <MobileMenu open={menuOpen} onClose={closeMenu} links={navLinks} />
     </>
   );
 }

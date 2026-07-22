@@ -4,9 +4,10 @@ import {
   HERO_VIDEO_MIME_TYPES,
   MAX_BATCH_UPLOAD_CONCURRENCY,
   MAX_SOURCE_UPLOAD_BYTES,
+  PDF_MIME_TYPE,
   type UploadProfile,
 } from "@/lib/media/constants";
-import { isVideoMimeType } from "@/lib/media/mime";
+import { isPdfMimeType, isVideoMimeType } from "@/lib/media/mime";
 
 export type UploadQueueStatus = "pending" | "uploading" | "completed" | "failed";
 
@@ -45,15 +46,20 @@ export function isVideoUploadFile(file: File): boolean {
   return isVideoMimeType(file.type);
 }
 
+export function isPdfUploadFile(file: File): boolean {
+  return isPdfMimeType(file.type);
+}
+
 export function validateUploadFile(
   file: File,
   uploadProfile: UploadProfile = DEFAULT_UPLOAD_PROFILE
 ): string | null {
   const isImage = ACCEPTED_IMAGE_MIME_SET.has(file.type);
+  const isPdf = file.type === PDF_MIME_TYPE;
   const isHeroVideo =
     uploadProfile === "hero" && HERO_VIDEO_MIME_SET.has(file.type);
 
-  if (!isImage && !isHeroVideo) {
+  if (!isImage && !isHeroVideo && !isPdf) {
     if (HERO_VIDEO_MIME_SET.has(file.type)) {
       return "סרטונים נתמכים רק בפרופיל תמונה ראשית.";
     }

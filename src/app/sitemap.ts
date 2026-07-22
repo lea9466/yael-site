@@ -13,18 +13,31 @@ import {
   buildPostPath,
 } from "@/lib/public/blog-paths";
 import { buildRecipeCategoryPath, buildRecipePath } from "@/lib/public/recipe-paths";
+import {
+  fetchPublishedPressSlugs,
+  hasPublishedPressArticles,
+} from "@/lib/press/queries";
 import { getSiteOrigin } from "@/lib/seo/metadata";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = getSiteOrigin();
-  const [services, recipes, recipeCategories, posts, blogCategories] =
-    await Promise.all([
-      getPublishedServiceSlugs(),
-      getPublishedRecipeSlugs(),
-      getPublishedRecipeCategorySlugs(),
-      getPublishedPostSlugs(),
-      getPublishedBlogCategorySlugs(),
-    ]);
+  const [
+    services,
+    recipes,
+    recipeCategories,
+    posts,
+    blogCategories,
+    pressArticles,
+    includePressListing,
+  ] = await Promise.all([
+    getPublishedServiceSlugs(),
+    getPublishedRecipeSlugs(),
+    getPublishedRecipeCategorySlugs(),
+    getPublishedPostSlugs(),
+    getPublishedBlogCategorySlugs(),
+    fetchPublishedPressSlugs(),
+    hasPublishedPressArticles(),
+  ]);
 
   const staticEntries: MetadataRoute.Sitemap = PUBLIC_STATIC_ROUTES.map(
     (route) => ({
@@ -34,6 +47,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: route.href === "/" ? 1 : 0.7,
     })
   );
+
+  const pressListingEntries: MetadataRoute.Sitemap = includePressListing
+    ? [
+        {
+          url: `${origin}/press`,
+          lastModified: new Date(),
+          changeFrequency: "weekly",
+          priority: 0.75,
+        },
+      ]
+    : [];
 
   const serviceEntries: MetadataRoute.Sitemap = services.map((item) => ({
     url: `${origin}/services/${item.slug}`,
@@ -74,12 +98,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  const pressEntries: MetadataRoute.Sitemap = pressArticles.map((item) => ({
+    url: `${origin}/press/${item.slug}`,
+    lastModified: new Date(item.updated_at),
+    changeFrequency: "monthly",
+    priority: 0.75,
+  }));
+
   return [
     ...staticEntries,
+    ...pressListingEntries,
     ...serviceEntries,
     ...recipeCategoryEntries,
     ...recipeEntries,
     ...blogCategoryEntries,
     ...postEntries,
+    ...pressEntries,
   ];
 }

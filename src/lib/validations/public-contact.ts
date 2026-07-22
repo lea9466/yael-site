@@ -8,10 +8,10 @@ export const PUBLIC_CONTACT_MESSAGE_MAX = 4000;
 
 const privacyAcceptedSchema = z
   .boolean({
-    message: "יש לאשר את מדיניות הפרטיות",
+    message: "יש לאשר את מדיניות הפרטיות כדי לשלוח את הפנייה.",
   })
   .refine((value) => value === true, {
-    message: "יש לאשר את מדיניות הפרטיות",
+    message: "יש לאשר את מדיניות הפרטיות כדי לשלוח את הפנייה.",
   });
 
 /** Client-side form schema — keeps phone as string for RHF. */

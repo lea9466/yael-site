@@ -41,6 +41,75 @@ const FIELD_ORDER = [
   "privacy_policy_accepted",
 ] as const;
 
+const CONTACT_FORM_DRAFT_KEY = "yael-contact-form-draft-v1";
+
+const EMPTY_FORM_VALUES: PublicContactFormValues = {
+  full_name: "",
+  email: "",
+  phone: "",
+  message: "",
+  privacy_policy_accepted: false,
+};
+
+function readContactFormDraft(): PublicContactFormValues | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const raw = window.sessionStorage.getItem(CONTACT_FORM_DRAFT_KEY);
+
+    if (!raw) {
+      return null;
+    }
+
+    const parsed: unknown = JSON.parse(raw);
+
+    if (!parsed || typeof parsed !== "object") {
+      return null;
+    }
+
+    const draft = parsed as Partial<PublicContactFormValues>;
+
+    return {
+      full_name: typeof draft.full_name === "string" ? draft.full_name : "",
+      email: typeof draft.email === "string" ? draft.email : "",
+      phone: typeof draft.phone === "string" ? draft.phone : "",
+      message: typeof draft.message === "string" ? draft.message : "",
+      privacy_policy_accepted: draft.privacy_policy_accepted === true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeContactFormDraft(values: PublicContactFormValues) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.sessionStorage.setItem(
+      CONTACT_FORM_DRAFT_KEY,
+      JSON.stringify(values)
+    );
+  } catch {
+    // Ignore quota / private-mode failures.
+  }
+}
+
+function clearContactFormDraft() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.sessionStorage.removeItem(CONTACT_FORM_DRAFT_KEY);
+  } catch {
+    // Ignore storage failures.
+  }
+}
+
 export function ContactForm({ links }: ContactFormProps) {
   const formId = useId();
   const [isPending, startTransition] = useTransition();
@@ -58,17 +127,13 @@ export function ContactForm({ links }: ContactFormProps) {
     register,
     control,
     handleSubmit,
+    reset,
+    getValues,
     setError,
     formState: { errors },
   } = useForm<PublicContactFormValues>({
     resolver: zodResolver(publicContactFormSchema),
-    defaultValues: {
-      full_name: "",
-      email: "",
-      phone: "",
-      message: "",
-      privacy_policy_accepted: false,
-    },
+    defaultValues: EMPTY_FORM_VALUES,
   });
 
   const fullNameRegister = register("full_name");
@@ -77,10 +142,39 @@ export function ContactForm({ links }: ContactFormProps) {
   const messageRegister = register("message");
 
   useEffect(() => {
+    const draft = readContactFormDraft();
+
+    if (draft) {
+      reset(draft);
+    }
+  }, [reset]);
+
+  useEffect(() => {
+    function persistDraft() {
+      if (submitted) {
+        return;
+      }
+
+      writeContactFormDraft(getValues());
+    }
+
+    window.addEventListener("pagehide", persistDraft);
+
+    return () => {
+      window.removeEventListener("pagehide", persistDraft);
+    };
+  }, [getValues, submitted]);
+
+  useEffect(() => {
     if (submitted) {
+      clearContactFormDraft();
       successRef.current?.focus();
     }
   }, [submitted]);
+
+  function persistDraftBeforePrivacyNavigation() {
+    writeContactFormDraft(getValues());
+  }
 
   function applyFieldErrors(fieldErrors: PublicContactFieldErrors) {
     for (const key of FIELD_ORDER) {
@@ -365,13 +459,15 @@ export function ContactForm({ links }: ContactFormProps) {
                 }
               />
               <span>
-                קראתי ואני מסכימ/ה ל
+                קראתי את{" "}
                 <Link
-                  href="/privacy"
+                  href="/privacy-policy"
                   className="contact-page__privacy-link public-focus-ring"
+                  onClick={persistDraftBeforePrivacyNavigation}
                 >
                   מדיניות הפרטיות
-                </Link>
+                </Link>{" "}
+                ואני מסכים/ה למסירת הפרטים ולטיפול בפנייה בהתאם לה.
               </span>
             </label>
           )}

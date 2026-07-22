@@ -12,6 +12,7 @@ export const RESERVED_RECIPE_SLUGS = [
   "articles",
   "contact",
   "privacy",
+  "privacy-policy",
   "terms",
   "testimonials",
   "certificates",

@@ -13,6 +13,7 @@ export const RESERVED_ARTICLE_SLUGS = [
   "blog",
   "contact",
   "privacy",
+  "privacy-policy",
   "terms",
   "testimonials",
   "certificates",

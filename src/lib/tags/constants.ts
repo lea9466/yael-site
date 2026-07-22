@@ -16,6 +16,7 @@ export const RESERVED_TAG_SLUGS = [
   "articles",
   "contact",
   "privacy",
+  "privacy-policy",
   "terms",
   "testimonials",
   "certificates",

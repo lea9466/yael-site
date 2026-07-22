@@ -15,7 +15,7 @@ export const PUBLIC_PRIMARY_NAV: PublicNavLink[] = [
 export const PUBLIC_FOOTER_NAV: PublicNavLink[] = [
   ...PUBLIC_PRIMARY_NAV,
   { label: "יצירת קשר", href: "/contact" },
-  { label: "מדיניות פרטיות", href: "/privacy" },
+  { label: "מדיניות פרטיות", href: "/privacy-policy" },
   { label: "תנאי שימוש", href: "/terms" },
 ];
 

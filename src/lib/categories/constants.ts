@@ -16,6 +16,7 @@ export const RESERVED_CATEGORY_SLUGS = [
   "articles",
   "contact",
   "privacy",
+  "privacy-policy",
   "terms",
   "testimonials",
   "certificates",

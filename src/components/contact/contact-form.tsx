@@ -369,7 +369,7 @@ export function ContactForm({ links }: ContactFormProps) {
           dir="ltr"
           placeholder="name@example.com"
           maxLength={PUBLIC_CONTACT_EMAIL_MAX}
-          className="text-left"
+          className="text-right"
           error={Boolean(errors.email)}
           aria-invalid={Boolean(errors.email) || undefined}
           aria-describedby={errors.email ? emailErrorId : undefined}

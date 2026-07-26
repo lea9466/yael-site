@@ -54,9 +54,6 @@ export function PressForm({ mode, initialValues, article }: PressFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [values, setValues] = useState(initialValues);
-  const [coverPreview, setCoverPreview] = useState<PressMediaPreview | null>(
-    article?.coverPreview ?? null
-  );
   const [pdfPreview, setPdfPreview] = useState<PressMediaPreview | null>(
     article?.pdfPreview ?? null
   );
@@ -271,33 +268,8 @@ export function PressForm({ mode, initialValues, article }: PressFormProps) {
 
         <AdminFormSection
           title="מדיה"
-          description="תמונת שער וקובץ PDF מספריית המדיה"
+          description="קובץ PDF של הכתבה מספריית המדיה"
         >
-          <ServiceMediaPicker
-            fieldId="press-cover"
-            label="תמונת שער"
-            mimeFilter="image"
-            value={values.cover_media_id}
-            preview={coverPreview}
-            error={fieldErrors.cover_media_id}
-            emptyTitle="בחרו תמונת שער"
-            emptyDescription="אופציונלי — בחרו מספריית המדיה או העלו תמונה"
-            onChange={(mediaId, preview) => {
-              setField("cover_media_id", mediaId);
-              setCoverPreview(
-                preview
-                  ? {
-                      id: preview.id,
-                      url: preview.url,
-                      alt: preview.alt,
-                      mimeType: preview.mimeType ?? "image/webp",
-                      sizeBytes: preview.sizeBytes ?? 0,
-                    }
-                  : null
-              );
-            }}
-          />
-
           <ServiceMediaPicker
             fieldId="press-pdf"
             label="קובץ PDF"

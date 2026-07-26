@@ -3,7 +3,6 @@ import { MessageCircle } from "lucide-react";
 import { ContactDetailsCard } from "@/components/contact/contact-details-card";
 import { ContactDirectCta } from "@/components/contact/contact-direct-cta";
 import { ContactForm } from "@/components/contact/contact-form";
-import { ContactNextSteps } from "@/components/contact/contact-next-steps";
 import type { PublicContactLinks } from "@/lib/contact/public-links";
 
 type ContactPageViewProps = {
@@ -46,7 +45,6 @@ export function ContactPageView({ links }: ContactPageViewProps) {
         </div>
       </section>
 
-      <ContactNextSteps />
       <ContactDirectCta links={links} />
     </div>
   );

@@ -26,7 +26,7 @@ export function CertificatesSection({ certificates }: CertificatesSectionProps) 
             title="תעודות והכשרות"
             description="מקצועיות, ידע וניסיון — בבסיס כל ליווי."
             actionLabel="לכל התעודות"
-            actionHref="/certificates"
+            actionHref="/about#certificates"
           />
         </HomepageReveal>
 

@@ -10,7 +10,6 @@ export const PUBLIC_PRIMARY_NAV: PublicNavLink[] = [
   { label: "מתכונים", href: "/recipes" },
   { label: "פוסטים", href: "/blog" },
   { label: "כתבות", href: "/press" },
-  { label: "תעודות", href: "/certificates" },
 ];
 
 export const PUBLIC_PRESS_NAV_HREF = "/press";

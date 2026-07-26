@@ -80,7 +80,6 @@ export const pressArticleDraftInputSchema = z.object({
     .trim()
     .max(PRESS_PUBLICATION_NAME_MAX, "שם גוף התקשורת ארוך מדי"),
   published_at: publishedAtSchema,
-  cover_media_id: optionalUuidSchema,
   pdf_media_id: optionalUuidSchema,
   display_order: z.coerce.number().int().min(0).max(10_000),
   status: z.literal("draft"),
@@ -110,7 +109,6 @@ export const pressArticlePublishInputSchema = z.object({
   published_at: z
     .string({ error: "יש לבחור תאריך פרסום" })
     .datetime({ offset: true, message: "תאריך פרסום אינו תקין" }),
-  cover_media_id: optionalUuidSchema,
   pdf_media_id: uuidSchema,
   display_order: z.coerce.number().int().min(0).max(10_000),
   status: z.literal("published"),

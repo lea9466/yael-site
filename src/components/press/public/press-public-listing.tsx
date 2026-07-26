@@ -12,26 +12,16 @@ export function PressPublicListing({ articles }: PressPublicListingProps) {
   const isEmpty = articles.length === 0;
 
   return (
-    <div className="mx-auto w-full max-w-[90rem] px-5 pb-16 pt-10 md:px-20 md:pb-24 md:pt-14">
-      <header className="relative mb-12 overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-light-sage-soft)] px-6 py-12 sm:px-10 sm:py-16">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -start-10 -top-10 size-40 rounded-full bg-[var(--color-warm-gold-soft)] blur-2xl"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-16 -end-8 size-48 rounded-full bg-[var(--color-coral-soft)] blur-2xl"
-        />
-        <div className="relative z-[var(--z-page)] max-w-2xl space-y-4">
-          <p className="text-caption font-medium tracking-wide text-[var(--color-secondary)]">
-            מהעיתונות
-          </p>
-          <h1 className="text-page-title">כתבות וראיונות</h1>
-          <p className="text-lg text-[var(--color-text-muted)]">
-            כתבות, ראיונות וסיקור תקשורתי על הגישה לאכילה מחוברת ועל הליווי
-            התזונתי של יעל.
-          </p>
-        </div>
+    <div className="mx-auto w-full max-w-[90rem] px-5 py-12 md:px-20 md:py-16">
+      <header className="mb-10 max-w-2xl space-y-3">
+        <p className="text-caption font-medium tracking-wide text-[var(--color-secondary)]">
+          מהעיתונות
+        </p>
+        <h1 className="text-page-title">כתבות וראיונות</h1>
+        <p className="text-lg text-[var(--color-text-muted)]">
+          כתבות, ראיונות וסיקור תקשורתי על אכילה מחוברת ועל הליווי התזונתי של
+          יעל.
+        </p>
       </header>
 
       {isEmpty ? (
@@ -41,10 +31,10 @@ export function PressPublicListing({ articles }: PressPublicListingProps) {
           description="בקרוב תוכלו לקרוא כאן כתבות וראיונות מהעיתונות."
         />
       ) : (
-        <ul className="grid list-none gap-6 p-0 sm:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article, index) => (
-            <li key={article.id}>
-              <PressPublicCard article={article} priority={index === 0} />
+        <ul className="mx-auto grid list-none gap-x-8 gap-y-12 p-0 sm:grid-cols-2 lg:max-w-5xl lg:grid-cols-2 xl:max-w-6xl">
+          {articles.map((article) => (
+            <li key={article.id} className="flex justify-center">
+              <PressPublicCard article={article} />
             </li>
           ))}
         </ul>

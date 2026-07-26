@@ -49,7 +49,7 @@ async function getAdminSupabase(): Promise<{ supabase: SupabaseClient } | null> 
 
 function revalidateCertificatePaths() {
   revalidatePath("/admin/certificates");
-  revalidatePath("/certificates");
+  revalidatePath("/about");
   revalidatePath("/");
 }
 

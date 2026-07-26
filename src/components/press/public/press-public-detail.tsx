@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
+import { PressNewspaperMark } from "@/components/press/public/press-newspaper-mark";
 import { formatPressDate } from "@/lib/press/date";
 import type { PressArticlePublicDetail } from "@/lib/press/types";
 
@@ -11,10 +12,16 @@ type PressPublicDetailViewProps = {
 export function PressPublicDetailView({ article }: PressPublicDetailViewProps) {
   return (
     <article className="mx-auto w-full max-w-5xl px-5 py-10 md:px-10 md:py-16">
-      <nav aria-label="פירורי לחם" className="mb-8 text-caption text-[var(--color-text-muted)]">
+      <nav
+        aria-label="פירורי לחם"
+        className="mb-8 text-caption text-[var(--color-text-muted)]"
+      >
         <ol className="flex flex-wrap items-center gap-2">
           <li>
-            <Link href="/" className="public-focus-ring hover:text-[var(--color-primary)]">
+            <Link
+              href="/"
+              className="public-focus-ring hover:text-[var(--color-primary)]"
+            >
               בית
             </Link>
           </li>
@@ -32,19 +39,34 @@ export function PressPublicDetailView({ article }: PressPublicDetailViewProps) {
         </ol>
       </nav>
 
-      <header className="mb-8 max-w-3xl space-y-4">
-        <p className="text-caption font-medium tracking-wide text-[var(--color-secondary)]">
-          {article.publication_name}
-        </p>
-        <h1 className="text-page-title">{article.title}</h1>
-        <p className="text-[var(--color-text-muted)]">
-          {formatPressDate(article.published_at)}
-        </p>
-        {article.excerpt ? (
-          <p className="text-lg leading-relaxed text-[var(--color-text-muted)]">
-            {article.excerpt}
-          </p>
-        ) : null}
+      <header className="mb-10 grid gap-8 md:grid-cols-[auto_minmax(0,1fr)] md:items-start">
+        <div className="mx-auto w-[8.5rem] shrink-0 md:mx-0">
+          <PressNewspaperMark
+            publicationName={article.publication_name}
+            className="press-paper-mark"
+          />
+        </div>
+
+        <div className="max-w-2xl space-y-4">
+          <div className="space-y-1">
+            <p className="text-caption font-medium text-[var(--color-soft-accent)]">
+              {article.publication_name}
+            </p>
+            <p className="text-[var(--color-text-muted)]">
+              <time dateTime={article.published_at}>
+                {formatPressDate(article.published_at)}
+              </time>
+            </p>
+          </div>
+
+          <h1 className="text-page-title">{article.title}</h1>
+
+          {article.excerpt ? (
+            <p className="text-lg leading-relaxed text-[var(--color-text-muted)]">
+              {article.excerpt}
+            </p>
+          ) : null}
+        </div>
       </header>
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">

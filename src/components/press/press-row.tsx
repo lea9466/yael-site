@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical, Newspaper, Pencil, Trash2 } from "lucide-react";
 
 import { deletePressArticleAction } from "@/actions/press";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
@@ -58,20 +57,8 @@ export function PressRow({ item }: PressRowProps) {
     <>
       <AdminListItem>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="relative size-16 shrink-0 overflow-hidden rounded-[var(--radius-md)] bg-[var(--color-surface-soft)]">
-            {item.coverUrl ? (
-              <Image
-                src={item.coverUrl}
-                alt={item.coverAlt ?? item.title}
-                fill
-                className="object-cover"
-                sizes="64px"
-              />
-            ) : (
-              <div className="flex size-full items-center justify-center text-caption text-[var(--color-text-muted)]">
-                אין
-              </div>
-            )}
+          <div className="flex size-16 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-surface-soft)] text-[var(--color-primary)]">
+            <Newspaper aria-hidden="true" className="size-6" />
           </div>
 
           <div className="min-w-0 flex-1 space-y-1">

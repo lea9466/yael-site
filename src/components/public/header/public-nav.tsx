@@ -17,7 +17,7 @@ export function PublicNav({ links, className, onNavigate }: PublicNavProps) {
 
   return (
     <nav aria-label="ניווט ראשי" className={className}>
-      <ul className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-8 xl:gap-10">
+      <ul className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-6 xl:gap-8">
         {links.map((link) => {
           const isActive =
             link.href === "/"
@@ -31,7 +31,7 @@ export function PublicNav({ links, className, onNavigate }: PublicNavProps) {
                 onClick={onNavigate}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "public-focus-ring block rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium transition-colors duration-[var(--transition-fast)]",
+                  "public-focus-ring block rounded-[var(--radius-md)] px-2.5 py-1.5 text-base font-medium transition-colors duration-[var(--transition-fast)] lg:px-2 lg:py-1",
                   isActive
                     ? "bg-[var(--color-light-sage-soft)] text-[var(--color-primary)]"
                     : "text-[var(--color-text)] hover:bg-[var(--color-surface-soft)] hover:text-[var(--color-primary)]"

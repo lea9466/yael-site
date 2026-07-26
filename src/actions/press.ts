@@ -60,7 +60,6 @@ function toDatabasePayload(input: PressArticleInput) {
     excerpt: input.excerpt.length > 0 ? input.excerpt : null,
     publication_name: input.publication_name,
     published_at: input.published_at,
-    cover_media_id: input.cover_media_id,
     pdf_media_id: input.pdf_media_id,
     display_order: input.display_order,
     status: input.status,
@@ -71,7 +70,6 @@ function toDatabasePayload(input: PressArticleInput) {
 }
 
 async function validateMedia(
-  coverMediaId: string | null,
   pdfMediaId: string | null,
   requirePdf: boolean
 ): Promise<PressArticleActionResult | null> {
@@ -81,28 +79,6 @@ async function validateMedia(
       error: PRESS_ERRORS.pdfRequiredPublish,
       fieldErrors: { pdf_media_id: PRESS_ERRORS.pdfRequiredPublish },
     };
-  }
-
-  if (coverMediaId) {
-    const exists = await verifyMediaExists(coverMediaId);
-
-    if (!exists) {
-      return {
-        success: false,
-        error: PRESS_ERRORS.mediaNotFound,
-        fieldErrors: { cover_media_id: PRESS_ERRORS.mediaNotFound },
-      };
-    }
-
-    const isImage = await verifyMediaMime(coverMediaId, "image");
-
-    if (!isImage) {
-      return {
-        success: false,
-        error: PRESS_ERRORS.coverMustBeImage,
-        fieldErrors: { cover_media_id: PRESS_ERRORS.coverMustBeImage },
-      };
-    }
   }
 
   if (pdfMediaId) {
@@ -195,7 +171,6 @@ export async function createPressArticleAction(
   }
 
   const mediaError = await validateMedia(
-    input.cover_media_id,
     input.pdf_media_id,
     input.status === "published"
   );
@@ -258,7 +233,6 @@ export async function updatePressArticleAction(
   }
 
   const mediaError = await validateMedia(
-    parsed.data.cover_media_id,
     parsed.data.pdf_media_id,
     parsed.data.status === "published"
   );

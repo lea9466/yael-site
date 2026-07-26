@@ -1,22 +1,46 @@
 import "server-only";
 
+import { Resend } from "resend";
+
+import {
+  buildContactNotificationHtml,
+  buildContactNotificationSubject,
+  buildContactNotificationText,
+} from "@/lib/contact/notification-email";
+import type { ContactNotificationPayload } from "@/lib/contact/types";
 import type { PublicContactMessageValues } from "@/lib/validations/public-contact";
 
-export type ContactNotificationPayload = {
-  messageId: string;
-  fullName: string;
-  email: string;
-  phone: string | null;
-  message: string;
-  createdAt: string;
-  businessEmail: string | null;
-};
+export type { ContactNotificationPayload };
+
+function resolveRecipient(businessEmail: string | null): string | null {
+  const fromProfile = businessEmail?.trim() || null;
+
+  if (fromProfile) {
+    return fromProfile;
+  }
+
+  const fallback = process.env.CONTACT_NOTIFICATION_EMAIL?.trim() || null;
+  return fallback || null;
+}
+
+function resolveFromAddress(): string | null {
+  const fromEmail = process.env.RESEND_FROM_EMAIL?.trim() || null;
+
+  if (!fromEmail) {
+    return null;
+  }
+
+  if (fromEmail.includes("<")) {
+    return fromEmail;
+  }
+
+  return `Yaelifestyle <${fromEmail}>`;
+}
 
 /**
  * Notify Yael about a new contact message.
  *
- * TODO(resend): Wire Resend here once RESEND_API_KEY / RESEND_FROM_EMAIL
- * are configured. Expected flow after insert:
+ * Flow after insert:
  * 1. Resolve recipient from business profile email (fallback CONTACT_NOTIFICATION_EMAIL).
  * 2. Send RTL HTML email with subject: `פנייה חדשה מהאתר – {fullName}`.
  * 3. Include name, email, phone, message, received time, admin deep link.
@@ -28,8 +52,45 @@ export type ContactNotificationPayload = {
 export async function notifyContactMessageReceived(
   payload: ContactNotificationPayload
 ): Promise<void> {
-  // TODO(resend): replace this no-op with Resend sendMail implementation.
-  void payload;
+  const apiKey = process.env.RESEND_API_KEY?.trim() || null;
+  const from = resolveFromAddress();
+  const to = resolveRecipient(payload.businessEmail);
+
+  if (!apiKey || !from) {
+    console.error("[contact-form] notification skipped: missing Resend config", {
+      at: new Date().toISOString(),
+      messageId: payload.messageId,
+      type: "config",
+    });
+    return;
+  }
+
+  if (!to) {
+    console.error("[contact-form] notification skipped: missing recipient", {
+      at: new Date().toISOString(),
+      messageId: payload.messageId,
+      type: "recipient",
+    });
+    return;
+  }
+
+  const resend = new Resend(apiKey);
+  const { error } = await resend.emails.send({
+    from,
+    to: [to],
+    replyTo: payload.email,
+    subject: buildContactNotificationSubject(payload.fullName),
+    html: buildContactNotificationHtml(payload),
+    text: buildContactNotificationText(payload),
+  });
+
+  if (error) {
+    console.error("[contact-form] Resend send failed", {
+      at: new Date().toISOString(),
+      messageId: payload.messageId,
+      type: error.name || "ResendError",
+    });
+  }
 }
 
 export function buildContactNotificationPayload(input: {

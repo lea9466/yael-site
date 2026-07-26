@@ -28,19 +28,19 @@ export function PublicLogo({
       )}
     >
       {logo?.url ? (
-        <span className="relative block h-10 w-auto min-w-[2.5rem] sm:h-11">
+        <span className="relative block h-14 w-auto min-w-[3.5rem] sm:h-16">
           <Image
             src={logo.url}
             alt={logo.alt || businessName}
-            width={160}
-            height={44}
+            width={240}
+            height={64}
             priority={priority}
             className="h-full w-auto object-contain object-right"
           />
         </span>
       ) : (
         <span className="flex flex-col text-right leading-tight">
-          <span className="text-base font-semibold text-[var(--color-primary)] sm:text-lg">
+          <span className="text-lg font-semibold text-[var(--color-primary)] sm:text-xl">
             {businessName}
           </span>
           {settings.businessProfile.tagline ? (

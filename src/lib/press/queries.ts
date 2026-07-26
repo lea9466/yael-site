@@ -2,7 +2,7 @@ import "server-only";
 
 import { createClient } from "@/lib/auth/session";
 import { MEDIA_LIBRARY_SELECT_COLUMNS, PDF_MIME_TYPE } from "@/lib/media/constants";
-import { isImageMimeType, isPdfMimeType } from "@/lib/media/mime";
+import { isPdfMimeType } from "@/lib/media/mime";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
 import { PRESS_PAGE_SIZE } from "@/lib/press/constants";
 import type {
@@ -20,7 +20,7 @@ import type {
 } from "@/lib/validations/press-article";
 
 const PRESS_SELECT_COLUMNS =
-  "id, title, slug, excerpt, publication_name, published_at, cover_media_id, pdf_media_id, display_order, status, seo_title, seo_description, created_at, updated_at";
+  "id, title, slug, excerpt, publication_name, published_at, pdf_media_id, display_order, status, seo_title, seo_description, created_at, updated_at";
 
 type SortConfig = {
   column: "display_order" | "published_at" | "title" | "updated_at" | "created_at";
@@ -109,7 +109,7 @@ export async function verifyMediaExists(mediaId: string): Promise<boolean> {
 
 export async function verifyMediaMime(
   mediaId: string,
-  kind: "image" | "pdf"
+  kind: "pdf"
 ): Promise<boolean> {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -126,7 +126,7 @@ export async function verifyMediaMime(
     return isPdfMimeType(data.mime_type) || data.mime_type === PDF_MIME_TYPE;
   }
 
-  return isImageMimeType(data.mime_type);
+  return false;
 }
 
 export async function fetchPressArticlesList(
@@ -140,10 +140,7 @@ export async function fetchPressArticlesList(
 
     let listQuery = supabase
       .from("press_articles")
-      .select(
-        `${PRESS_SELECT_COLUMNS}, cover:media_library!press_articles_cover_media_id_fkey(${MEDIA_LIBRARY_SELECT_COLUMNS})`,
-        { count: "exact" }
-      );
+      .select(PRESS_SELECT_COLUMNS, { count: "exact" });
 
     if (query.q.length > 0) {
       const pattern = `%${escapeIlikePattern(query.q)}%`;
@@ -179,23 +176,9 @@ export async function fetchPressArticlesList(
         .select("*", { count: "exact", head: true }),
     ]);
 
-    const items: PressArticleListItem[] = (data ?? []).map((row) => {
-      const record = asPressRecord(row);
-      const cover = toMediaPreview(
-        (row.cover as MediaJoinRow | MediaJoinRow[] | null) &&
-          !Array.isArray(row.cover)
-          ? (row.cover as MediaJoinRow)
-          : Array.isArray(row.cover)
-            ? (row.cover[0] ?? null)
-            : null
-      );
-
-      return {
-        ...record,
-        coverUrl: cover?.url ?? null,
-        coverAlt: cover?.alt ?? null,
-      };
-    });
+    const items: PressArticleListItem[] = (data ?? []).map((row) =>
+      asPressRecord(row)
+    );
 
     const filteredCount = count ?? 0;
 
@@ -226,7 +209,7 @@ export async function fetchPressArticleById(
     const { data, error } = await supabase
       .from("press_articles")
       .select(
-        `${PRESS_SELECT_COLUMNS}, cover:media_library!press_articles_cover_media_id_fkey(${MEDIA_LIBRARY_SELECT_COLUMNS}), pdf:media_library!press_articles_pdf_media_id_fkey(${MEDIA_LIBRARY_SELECT_COLUMNS})`
+        `${PRESS_SELECT_COLUMNS}, pdf:media_library!press_articles_pdf_media_id_fkey(${MEDIA_LIBRARY_SELECT_COLUMNS})`
       )
       .eq("id", id)
       .maybeSingle();
@@ -236,14 +219,10 @@ export async function fetchPressArticleById(
     }
 
     const record = asPressRecord(data);
-    const coverRaw = data.cover as MediaJoinRow | MediaJoinRow[] | null;
     const pdfRaw = data.pdf as MediaJoinRow | MediaJoinRow[] | null;
 
     return {
       ...record,
-      coverPreview: toMediaPreview(
-        Array.isArray(coverRaw) ? (coverRaw[0] ?? null) : coverRaw
-      ),
       pdfPreview: toMediaPreview(
         Array.isArray(pdfRaw) ? (pdfRaw[0] ?? null) : pdfRaw
       ),
@@ -260,9 +239,7 @@ export async function fetchPublishedPressArticles(): Promise<
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("press_articles")
-      .select(
-        `${PRESS_SELECT_COLUMNS}, cover:media_library!press_articles_cover_media_id_fkey(${MEDIA_LIBRARY_SELECT_COLUMNS})`
-      )
+      .select(PRESS_SELECT_COLUMNS)
       .eq("status", "published")
       .order("display_order", { ascending: true })
       .order("published_at", { ascending: false });
@@ -273,10 +250,6 @@ export async function fetchPublishedPressArticles(): Promise<
 
     return data.map((row) => {
       const record = asPressRecord(row);
-      const coverRaw = row.cover as MediaJoinRow | MediaJoinRow[] | null;
-      const cover = toMediaPreview(
-        Array.isArray(coverRaw) ? (coverRaw[0] ?? null) : coverRaw
-      );
 
       return {
         id: record.id,
@@ -285,8 +258,6 @@ export async function fetchPublishedPressArticles(): Promise<
         excerpt: record.excerpt,
         publication_name: record.publication_name,
         published_at: record.published_at ?? record.created_at,
-        coverUrl: cover?.url ?? null,
-        coverAlt: cover?.alt ?? null,
       };
     });
   } catch {
@@ -302,7 +273,7 @@ export async function fetchPublishedPressArticleBySlug(
     const { data, error } = await supabase
       .from("press_articles")
       .select(
-        `${PRESS_SELECT_COLUMNS}, cover:media_library!press_articles_cover_media_id_fkey(${MEDIA_LIBRARY_SELECT_COLUMNS}), pdf:media_library!press_articles_pdf_media_id_fkey(${MEDIA_LIBRARY_SELECT_COLUMNS})`
+        `${PRESS_SELECT_COLUMNS}, pdf:media_library!press_articles_pdf_media_id_fkey(${MEDIA_LIBRARY_SELECT_COLUMNS})`
       )
       .eq("status", "published")
       .eq("slug", slug)
@@ -313,11 +284,7 @@ export async function fetchPublishedPressArticleBySlug(
     }
 
     const record = asPressRecord(data);
-    const coverRaw = data.cover as MediaJoinRow | MediaJoinRow[] | null;
     const pdfRaw = data.pdf as MediaJoinRow | MediaJoinRow[] | null;
-    const cover = toMediaPreview(
-      Array.isArray(coverRaw) ? (coverRaw[0] ?? null) : coverRaw
-    );
     const pdf = toMediaPreview(
       Array.isArray(pdfRaw) ? (pdfRaw[0] ?? null) : pdfRaw
     );
@@ -333,8 +300,6 @@ export async function fetchPublishedPressArticleBySlug(
       excerpt: record.excerpt,
       publication_name: record.publication_name,
       published_at: record.published_at ?? record.created_at,
-      coverUrl: cover?.url ?? null,
-      coverAlt: cover?.alt ?? null,
       pdfUrl: pdf.url,
       seo_title: record.seo_title,
       seo_description: record.seo_description,

@@ -50,8 +50,6 @@ export async function generateMetadata({
     path: `/press/${article.slug}`,
     title: article.seo_title || article.title,
     description,
-    ogImage: article.coverUrl,
-    ogImageAlt: article.coverAlt ?? article.title,
   });
 }
 

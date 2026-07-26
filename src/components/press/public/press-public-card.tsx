@@ -1,76 +1,94 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { formatPressDate } from "@/lib/press/date";
 import type { PressArticlePublicCard } from "@/lib/press/types";
 
+import "./press-card.css";
+
 type PressPublicCardProps = {
   article: PressArticlePublicCard;
-  priority?: boolean;
 };
 
-export function PressPublicCard({
-  article,
-  priority = false,
-}: PressPublicCardProps) {
+export function PressPublicCard({ article }: PressPublicCardProps) {
+  const href = `/press/${article.slug}`;
+
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-[var(--transition-base)] hover:-translate-y-1 hover:shadow-[var(--shadow-md)]">
-      <Link
-        href={`/press/${article.slug}`}
-        className="public-focus-ring relative block aspect-[16/10] overflow-hidden bg-[var(--color-surface-soft)]"
-      >
-        {article.coverUrl ? (
-          <Image
-            src={article.coverUrl}
-            alt={article.coverAlt ?? article.title}
-            fill
-            priority={priority}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-[var(--transition-base)] group-hover:scale-[1.03]"
-          />
-        ) : (
-          <div className="flex size-full items-center justify-center bg-[var(--color-light-sage-soft)] text-sm text-[var(--color-text-muted)]">
-            {article.publication_name}
+    <article className="press-card">
+      <Link href={href} className="press-card__link public-focus-ring">
+        <div className="press-card__stack" aria-hidden="true">
+          <div className="press-card__sheet press-card__sheet--shadow" />
+          <div className="press-card__sheet press-card__sheet--back" />
+        </div>
+
+        <div className="press-card__sheet press-card__sheet--front">
+          <div className="press-card__edge" aria-hidden="true" />
+
+          <header className="press-card__masthead">
+            <p className="press-card__kicker">מהעיתונות</p>
+            <p className="press-card__publication">{article.publication_name}</p>
+            <div className="press-card__meta-row">
+              <span className="press-card__ornament" aria-hidden="true" />
+              <time
+                className="press-card__date"
+                dateTime={article.published_at}
+              >
+                {formatPressDate(article.published_at)}
+              </time>
+              <span className="press-card__ornament" aria-hidden="true" />
+            </div>
+            <span className="press-card__rule press-card__rule--double" aria-hidden="true" />
+          </header>
+
+          <div className="press-card__body">
+            <h2 className="press-card__title">{article.title}</h2>
+
+            <div className="press-card__feature" aria-hidden="true">
+              <span className="press-card__feature-glow" />
+              <span className="press-card__feature-lines">
+                <span />
+                <span />
+                <span />
+              </span>
+            </div>
+
+            {article.excerpt ? (
+              <p className="press-card__excerpt">{article.excerpt}</p>
+            ) : null}
+
+            <div className="press-card__columns" aria-hidden="true">
+              <div className="press-card__col">
+                <span className="press-card__line press-card__line--head" />
+                <span className="press-card__line" />
+                <span className="press-card__line" />
+                <span className="press-card__line press-card__line--mid" />
+                <span className="press-card__line" />
+                <span className="press-card__line press-card__line--short" />
+                <span className="press-card__line" />
+                <span className="press-card__line press-card__line--mid" />
+              </div>
+              <div className="press-card__col">
+                <span className="press-card__line" />
+                <span className="press-card__line press-card__line--mid" />
+                <span className="press-card__line" />
+                <span className="press-card__line" />
+                <span className="press-card__line press-card__line--short" />
+                <span className="press-card__line press-card__line--head" />
+                <span className="press-card__line" />
+                <span className="press-card__line press-card__line--mid" />
+              </div>
+            </div>
           </div>
-        )}
+
+          <footer className="press-card__footer">
+            <span className="press-card__folio" aria-hidden="true">
+              עמוד א׳
+            </span>
+            <span className="press-card__cta">לקריאת הכתבה</span>
+          </footer>
+
+          <span className="press-card__fold" aria-hidden="true" />
+        </div>
       </Link>
-
-      <div className="flex flex-1 flex-col gap-3 p-5 sm:p-6">
-        <div className="space-y-1">
-          <p className="text-caption font-medium tracking-wide text-[var(--color-secondary)]">
-            {article.publication_name}
-          </p>
-          <p className="text-caption text-[var(--color-text-muted)]">
-            {formatPressDate(article.published_at)}
-          </p>
-        </div>
-
-        <h2 className="text-section-title text-xl sm:text-2xl">
-          <Link
-            href={`/press/${article.slug}`}
-            className="public-focus-ring rounded-[var(--radius-sm)] hover:underline"
-          >
-            {article.title}
-          </Link>
-        </h2>
-
-        {article.excerpt ? (
-          <p className="line-clamp-3 flex-1 text-[var(--color-text-muted)]">
-            {article.excerpt}
-          </p>
-        ) : (
-          <div className="flex-1" />
-        )}
-
-        <div className="pt-1">
-          <Link
-            href={`/press/${article.slug}`}
-            className="public-focus-ring inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] bg-[image:var(--gradient-warm)] px-5 text-sm font-medium text-[var(--color-text-on-primary)] shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-[var(--transition-base)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]"
-          >
-            לקריאת הכתבה
-          </Link>
-        </div>
-      </div>
     </article>
   );
 }

@@ -6,6 +6,5 @@ export const PRESS_ERRORS = {
   mediaNotFound: "קובץ המדיה שנבחר לא נמצא.",
   pdfRequiredPublish: "יש לבחור קובץ PDF לפני פרסום.",
   pdfMustBePdf: "יש לבחור קובץ PDF בלבד.",
-  coverMustBeImage: "תמונת השער חייבת להיות תמונה.",
   publishIncomplete: "יש למלא את כל השדות החובה לפני פרסום.",
 } as const;

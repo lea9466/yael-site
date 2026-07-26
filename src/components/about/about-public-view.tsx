@@ -2,10 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowDown, ArrowLeft, Sparkles } from "lucide-react";
 
+import { AboutCertificatesSection } from "@/components/about/about-certificates-section";
 import { AboutEditorialStory } from "@/components/about/about-editorial-story";
 import { AboutGallery } from "@/components/about/about-gallery";
 import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import type { AboutMediaPreview } from "@/lib/about/queries";
+import type { CertificateListItem } from "@/lib/certificates/types";
 import type { AboutPageData } from "@/lib/validations/about";
 import { escapeHtml } from "@/lib/services/sanitize";
 import { cn } from "@/lib/utils/cn";
@@ -14,6 +16,7 @@ type AboutPublicViewProps = {
   data: AboutPageData;
   coverPreview: AboutMediaPreview | null;
   blockMediaUrls: Map<string, AboutMediaPreview>;
+  certificates?: CertificateListItem[];
   mode?: "public" | "preview";
 };
 
@@ -25,6 +28,7 @@ export function AboutPublicView({
   data,
   coverPreview,
   blockMediaUrls,
+  certificates = [],
   mode = "public",
 }: AboutPublicViewProps) {
   const isPreview = mode === "preview";
@@ -132,6 +136,8 @@ export function AboutPublicView({
           isPreview={isPreview}
         />
       ) : null}
+
+      <AboutCertificatesSection items={certificates} isPreview={isPreview} />
 
       <section className="about-page__cta" aria-labelledby="about-cta-heading">
         <div className="about-page__container">

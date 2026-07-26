@@ -8,7 +8,6 @@ export type PressArticleRecord = {
   excerpt: string | null;
   publication_name: string;
   published_at: string | null;
-  cover_media_id: string | null;
   pdf_media_id: string | null;
   display_order: number;
   status: PressStatus;
@@ -26,13 +25,9 @@ export type PressMediaPreview = {
   sizeBytes: number;
 };
 
-export type PressArticleListItem = PressArticleRecord & {
-  coverUrl: string | null;
-  coverAlt: string | null;
-};
+export type PressArticleListItem = PressArticleRecord;
 
 export type PressArticleDetail = PressArticleRecord & {
-  coverPreview: PressMediaPreview | null;
   pdfPreview: PressMediaPreview | null;
 };
 
@@ -58,8 +53,6 @@ export type PressArticlePublicCard = {
   excerpt: string | null;
   publication_name: string;
   published_at: string;
-  coverUrl: string | null;
-  coverAlt: string | null;
 };
 
 export type PressArticlePublicDetail = PressArticlePublicCard & {
@@ -75,7 +68,6 @@ export type PressArticleFormValues = {
   excerpt: string;
   publication_name: string;
   published_at: string;
-  cover_media_id: string | null;
   pdf_media_id: string | null;
   display_order: number;
   status: PressStatus;

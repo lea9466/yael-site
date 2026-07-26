@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { AboutPublicView } from "@/components/about/about-public-view";
 import { fetchAboutPageDetail } from "@/lib/about/queries";
 import { getDefaultAboutPageData } from "@/lib/about/defaults";
+import { fetchCertificatesPageData } from "@/lib/certificates/queries";
 import { getWebsiteSettings } from "@/lib/public/queries";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { shortenForSeoDescription } from "@/lib/seo/resolve";
@@ -39,7 +40,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PublicAboutPage() {
-  const detail = await fetchAboutPageDetail();
+  const [detail, certificatesData] = await Promise.all([
+    fetchAboutPageDetail(),
+    fetchCertificatesPageData(),
+  ]);
 
   if (!detail) {
     notFound();
@@ -50,6 +54,7 @@ export default async function PublicAboutPage() {
       data={detail.data}
       coverPreview={detail.coverPreview}
       blockMediaUrls={detail.blockMediaUrls}
+      certificates={certificatesData?.items ?? []}
       mode="public"
     />
   );

@@ -1,13 +1,6 @@
 import Link from "next/link";
 import { MultilineText } from "@/components/ui/multiline-text";
-import type { LucideIcon } from "lucide-react";
-import {
-  Globe,
-  Mail,
-  MapPin,
-  Phone,
-  Share2,
-} from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 
 import { PublicLogo } from "@/components/public/header/public-logo";
 import { Container } from "@/components/public/layout/container";
@@ -18,28 +11,18 @@ import {
 import { WEEKDAYS } from "@/lib/settings/constants";
 import type { BusinessProfileData } from "@/lib/validations/site-settings";
 import type { WebsiteSettingsPublic } from "@/lib/public/types";
-import { cn } from "@/lib/utils/cn";
 
-type SocialKey = keyof BusinessProfileData["social"];
+const FOOTER_INFO_HREFS = new Set(["/contact", "/privacy-policy", "/terms"]);
 
-type SocialLinkConfig = {
-  key: SocialKey;
-  label: string;
-  icon: LucideIcon;
-};
-
-const SOCIAL_LINKS: SocialLinkConfig[] = [
-  { key: "instagram", label: "אינסטגרם", icon: Share2 },
-  { key: "facebook", label: "פייסבוק", icon: Share2 },
-  { key: "youtube", label: "יוטיוב", icon: Share2 },
-  { key: "linkedin", label: "לינקדאין", icon: Share2 },
-  { key: "tiktok", label: "טיקטוק", icon: Globe },
-  { key: "pinterest", label: "פינטרסט", icon: Globe },
-];
-
-function FooterNavColumn({ links }: { links: PublicNavLink[] }) {
+function FooterNavColumn({
+  links,
+  ariaLabel,
+}: {
+  links: PublicNavLink[];
+  ariaLabel: string;
+}) {
   return (
-    <nav aria-label="קישורי תחתית">
+    <nav aria-label={ariaLabel}>
       <ul className="space-y-2">
         {links.map((link) => (
           <li key={link.href}>
@@ -84,16 +67,12 @@ export function PublicFooter({
   const { businessProfile } = settings;
   const currentYear = new Date().getFullYear();
   const workingHours = formatWorkingHours(businessProfile);
-
-  const availableSocialLinks = SOCIAL_LINKS.flatMap((social) => {
-    const href = businessProfile.social[social.key];
-
-    if (!href) {
-      return [];
-    }
-
-    return [{ ...social, href }];
-  });
+  const primaryNavLinks = navLinks.filter(
+    (link) => !FOOTER_INFO_HREFS.has(link.href)
+  );
+  const infoNavLinks = navLinks.filter((link) =>
+    FOOTER_INFO_HREFS.has(link.href)
+  );
 
   const whatsapp = businessProfile.social.whatsapp;
   const addressLine = [businessProfile.address, businessProfile.city]
@@ -103,7 +82,7 @@ export function PublicFooter({
   return (
     <footer className="mt-auto border-t border-[var(--color-border)] bg-[var(--color-surface-soft)]/80">
       <Container className="py-[var(--spacing-3xl)]">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-y-10 md:grid-cols-2 md:gap-x-12 lg:grid-cols-4">
           <div className="space-y-4">
             <PublicLogo settings={settings} />
             {businessProfile.short_description ? (
@@ -182,42 +161,20 @@ export function PublicFooter({
             <h2 className="text-sm font-semibold text-[var(--color-primary)]">
               ניווט
             </h2>
-            <FooterNavColumn links={navLinks} />
+            <FooterNavColumn
+              links={primaryNavLinks}
+              ariaLabel="ניווט בתחתית האתר"
+            />
           </div>
 
           <div className="space-y-4">
             <h2 className="text-sm font-semibold text-[var(--color-primary)]">
-              רשתות חברתיות
+              מידע וקשר
             </h2>
-            {availableSocialLinks.length > 0 ? (
-              <ul className="flex flex-wrap gap-2">
-                {availableSocialLinks.map((social) => {
-                  const Icon = social.icon;
-
-                  return (
-                    <li key={social.key}>
-                      <a
-                        href={social.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={social.label}
-                        className={cn(
-                          "public-focus-ring inline-flex size-10 items-center justify-center rounded-[var(--radius-full)]",
-                          "border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-primary)]",
-                          "transition-[transform,background-color] duration-[var(--transition-fast)] hover:-translate-y-0.5 hover:bg-[var(--color-light-sage-soft)]"
-                        )}
-                      >
-                        <Icon aria-hidden className="size-4" />
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <p className="text-sm text-[var(--color-text-muted)]">
-                עקבו אחרי העדכונים בקרוב.
-              </p>
-            )}
+            <FooterNavColumn
+              links={infoNavLinks}
+              ariaLabel="מידע ויצירת קשר"
+            />
           </div>
         </div>
 

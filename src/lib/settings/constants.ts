@@ -27,7 +27,6 @@ export const SETTINGS_TABS = [
   { id: "general", label: "כללי" },
   { id: "homepage", label: "דף הבית" },
   { id: "contact", label: "יצירת קשר" },
-  { id: "social", label: "רשתות חברתיות" },
   { id: "seo", label: "SEO" },
   { id: "analytics", label: "אנליטיקות" },
   { id: "branding", label: "מיתוג" },

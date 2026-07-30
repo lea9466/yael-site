@@ -296,45 +296,6 @@ export function SettingsTabPanels({
       </SettingsPanel>
 
       <SettingsPanel
-        id="social"
-        activeTab={activeTab}
-        tabId="social"
-        title="רשתות חברתיות"
-        description="קישורים לפרופילים ברשתות החברתיות."
-      >
-        <div className="grid gap-6 lg:grid-cols-2">
-          {(
-            [
-              ["socialFacebook", "Facebook", "social.facebook"],
-              ["socialInstagram", "Instagram", "social.instagram"],
-              ["socialYoutube", "YouTube", "social.youtube"],
-              ["socialTiktok", "TikTok", "social.tiktok"],
-              ["socialLinkedin", "LinkedIn", "social.linkedin"],
-              ["socialPinterest", "Pinterest", "social.pinterest"],
-            ] as const
-          ).map(([key, label, errorKey]) => (
-            <FormField
-              key={key}
-              label={label}
-              htmlFor={`field-${key}`}
-              hint="אופציונלי"
-              error={fieldErrors[errorKey]}
-            >
-              <Input
-                id={`field-${key}`}
-                type="url"
-                dir="ltr"
-                placeholder="https://"
-                value={formState[key]}
-                error={Boolean(fieldErrors[errorKey])}
-                onChange={(event) => onChange(key, event.target.value)}
-              />
-            </FormField>
-          ))}
-        </div>
-      </SettingsPanel>
-
-      <SettingsPanel
         id="seo"
         activeTab={activeTab}
         tabId="seo"

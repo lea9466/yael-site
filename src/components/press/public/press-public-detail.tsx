@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { Download, ExternalLink } from "lucide-react";
 
 import { PressNewspaperMark } from "@/components/press/public/press-newspaper-mark";
 import { formatPressDate } from "@/lib/press/date";
@@ -10,6 +10,9 @@ type PressPublicDetailViewProps = {
 };
 
 export function PressPublicDetailView({ article }: PressPublicDetailViewProps) {
+  const pdfViewUrl = article.pdfUrl;
+  const pdfDownloadUrl = `/api/press/${encodeURIComponent(article.slug)}/pdf?download=1`;
+
   return (
     <article className="mx-auto w-full max-w-5xl px-5 py-10 md:px-10 md:py-16">
       <nav
@@ -40,7 +43,7 @@ export function PressPublicDetailView({ article }: PressPublicDetailViewProps) {
       </nav>
 
       <header className="mb-10 grid gap-8 md:grid-cols-[auto_minmax(0,1fr)] md:items-start">
-        <div className="mx-auto w-[8.5rem] shrink-0 md:mx-0">
+        <div className="me-auto w-[8.5rem] shrink-0 md:mx-0">
           <PressNewspaperMark
             publicationName={article.publication_name}
             className="press-paper-mark"
@@ -73,21 +76,30 @@ export function PressPublicDetailView({ article }: PressPublicDetailViewProps) {
         <p className="text-sm font-medium text-[var(--color-primary)]">
           תצוגת הכתבה
         </p>
-        <a
-          href={article.pdfUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="public-focus-ring inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-transparent px-4 text-sm font-medium text-[var(--color-primary)] transition-[background-color] duration-[var(--transition-base)] hover:bg-[var(--color-light-sage-soft)]"
-        >
-          <ExternalLink aria-hidden="true" className="size-4" />
-          פתח במסך מלא
-        </a>
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href={pdfDownloadUrl}
+            className="public-focus-ring inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 text-sm font-medium text-[var(--color-text-on-primary)] transition-[opacity] duration-[var(--transition-base)] hover:opacity-90"
+          >
+            <Download aria-hidden="true" className="size-4" />
+            הורדת PDF
+          </a>
+          <a
+            href={pdfViewUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="public-focus-ring inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-transparent px-4 text-sm font-medium text-[var(--color-primary)] transition-[background-color] duration-[var(--transition-base)] hover:bg-[var(--color-light-sage-soft)]"
+          >
+            <ExternalLink aria-hidden="true" className="size-4" />
+            פתח במסך מלא
+          </a>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)]">
         <iframe
           title={`כתבה: ${article.title}`}
-          src={`${article.pdfUrl}#toolbar=1&navpanes=0`}
+          src={`${pdfViewUrl}#toolbar=1&navpanes=0`}
           className="h-[min(80vh,56rem)] w-full bg-[var(--color-surface-soft)]"
         />
       </div>

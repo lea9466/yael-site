@@ -141,10 +141,11 @@ async function persistProcessedMedia(
 ): Promise<UploadMediaResult> {
   const originalFileName = sanitizeOriginalFileName(originalName);
 
-  // Prefer Blob so storage-js uses multipart FormData (reliable in Node fetch).
-  const uploadBody = new Blob([Uint8Array.from(image.buffer)], {
-    type: image.mimeType,
-  });
+  // Upload raw bytes (Buffer/Uint8Array). Avoid Blob wrapping — safer for
+  // large binary PDFs and keeps the file byte-identical to the source.
+  const uploadBody = Buffer.isBuffer(image.buffer)
+    ? image.buffer
+    : Buffer.from(image.buffer);
 
   const { error: uploadError } = await supabase.storage
     .from(PUBLIC_MEDIA_BUCKET)

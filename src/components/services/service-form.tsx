@@ -685,7 +685,7 @@ export function ServiceForm({
                 <div className="grid gap-3">
                   <RepeaterTextField
                     value={item.text}
-                    placeholder="לדוגמה: נשים בהריון"
+                    placeholder="לדוגמה: נשים אחרי לידה"
                     onChange={(text) => updateItem({ ...item, text })}
                   />
                   <ServiceAudienceIconPicker

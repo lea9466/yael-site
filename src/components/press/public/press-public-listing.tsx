@@ -31,10 +31,13 @@ export function PressPublicListing({ articles }: PressPublicListingProps) {
           description="בקרוב תוכלו לקרוא כאן כתבות וראיונות מהעיתונות."
         />
       ) : (
-        <ul className="mx-auto grid list-none gap-x-8 gap-y-12 p-0 sm:grid-cols-2 lg:max-w-5xl lg:grid-cols-2 xl:max-w-6xl">
-          {articles.map((article) => (
-            <li key={article.id} className="flex justify-center">
-              <PressPublicCard article={article} />
+        <ul className="grid list-none justify-items-stretch gap-x-7 gap-y-10 p-0 text-right sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {articles.map((article, index) => (
+            <li
+              key={article.id}
+              className="flex w-full justify-center sm:block"
+            >
+              <PressPublicCard article={article} accentIndex={index} />
             </li>
           ))}
         </ul>

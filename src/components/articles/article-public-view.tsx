@@ -52,6 +52,16 @@ export function ArticlePublicView({
         <ArticleHero article={article} />
 
         {showContent && hasBlocks ? (
+          <div className="post-article__flourish" aria-hidden="true">
+            <span className="post-article__flourish-line" />
+            <span className="post-article__flourish-leaf post-article__flourish-leaf--olive" />
+            <span className="post-article__flourish-dot" />
+            <span className="post-article__flourish-leaf post-article__flourish-leaf--coral" />
+            <span className="post-article__flourish-line" />
+          </div>
+        ) : null}
+
+        {showContent && hasBlocks ? (
           <section className="post-article__body" dir="rtl">
             {article.content.blocks.map((block, index) => {
               const media =

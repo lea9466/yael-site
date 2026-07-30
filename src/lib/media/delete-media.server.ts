@@ -7,17 +7,6 @@ import { findMediaUsages } from "@/lib/media/check-usage";
 import { MEDIA_ERRORS } from "@/lib/media/media-errors";
 import type { MediaUsageReference } from "@/lib/media/media-types";
 
-async function removeStorageObject(
-  supabase: SupabaseClient,
-  storagePath: string
-): Promise<boolean> {
-  const { error } = await supabase.storage
-    .from(PUBLIC_MEDIA_BUCKET)
-    .remove([storagePath]);
-
-  return !error;
-}
-
 export type DeleteMediaItemResult =
   | {
       outcome: "deleted";
@@ -78,12 +67,11 @@ export async function deleteMediaItem(
       };
     }
 
-    const storageDeleted = await removeStorageObject(
-      supabase,
-      mediaRow.storage_path
-    );
+    const { error: storageError } = await supabase.storage
+      .from(PUBLIC_MEDIA_BUCKET)
+      .remove([mediaRow.storage_path]);
 
-    if (!storageDeleted) {
+    if (storageError) {
       return {
         outcome: "failed",
         id: mediaId,

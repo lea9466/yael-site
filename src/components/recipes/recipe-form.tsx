@@ -767,7 +767,7 @@ export function RecipeForm({
             <FormField
               label="מספר מנות"
               htmlFor="recipe-servings"
-              required
+              hint="אופציונלי"
               error={fieldErrors.servings}
             >
               <Input

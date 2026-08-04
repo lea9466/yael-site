@@ -42,7 +42,7 @@ export function createEmptyRecipeFormInput(
     seo_og_media_id: null,
     category_id: categoryId ?? "",
     prep_duration: "30 דקות",
-    servings: "4 מנות",
+    servings: "",
     difficulty: "easy",
     featured: false,
     status: "draft",

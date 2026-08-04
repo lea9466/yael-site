@@ -22,7 +22,7 @@ export function MediaBulkActionBar({
       role="region"
       aria-label="פעולות על פריטים נבחרים"
       aria-live="polite"
-      className="sticky bottom-4 z-20 mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-lg)] sm:flex-row sm:items-center sm:justify-between"
+      className="sticky top-4 z-20 mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-lg)] sm:flex-row sm:items-center sm:justify-between"
     >
       <p className="text-sm font-medium">
         נבחרו {selectedCount} תמונות

@@ -197,7 +197,6 @@ const recipeBaseFieldsSchema = z.object({
   servings: z
     .string()
     .trim()
-    .min(1, "יש להזין מספר מנות")
     .max(120, "תיאור המנות ארוך מדי"),
   difficulty: z.enum(RECIPE_DIFFICULTIES, {
     message: "יש לבחור רמת קושי",

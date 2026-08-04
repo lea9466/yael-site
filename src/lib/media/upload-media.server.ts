@@ -141,11 +141,14 @@ async function persistProcessedMedia(
 ): Promise<UploadMediaResult> {
   const originalFileName = sanitizeOriginalFileName(originalName);
 
-  // Upload raw bytes (Buffer/Uint8Array). Avoid Blob wrapping — safer for
-  // large binary PDFs and keeps the file byte-identical to the source.
-  const uploadBody = Buffer.isBuffer(image.buffer)
-    ? image.buffer
-    : Buffer.from(image.buffer);
+  // Prefer Blob so storage-js uses multipart FormData (binary-safe in Node
+  // fetch). Always copy into a tightly sized Uint8Array — uploading a pooled
+  // Buffer/view directly can be UTF-8-mangled by undici on Vercel and store a
+  // corrupt object that still returns HTTP 200.
+  const byteLength = Math.min(image.sizeBytes, image.buffer.byteLength);
+  const exactBytes = new Uint8Array(byteLength);
+  exactBytes.set(image.buffer.subarray(0, byteLength));
+  const uploadBody = new Blob([exactBytes], { type: image.mimeType });
 
   const { error: uploadError } = await supabase.storage
     .from(PUBLIC_MEDIA_BUCKET)

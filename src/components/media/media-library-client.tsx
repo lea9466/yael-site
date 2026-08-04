@@ -321,6 +321,12 @@ export function MediaLibraryClient({ data }: MediaLibraryClientProps) {
           />
         ) : null}
 
+        <MediaBulkActionBar
+          selectedCount={effectiveSelectedIds.size}
+          onClearSelection={handleClearSelection}
+          onDeleteSelected={() => setBulkDeleteOpen(true)}
+        />
+
         {!isEmptyLibrary && !hasNoSearchResults ? (
           <>
             <MediaGrid
@@ -412,12 +418,6 @@ export function MediaLibraryClient({ data }: MediaLibraryClientProps) {
         open={bulkDeleteOpen}
         onClose={() => setBulkDeleteOpen(false)}
         onSuccess={handleBulkDeleteSuccess}
-      />
-
-      <MediaBulkActionBar
-        selectedCount={effectiveSelectedIds.size}
-        onClearSelection={handleClearSelection}
-        onDeleteSelected={() => setBulkDeleteOpen(true)}
       />
     </div>
   );

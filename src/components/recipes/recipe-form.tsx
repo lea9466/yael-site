@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import {
   Archive,
-  Clock,
   ExternalLink,
   Eye,
   FileText,
+  Gauge,
   Image,
   Layers,
   Sparkles,
@@ -756,33 +756,14 @@ export function RecipeForm({
 
         <section id="section-details" className="space-y-5">
           <AdminSectionHeader
-            icon={Clock}
+            icon={Gauge}
             module="recipes"
-            emoji="⏱️"
+            emoji="🍽️"
             title="פרטי המתכון"
-            description="זמן הכנה, מנות ורמת קושי."
+            description="מספר מנות ורמת קושי."
           />
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField
-              label="משך הכנה"
-              htmlFor="recipe-prep-duration"
-              required
-              error={fieldErrors.prep_duration}
-            >
-              <Input
-                id="recipe-prep-duration"
-                type="text"
-                maxLength={120}
-                placeholder="לדוגמה: 20 דקות"
-                value={values.prep_duration}
-                error={Boolean(fieldErrors.prep_duration)}
-                onChange={(event) =>
-                  setField("prep_duration", event.target.value)
-                }
-              />
-            </FormField>
-
             <FormField
               label="מספר מנות"
               htmlFor="recipe-servings"
@@ -801,27 +782,27 @@ export function RecipeForm({
                 }
               />
             </FormField>
-          </div>
 
-          <Select
-            id="recipe-difficulty"
-            label="רמת קושי"
-            required
-            value={values.difficulty}
-            error={Boolean(fieldErrors.difficulty)}
-            onChange={(event) =>
-              setField(
-                "difficulty",
-                event.target.value as RecipeDraftInput["difficulty"]
-              )
-            }
-          >
-            {Object.entries(DIFFICULTY_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </Select>
+            <Select
+              id="recipe-difficulty"
+              label="רמת קושי"
+              required
+              value={values.difficulty}
+              error={Boolean(fieldErrors.difficulty)}
+              onChange={(event) =>
+                setField(
+                  "difficulty",
+                  event.target.value as RecipeDraftInput["difficulty"]
+                )
+              }
+            >
+              {Object.entries(DIFFICULTY_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </Select>
+          </div>
         </section>
 
         <hr className="border-[var(--color-border)]" />

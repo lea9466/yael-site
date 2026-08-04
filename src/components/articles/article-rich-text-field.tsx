@@ -24,11 +24,18 @@ type RichTextMirrorProps = {
   value: string;
   marks?: ArticleTextMark[];
   className?: string;
+  containerRef?: React.RefObject<HTMLDivElement | null>;
 };
 
-function RichTextMirror({ value, marks, className }: RichTextMirrorProps) {
+function RichTextMirror({
+  value,
+  marks,
+  className,
+  containerRef,
+}: RichTextMirrorProps) {
   return (
     <div
+      ref={containerRef}
       aria-hidden="true"
       dir="rtl"
       lang="he"
@@ -132,6 +139,7 @@ export function ArticleRichTextarea({
   onChange,
   onFocus,
   onBlur,
+  onScroll,
   onCompositionStart,
   onCompositionEnd,
   "data-block-id": blockId,
@@ -141,6 +149,7 @@ export function ArticleRichTextarea({
   const externalValue = typeof value === "string" ? value : "";
   const blockKey = getFieldBlockKey(blockId, listItemId);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const mirrorRef = useRef<HTMLDivElement>(null);
   const {
     draftValue,
     setDraftValue,
@@ -214,6 +223,7 @@ export function ArticleRichTextarea({
       <RichTextMirror
         value={draftValue}
         marks={draftMarks}
+        containerRef={mirrorRef}
         className={cn(
           "px-4 py-3.5 text-sm leading-[var(--line-height-relaxed)]",
           mirrorClassName ?? className
@@ -229,6 +239,16 @@ export function ArticleRichTextarea({
         error={error}
         value={draftValue}
         onChange={handleChange}
+        onScroll={(event) => {
+          const mirror = mirrorRef.current;
+
+          if (mirror) {
+            mirror.scrollTop = event.currentTarget.scrollTop;
+            mirror.scrollLeft = event.currentTarget.scrollLeft;
+          }
+
+          onScroll?.(event);
+        }}
         onFocus={(event) => {
           isFocusedRef.current = true;
           onFocus?.(event);

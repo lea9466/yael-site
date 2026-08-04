@@ -42,20 +42,11 @@ function trimTextWithMarks(text: string, marks: ArticleTextMark[]): TextWithMark
   return { text: finalText, marks: shiftedMarks };
 }
 
-/**
- * Splits raw pasted plain text into paragraphs. Since the article editor's
- * data model has no soft line-break primitive (each block is a single flat
- * string), every newline - blank or not - starts a new paragraph block.
- * Consecutive blank lines are collapsed instead of producing empty paragraphs.
- */
+/** Keeps pasted plain text together as one paragraph block. */
 export function parsePastedPlainText(raw: string): PastedBlockDraft[] {
-  const normalized = raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  const text = raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim();
 
-  return normalized
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
-    .map((text) => ({ kind: "paragraph" as const, text, marks: [] }));
+  return text.length > 0 ? [{ kind: "paragraph", text, marks: [] }] : [];
 }
 
 function isBoldElement(el: HTMLElement): boolean {
@@ -388,6 +379,28 @@ export function flattenDraftsToSegments(drafts: PastedBlockDraft[]): TextWithMar
   }
 
   return segments.filter((segment) => segment.text.length > 0);
+}
+
+/**
+ * Combines structured clipboard content into one editable text block while
+ * retaining safe inline marks and paragraph spacing.
+ */
+export function mergePastedDrafts(drafts: PastedBlockDraft[]): PastedBlockDraft {
+  const segments = flattenDraftsToSegments(drafts);
+  let text = "";
+  const marks: ArticleTextMark[] = [];
+
+  segments.forEach((segment, index) => {
+    if (index > 0) {
+      text += "\n\n";
+    }
+
+    const offset = text.length;
+    text += segment.text;
+    marks.push(...shiftMarks(segment.marks, offset));
+  });
+
+  return { kind: "paragraph", text, marks };
 }
 
 export type ListItemPastePlan = {

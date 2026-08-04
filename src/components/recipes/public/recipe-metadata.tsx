@@ -1,4 +1,4 @@
-import { Clock, Gauge, Utensils } from "lucide-react";
+import { Gauge, Utensils } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { getDifficultyDisplay } from "@/lib/recipes/difficulty-display";
@@ -6,7 +6,6 @@ import type { RecipeDifficulty } from "@/lib/recipes/constants";
 import { cn } from "@/lib/utils/cn";
 
 type RecipeMetadataProps = {
-  prepDuration: string;
   servings: string;
   difficulty: RecipeDifficulty;
   className?: string;
@@ -14,7 +13,7 @@ type RecipeMetadataProps = {
 
 type MetaItem =
   | {
-      key: "prep" | "servings";
+      key: "servings";
       label: string;
       value: string;
       icon: LucideIcon;
@@ -28,25 +27,14 @@ type MetaItem =
     };
 
 export function RecipeMetadata({
-  prepDuration,
   servings,
   difficulty,
   className,
 }: RecipeMetadataProps) {
-  const prep = prepDuration.trim();
   const yieldText = servings.trim();
   const difficultyDisplay = getDifficultyDisplay(difficulty);
 
   const items: MetaItem[] = [];
-
-  if (prep.length > 0) {
-    items.push({
-      key: "prep",
-      label: "זמן הכנה",
-      value: prep,
-      icon: Clock,
-    });
-  }
 
   if (yieldText.length > 0) {
     items.push({

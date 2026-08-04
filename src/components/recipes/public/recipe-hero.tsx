@@ -56,7 +56,6 @@ export function RecipeHero({
         ) : null}
 
         <RecipeMetadata
-          prepDuration={recipe.prep_duration}
           servings={recipe.servings}
           difficulty={recipe.difficulty}
         />

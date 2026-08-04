@@ -44,6 +44,7 @@ import {
   buildListItemPastePlan,
   buildPasteInsertionPlan,
   flattenDraftsToSegments,
+  mergePastedDrafts,
   parsePastedHtml,
   parsePastedPlainText,
   type PastedBlockDraft,
@@ -481,22 +482,6 @@ export function ArticleEditor({
 
   const updateBlock = (id: string, nextBlock: EditorBlockUnion) => {
     onChange(blocks.map((block) => (block.id === id ? nextBlock : block)));
-  };
-
-  const insertBlocksAfter = (id: string, newBlocks: EditorBlockUnion[]) => {
-    if (newBlocks.length === 0) {
-      return;
-    }
-
-    const index = blocks.findIndex((block) => block.id === id);
-
-    if (index === -1) {
-      return;
-    }
-
-    const nextBlocks = [...blocks];
-    nextBlocks.splice(index + 1, 0, ...newBlocks);
-    onChange(nextBlocks);
   };
 
   const removeBlock = (id: string) => {
@@ -971,7 +956,10 @@ export function ArticleEditor({
     const start = field.selectionStart ?? block.text.length;
     const end = field.selectionEnd ?? block.text.length;
 
-    const plan = buildPasteInsertionPlan(block.text, block.marks, start, end, drafts);
+    const mergedDraft = mergePastedDrafts(drafts);
+    const plan = buildPasteInsertionPlan(block.text, block.marks, start, end, [
+      mergedDraft,
+    ]);
     const fieldKey = getFieldKey(blockId);
     fieldTextRef.current.set(fieldKey, plan.updatedCurrentText);
 

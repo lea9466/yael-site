@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, Gauge, UtensilsCrossed } from "lucide-react";
+import { Gauge, UtensilsCrossed } from "lucide-react";
 
 import { PublicHighlightPill } from "@/components/homepage/public-highlight-pill";
 import { MultilineText } from "@/components/ui/multiline-text";
@@ -20,7 +20,7 @@ type RecipeCardProps = {
 export function RecipeCard({ recipe, className }: RecipeCardProps) {
   const href = buildRecipePath(recipe.categorySlug, recipe.slug);
   const tags = getRecipeCardTags(recipe);
-  const { prepDuration, servings, difficulty } = getRecipeCardMeta(recipe);
+  const { servings, difficulty } = getRecipeCardMeta(recipe);
 
   return (
     <article className={cn("recipe-card group", className)}>
@@ -47,14 +47,8 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
           </MultilineText>
         ) : null}
 
-        {(prepDuration || servings || difficulty) ? (
+        {(servings || difficulty) ? (
           <div className="recipe-card__meta">
-            {prepDuration ? (
-              <div className="recipe-card__meta-item">
-                <Clock aria-hidden="true" className="recipe-card__meta-icon" />
-                <span>{prepDuration}</span>
-              </div>
-            ) : null}
             {servings ? (
               <div className="recipe-card__meta-item">
                 <UtensilsCrossed aria-hidden="true" className="recipe-card__meta-icon" />

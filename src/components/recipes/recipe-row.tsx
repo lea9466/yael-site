@@ -134,7 +134,6 @@ export function RecipeRow({ item }: RecipeRowProps) {
               </h3>
               <p className="text-sm text-[var(--color-text-muted)]">
                 {item.categoryName ?? "ללא קטגוריה"} ·{" "}
-                {item.prep_duration} ·{" "}
                 {formatDifficulty(item.difficulty)}
               </p>
               <div className="flex flex-wrap gap-2">

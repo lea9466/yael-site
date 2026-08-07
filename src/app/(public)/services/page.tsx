@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { ServiceCard } from "@/components/homepage/service-card";
+import { ServicesListingBreadcrumbJsonLd } from "@/components/services/public/services-listing-breadcrumb-json-ld";
 import { getServiceCardSurface } from "@/lib/homepage/service-card-display";
 import {
   getPublishedServices,
@@ -25,6 +26,7 @@ export default async function PublicServicesPage() {
 
   return (
     <div className="mx-auto w-full max-w-[90rem] px-5 py-12 md:px-20 md:py-16">
+      <ServicesListingBreadcrumbJsonLd />
       <header className="mb-10 max-w-2xl space-y-3">
         <h1 className="text-page-title">שירותים</h1>
         <p className="text-lg text-[var(--color-text-muted)]">

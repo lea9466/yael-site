@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { ServiceBreadcrumbJsonLd } from "@/components/services/public/service-breadcrumb-json-ld";
+import { ServiceJsonLd } from "@/components/services/public/service-json-ld";
 import { ServicePublicView } from "@/components/services/service-public-view";
 import {
   getPublishedServiceBySlug,
@@ -80,19 +82,30 @@ export default async function PublicServiceDetailPage({
 }: ServiceDetailPageProps) {
   const { slug: rawSlug } = await params;
   const slug = normalizeRouteSlug(rawSlug);
-  const service = await getPublishedServiceBySlug(slug);
+  const [service, settings] = await Promise.all([
+    getPublishedServiceBySlug(slug),
+    getWebsiteSettings(),
+  ]);
 
   if (!service) {
     notFound();
   }
 
   const testimonials = await getPublishedTestimonialsByServiceId(service.id);
+  const providerName = settings.businessProfile.business_name;
 
   return (
-    <ServicePublicView
-      service={service}
-      testimonials={testimonials}
-      mode="public"
-    />
+    <>
+      <ServiceJsonLd service={service} providerName={providerName} />
+      <ServiceBreadcrumbJsonLd
+        serviceTitle={service.title}
+        serviceSlug={service.slug}
+      />
+      <ServicePublicView
+        service={service}
+        testimonials={testimonials}
+        mode="public"
+      />
+    </>
   );
 }

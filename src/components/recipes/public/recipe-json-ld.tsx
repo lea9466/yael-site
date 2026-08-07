@@ -1,15 +1,22 @@
-import { normalizeRecipeSections } from "@/lib/recipes/content";
-import { buildRecipeCanonicalUrl } from "@/lib/seo/resolve";
-import { normalizeMultilineTextForSeo } from "@/lib/text/multiline-text";
 import { formatIngredientLine } from "@/lib/recipes/format-ingredient";
-import { sanitizePlainText } from "@/lib/services/sanitize";
+import { normalizeRecipeSections } from "@/lib/recipes/content";
 import type { RecipeDetail } from "@/lib/recipes/types";
+import { parseDurationToIso8601 } from "@/lib/seo/duration";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { buildRecipeCanonicalUrl } from "@/lib/seo/resolve";
+import { SITE_ORIGIN } from "@/lib/site/constants";
+import { normalizeMultilineTextForSeo } from "@/lib/text/multiline-text";
+import { sanitizePlainText } from "@/lib/services/sanitize";
 
 type RecipeJsonLdProps = {
   recipe: RecipeDetail;
+  authorName?: string;
 };
 
-export function RecipeJsonLd({ recipe }: RecipeJsonLdProps) {
+export function RecipeJsonLd({
+  recipe,
+  authorName = "יעל קנייבסקי",
+}: RecipeJsonLdProps) {
   const description = normalizeMultilineTextForSeo(
     sanitizePlainText(recipe.description)
   );
@@ -42,12 +49,22 @@ export function RecipeJsonLd({ recipe }: RecipeJsonLdProps) {
     });
   });
 
+  const prepTime = parseDurationToIso8601(recipe.prep_duration);
+  const author = {
+    "@type": "Person",
+    "@id": `${SITE_ORIGIN}/#person`,
+    name: authorName,
+  };
+
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Recipe",
     name: recipe.title,
     url: buildRecipeCanonicalUrl(recipe.slug, recipe.category?.slug),
     dateModified: recipe.updated_at,
+    author,
+    recipeCuisine: "ישראלית",
+    inLanguage: "he",
   };
 
   if (description) {
@@ -70,6 +87,11 @@ export function RecipeJsonLd({ recipe }: RecipeJsonLdProps) {
     jsonLd.recipeYield = recipe.servings.trim();
   }
 
+  if (prepTime) {
+    jsonLd.prepTime = prepTime;
+    jsonLd.totalTime = prepTime;
+  }
+
   if (ingredients.length > 0) {
     jsonLd.recipeIngredient = ingredients;
   }
@@ -82,10 +104,5 @@ export function RecipeJsonLd({ recipe }: RecipeJsonLdProps) {
     jsonLd.keywords = recipe.tags.map((tag) => tag.name).join(", ");
   }
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
-  );
+  return <JsonLd data={jsonLd} />;
 }

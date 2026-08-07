@@ -62,6 +62,7 @@ export async function generateMetadata({
     description,
     ogImage,
     ogImageAlt,
+    ogType: "article",
   });
 
   const customCanonical = article.seo.canonical_url?.trim();
@@ -107,7 +108,10 @@ export default async function PublicPostDetailPage({
 
   return (
     <>
-      <ArticleJsonLd article={article} />
+      <ArticleJsonLd
+        article={article}
+        authorName={settings.businessProfile.business_name}
+      />
       <ArticleBreadcrumbJsonLd
         postTitle={article.title}
         postSlug={article.slug}

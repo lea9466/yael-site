@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { PressArticleJsonLd } from "@/components/press/public/press-article-json-ld";
+import { PressBreadcrumbJsonLd } from "@/components/press/public/press-breadcrumb-json-ld";
 import { PressPublicDetailView } from "@/components/press/public/press-public-detail";
 import {
   fetchPublishedPressArticleBySlug,
@@ -34,8 +36,9 @@ export async function generateMetadata({
   if (!article) {
     return buildSiteMetadata(settings, {
       path: `/press/${slug}`,
-      title: "כתבה",
-      description: "כתבה מהעיתונות",
+      title: "כתבה לא נמצאה",
+      description: "הכתבה שחיפשתם אינה זמינה.",
+      noIndex: true,
     });
   }
 
@@ -50,6 +53,7 @@ export async function generateMetadata({
     path: `/press/${article.slug}`,
     title: article.seo_title || article.title,
     description,
+    ogType: "article",
   });
 }
 
@@ -58,11 +62,23 @@ export default async function PublicPressDetailPage({
 }: PressDetailPageProps) {
   const { slug: rawSlug } = await params;
   const slug = normalizeRouteSlug(rawSlug);
-  const article = await fetchPublishedPressArticleBySlug(slug);
+  const [article, settings] = await Promise.all([
+    fetchPublishedPressArticleBySlug(slug),
+    getWebsiteSettings(),
+  ]);
 
   if (!article) {
     notFound();
   }
 
-  return <PressPublicDetailView article={article} />;
+  return (
+    <>
+      <PressArticleJsonLd
+        article={article}
+        authorName={settings.businessProfile.business_name}
+      />
+      <PressBreadcrumbJsonLd title={article.title} slug={article.slug} />
+      <PressPublicDetailView article={article} />
+    </>
+  );
 }

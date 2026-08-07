@@ -1,8 +1,24 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { FileQuestion } from "lucide-react";
 
 import { Container } from "@/components/public/layout/container";
 import { PUBLIC_CTA } from "@/constants/public-navigation";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: "הדף לא נמצא | יעל קנייבסקי",
+  },
+  description: "הדף שחיפשתם אינו קיים.",
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+};
 
 export default function PublicNotFound() {
   return (

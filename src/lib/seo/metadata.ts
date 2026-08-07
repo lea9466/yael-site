@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { SITE_DOMAIN, SITE_ORIGIN } from "@/lib/site/constants";
 import { buildCanonicalUrl } from "@/lib/seo/resolve";
+import { finalizeDocumentTitle } from "@/lib/seo/title";
 import type { WebsiteSettingsPublic } from "@/lib/public/types";
 
 export type PageMetadataInput = {
@@ -10,6 +11,8 @@ export type PageMetadataInput = {
   path?: string;
   ogImage?: string | null;
   ogImageAlt?: string | null;
+  /** Open Graph type — use "article" for blog posts, recipes, and press. */
+  ogType?: "website" | "article";
   noIndex?: boolean;
 };
 
@@ -71,7 +74,11 @@ export function buildSiteMetadata(
   settings: WebsiteSettingsPublic,
   input: PageMetadataInput = {}
 ): Metadata {
-  const title = resolveTitle(input.title, settings);
+  const rawTitle = resolveTitle(input.title, settings);
+  const title = finalizeDocumentTitle(
+    rawTitle,
+    settings.businessProfile.business_name
+  );
   const description = resolveDescription(input.description, settings);
   const canonicalPath = input.path ?? "/";
   const canonicalUrl = buildCanonicalUrl(canonicalPath);
@@ -80,10 +87,14 @@ export function buildSiteMetadata(
     input.ogImageAlt ?? settings.ogImage?.alt ?? settings.businessProfile.business_name;
   const allowIndex =
     !input.noIndex && settings.siteSettings.robots_indexing_enabled;
+  const ogType = input.ogType ?? "website";
 
   const metadata: Metadata = {
     metadataBase: new URL(SITE_ORIGIN),
-    title,
+    // absolute avoids root layout template double-branding full SEO titles
+    title: {
+      absolute: title,
+    },
     description,
     icons: resolveFaviconIcons(),
     alternates: {
@@ -98,7 +109,7 @@ export function buildSiteMetadata(
       },
     },
     openGraph: {
-      type: "website",
+      type: ogType,
       locale: "he_IL",
       url: canonicalUrl,
       siteName: settings.businessProfile.business_name,

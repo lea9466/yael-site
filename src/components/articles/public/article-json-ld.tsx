@@ -1,18 +1,34 @@
+import type { ArticleDetail } from "@/lib/articles/types";
+import { JsonLd } from "@/lib/seo/json-ld";
 import { buildArticleCanonicalUrl } from "@/lib/seo/resolve";
+import { SITE_ORIGIN } from "@/lib/site/constants";
 import { normalizeMultilineTextForSeo } from "@/lib/text/multiline-text";
 import { sanitizePlainText } from "@/lib/services/sanitize";
-import type { ArticleDetail } from "@/lib/articles/types";
 
 type ArticleJsonLdProps = {
   article: ArticleDetail;
+  authorName?: string;
 };
 
-export function ArticleJsonLd({ article }: ArticleJsonLdProps) {
+export function ArticleJsonLd({
+  article,
+  authorName = "יעל קנייבסקי",
+}: ArticleJsonLdProps) {
   const description = normalizeMultilineTextForSeo(
-    sanitizePlainText(
-      article.seo.description.trim() || article.body
-    )
+    sanitizePlainText(article.seo.description.trim() || article.body)
   );
+
+  const author = {
+    "@type": "Person",
+    "@id": `${SITE_ORIGIN}/#person`,
+    name: authorName,
+  };
+
+  const publisher = {
+    "@type": "Organization",
+    "@id": `${SITE_ORIGIN}/#organization`,
+    name: authorName,
+  };
 
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -20,6 +36,13 @@ export function ArticleJsonLd({ article }: ArticleJsonLdProps) {
     headline: article.title,
     url: buildArticleCanonicalUrl(article.slug, article.category?.slug),
     dateModified: article.updated_at,
+    author,
+    publisher,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": buildArticleCanonicalUrl(article.slug, article.category?.slug),
+    },
+    inLanguage: "he",
   };
 
   if (description) {
@@ -46,10 +69,5 @@ export function ArticleJsonLd({ article }: ArticleJsonLdProps) {
     jsonLd.timeRequired = `PT${article.reading_time_minutes}M`;
   }
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
-  );
+  return <JsonLd data={jsonLd} />;
 }

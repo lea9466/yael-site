@@ -63,6 +63,7 @@ export async function generateMetadata({
     description,
     ogImage,
     ogImageAlt,
+    ogType: "article",
     noIndex: isAdminOnlyPreview,
   });
 
@@ -120,7 +121,10 @@ export default async function PublicRecipeDetailPage({
         />
       ) : (
         <>
-          <RecipeJsonLd recipe={recipe} />
+          <RecipeJsonLd
+            recipe={recipe}
+            authorName={settings.businessProfile.business_name}
+          />
           <RecipeBreadcrumbJsonLd
             recipeTitle={recipe.title}
             recipeSlug={recipe.slug}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { ContactPageJsonLd } from "@/components/contact/contact-page-json-ld";
 import { ContactPageView } from "@/components/contact/contact-page-view";
 import { resolvePublicContactLinks } from "@/lib/contact/public-links";
 import { getWebsiteSettings } from "@/lib/public/queries";
@@ -20,5 +21,10 @@ export default async function PublicContactPage() {
   const settings = await getWebsiteSettings();
   const links = resolvePublicContactLinks(settings.businessProfile);
 
-  return <ContactPageView links={links} />;
+  return (
+    <>
+      <ContactPageJsonLd settings={settings} />
+      <ContactPageView links={links} />
+    </>
+  );
 }

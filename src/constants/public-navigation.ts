@@ -48,5 +48,4 @@ export const PUBLIC_CTA = {
 /** Static sitemap routes — press listing is added dynamically when published items exist. */
 export const PUBLIC_STATIC_ROUTES: PublicNavLink[] = [
   ...buildPublicFooterNav({ includePress: false }),
-  { label: "המלצות", href: "/testimonials" },
 ];

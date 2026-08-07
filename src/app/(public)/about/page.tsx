@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { AboutBreadcrumbJsonLd } from "@/components/about/about-breadcrumb-json-ld";
 import { AboutPublicView } from "@/components/about/about-public-view";
 import { fetchAboutPageDetail } from "@/lib/about/queries";
 import { getDefaultAboutPageData } from "@/lib/about/defaults";
@@ -50,12 +51,15 @@ export default async function PublicAboutPage() {
   }
 
   return (
-    <AboutPublicView
-      data={detail.data}
-      coverPreview={detail.coverPreview}
-      blockMediaUrls={detail.blockMediaUrls}
-      certificates={certificatesData?.items ?? []}
-      mode="public"
-    />
+    <>
+      <AboutBreadcrumbJsonLd />
+      <AboutPublicView
+        data={detail.data}
+        coverPreview={detail.coverPreview}
+        blockMediaUrls={detail.blockMediaUrls}
+        certificates={certificatesData?.items ?? []}
+        mode="public"
+      />
+    </>
   );
 }

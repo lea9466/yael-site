@@ -2,6 +2,7 @@
 
 import { ChevronDown } from "lucide-react";
 
+import { SlugFormField } from "@/components/admin/slug-form-field";
 import { ServiceMediaPicker } from "@/components/services/service-media-picker";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
@@ -19,6 +20,18 @@ type SelectedMedia = {
   alt: string;
 };
 
+type AdminSeoSlugProps = {
+  label: string;
+  htmlFor: string;
+  value: string;
+  hint?: string;
+  required?: boolean;
+  locked?: boolean;
+  onChange: (value: string) => void;
+  onManualEdit: () => void;
+  onResetFromTitle: () => void;
+};
+
 type AdminSeoSectionProps = {
   id?: string;
   open: boolean;
@@ -33,6 +46,7 @@ type AdminSeoSectionProps = {
   onSeoTitleChange: (value: string) => void;
   onSeoDescriptionChange: (value: string) => void;
   onOgMediaChange: (mediaId: string | null, preview: SelectedMedia | null) => void;
+  slug?: AdminSeoSlugProps;
   className?: string;
 };
 
@@ -50,6 +64,7 @@ export function AdminSeoSection({
   onSeoTitleChange,
   onSeoDescriptionChange,
   onOgMediaChange,
+  slug,
   className,
 }: AdminSeoSectionProps) {
   return (
@@ -84,6 +99,21 @@ export function AdminSeoSection({
             אם לא תמלאו שדות כאן, המערכת תשתמש בכותרת, בתיאור ובתמונת הכיסוי
             לצורך SEO. כתובת קנונית נוצרת אוטומטית.
           </p>
+
+          {slug ? (
+            <SlugFormField
+              label={slug.label}
+              htmlFor={slug.htmlFor}
+              value={slug.value}
+              hint={slug.hint}
+              required={slug.required}
+              locked={slug.locked}
+              error={fieldErrors.slug}
+              onChange={slug.onChange}
+              onManualEdit={slug.onManualEdit}
+              onResetFromTitle={slug.onResetFromTitle}
+            />
+          ) : null}
 
           <div className="flex flex-wrap gap-2">
             <Button

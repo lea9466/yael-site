@@ -372,7 +372,10 @@ export async function updateArticleAction(
     return { success: false, error: ARTICLE_ERRORS.notFound };
   }
 
-  const data = parsed.data;
+  const data = {
+    ...parsed.data,
+    slug: existing.slug,
+  };
 
   if (!data.cover_media_id) {
     return {
@@ -404,12 +407,6 @@ export async function updateArticleAction(
 
   if (!taxonomyValidation.success) {
     return taxonomyValidation;
-  }
-
-  const slugValidation = await validateSlugAvailability(data.slug, data.id);
-
-  if (!slugValidation.success) {
-    return slugValidation;
   }
 
   const { error } = await session.supabase
@@ -461,7 +458,10 @@ export async function publishArticleAction(
     return { success: false, error: ARTICLE_ERRORS.notFound };
   }
 
-  const data = parsed.data;
+  const data = {
+    ...parsed.data,
+    slug: existing.slug,
+  };
   const contentForSave = toArticleContentForSave(data.content);
   const mediaValidation = await validateMediaIds(
     data.cover_media_id,
@@ -484,12 +484,6 @@ export async function publishArticleAction(
 
   if (!taxonomyValidation.success) {
     return taxonomyValidation;
-  }
-
-  const slugValidation = await validateSlugAvailability(data.slug, data.id);
-
-  if (!slugValidation.success) {
-    return slugValidation;
   }
 
   const { error } = await session.supabase

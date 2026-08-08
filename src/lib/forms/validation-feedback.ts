@@ -2,7 +2,6 @@ import type { ServiceFormSectionId } from "@/lib/services/constants";
 
 const FIELD_SECTION_MAP: Record<string, ServiceFormSectionId> = {
   title: "basic",
-  slug: "basic",
   short_description: "basic",
   cover_media_id: "basic",
   featured: "basic",

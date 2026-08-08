@@ -11,6 +11,7 @@ type SlugFormFieldProps = {
   hint?: string;
   error?: string;
   required?: boolean;
+  locked?: boolean;
   onChange: (value: string) => void;
   onManualEdit: () => void;
   onResetFromTitle: () => void;
@@ -20,19 +21,26 @@ export function SlugFormField({
   label,
   htmlFor,
   value,
-  hint = "נוצר אוטומטית מהכותרת. ניתן לעריכה ידנית.",
+  hint,
   error,
   required = true,
+  locked = false,
   onChange,
   onManualEdit,
   onResetFromTitle,
 }: SlugFormFieldProps) {
+  const resolvedHint =
+    hint ??
+    (locked
+      ? "לא ניתן לשנות את הכתובת לאחר השמירה הראשונה."
+      : "נוצר אוטומטית מהכותרת. ניתן לעריכה ידנית לפני השמירה הראשונה.");
+
   return (
     <FormField
       label={label}
       htmlFor={htmlFor}
-      required={required}
-      hint={hint}
+      required={required && !locked}
+      hint={resolvedHint}
       error={error}
     >
       <div className="space-y-2">
@@ -40,15 +48,23 @@ export function SlugFormField({
           id={htmlFor}
           value={value}
           dir="auto"
+          disabled={locked}
+          readOnly={locked}
           error={Boolean(error)}
           onChange={(event) => {
+            if (locked) {
+              return;
+            }
+
             onManualEdit();
             onChange(event.target.value);
           }}
         />
-        <Button type="button" variant="ghost" size="sm" onClick={onResetFromTitle}>
-          איפוס לפי הכותרת
-        </Button>
+        {!locked ? (
+          <Button type="button" variant="ghost" size="sm" onClick={onResetFromTitle}>
+            איפוס לפי הכותרת
+          </Button>
+        ) : null}
       </div>
     </FormField>
   );

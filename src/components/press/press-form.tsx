@@ -17,6 +17,7 @@ import {
 } from "@/components/admin/admin-form-section";
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
+import { SlugFormField } from "@/components/admin/slug-form-field";
 import { PressDeleteDialog } from "@/components/press/press-delete-dialog";
 import { ServiceMediaPicker } from "@/components/services/service-media-picker";
 import { Button } from "@/components/ui/button";
@@ -97,11 +98,26 @@ export function PressForm({ mode, initialValues, article }: PressFormProps) {
   };
 
   const handleTitleChange = (title: string) => {
-    setField("title", title);
+    setValues((current) => ({
+      ...current,
+      title,
+      slug:
+        mode === "edit" || slugTouched
+          ? current.slug
+          : slugifyPressTitle(title),
+    }));
+  };
 
-    if (!slugTouched) {
-      setField("slug", slugifyPressTitle(title));
+  const handleSlugResetFromTitle = () => {
+    if (mode === "edit") {
+      return;
     }
+
+    setSlugTouched(false);
+    setValues((current) => ({
+      ...current,
+      slug: slugifyPressTitle(current.title),
+    }));
   };
 
   const handleSubmit = () => {
@@ -122,7 +138,11 @@ export function PressForm({ mode, initialValues, article }: PressFormProps) {
             });
 
       if (!result.success) {
-        setFieldErrors(result.fieldErrors ?? {});
+        const errors = result.fieldErrors ?? {};
+        setFieldErrors(errors);
+        if (errors.slug || errors.seo_title || errors.seo_description) {
+          setSeoOpen(true);
+        }
         showToast("error", result.error);
         return;
       }
@@ -200,25 +220,6 @@ export function PressForm({ mode, initialValues, article }: PressFormProps) {
               id="press-title"
               value={values.title}
               onChange={(event) => handleTitleChange(event.target.value)}
-            />
-          </FormField>
-
-          <FormField
-            label="Slug"
-            htmlFor="press-slug"
-            error={fieldErrors.slug}
-            required={values.status === "published"}
-            hint="כתובת העמוד באתר"
-          >
-            <Input
-              id="press-slug"
-              value={values.slug}
-              dir="ltr"
-              className="text-start"
-              onChange={(event) => {
-                setSlugTouched(true);
-                setField("slug", event.target.value);
-              }}
             />
           </FormField>
 
@@ -373,6 +374,18 @@ export function PressForm({ mode, initialValues, article }: PressFormProps) {
 
           {seoOpen ? (
             <div className="mt-6 space-y-5">
+              <SlugFormField
+                label="כתובת (slug)"
+                htmlFor="press-slug"
+                value={values.slug}
+                required={values.status === "published"}
+                locked={mode === "edit"}
+                error={fieldErrors.slug}
+                onChange={(slug) => setField("slug", slug)}
+                onManualEdit={() => setSlugTouched(true)}
+                onResetFromTitle={handleSlugResetFromTitle}
+              />
+
               <FormField
                 label="SEO Title"
                 htmlFor="press-seo-title"

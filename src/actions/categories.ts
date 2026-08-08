@@ -211,13 +211,18 @@ export async function updateCategoryAction(
     };
   }
 
-  const uniqueCheck = await validateUniqueFields(parsed.data, parsed.data.id);
+  const lockedInput = {
+    ...parsed.data,
+    slug: existing.slug,
+  };
+
+  const uniqueCheck = await validateUniqueFields(lockedInput, lockedInput.id);
 
   if (!uniqueCheck.success) {
     return uniqueCheck;
   }
 
-  const imageCheck = await validateImageMedia(parsed.data.image_media_id ?? null);
+  const imageCheck = await validateImageMedia(lockedInput.image_media_id ?? null);
 
   if (!imageCheck.success) {
     return imageCheck;
@@ -227,20 +232,20 @@ export async function updateCategoryAction(
   const { error } = await supabase
     .from("categories")
     .update({
-      name: parsed.data.name,
-      slug: parsed.data.slug,
-      image_media_id: parsed.data.image_media_id ?? null,
+      name: lockedInput.name,
+      slug: existing.slug,
+      image_media_id: lockedInput.image_media_id ?? null,
     })
-    .eq("id", parsed.data.id)
-    .eq("type", parsed.data.type);
+    .eq("id", lockedInput.id)
+    .eq("type", lockedInput.type);
 
   if (error) {
     return mapDatabaseError(error);
   }
 
-  revalidateCategoryPaths(parsed.data.id);
+  revalidateCategoryPaths(lockedInput.id);
 
-  return { success: true, data: { id: parsed.data.id } };
+  return { success: true, data: { id: lockedInput.id } };
 }
 
 export async function deleteCategoryAction(input: {

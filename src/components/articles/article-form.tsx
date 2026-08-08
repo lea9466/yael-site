@@ -27,7 +27,6 @@ import { AdminFormActionBar } from "@/components/admin/admin-form-action-bar";
 import { AdminFormBody } from "@/components/admin/admin-form-section";
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
-import { SlugFormField } from "@/components/admin/slug-form-field";
 import { AdminSeoSection } from "@/components/admin/admin-seo-section";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import {
@@ -238,7 +237,10 @@ export function ArticleForm({
 
     if (
       Object.keys(errors).some(
-        (key) => key.startsWith("seo.") || key === "seo_og_media_id"
+        (key) =>
+          key === "slug" ||
+          key.startsWith("seo.") ||
+          key === "seo_og_media_id"
       )
     ) {
       setSeoOpen(true);
@@ -271,11 +273,16 @@ export function ArticleForm({
     setValues((current) => ({
       ...current,
       title,
-      slug: slugTouched ? current.slug : slugifyTitle(title),
+      slug:
+        mode === "edit" || slugTouched ? current.slug : slugifyTitle(title),
     }));
   };
 
   const handleSlugResetFromTitle = () => {
+    if (mode === "edit") {
+      return;
+    }
+
     setSlugTouched(false);
     setValues((current) => ({
       ...current,
@@ -585,16 +592,6 @@ export function ArticleForm({
               />
             </FormField>
 
-            <SlugFormField
-              label="כתובת פוסט (slug)"
-              htmlFor="article-slug"
-              value={values.slug}
-              error={fieldErrors.slug}
-              onChange={(slug) => setField("slug", slug)}
-              onManualEdit={() => setSlugTouched(true)}
-              onResetFromTitle={handleSlugResetFromTitle}
-            />
-
             {hasCategories ? (
               <Select
                 id="article-category"
@@ -705,6 +702,15 @@ export function ArticleForm({
             titleSource={values.title}
             descriptionSource={seoDescriptionSource}
             fieldErrors={fieldErrors}
+            slug={{
+              label: "כתובת פוסט (slug)",
+              htmlFor: "article-slug",
+              value: values.slug,
+              locked: mode === "edit",
+              onChange: (slug) => setField("slug", slug),
+              onManualEdit: () => setSlugTouched(true),
+              onResetFromTitle: handleSlugResetFromTitle,
+            }}
             onSeoTitleChange={(title) =>
               setValues((current) => ({
                 ...current,

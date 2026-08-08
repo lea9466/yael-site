@@ -21,7 +21,6 @@ import { AdminFormActionBar } from "@/components/admin/admin-form-action-bar";
 import { AdminFormBody } from "@/components/admin/admin-form-section";
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
-import { SlugFormField } from "@/components/admin/slug-form-field";
 import { AdminSeoSection } from "@/components/admin/admin-seo-section";
 import { ServiceArchiveDialog } from "@/components/services/service-archive-dialog";
 import { ServiceAudienceIconPicker } from "@/components/services/service-audience-icon-picker";
@@ -252,7 +251,10 @@ export function ServiceForm({
 
     if (
       Object.keys(errors).some(
-        (key) => key.startsWith("seo.") || key === "seo_og_media_id"
+        (key) =>
+          key === "slug" ||
+          key.startsWith("seo.") ||
+          key === "seo_og_media_id"
       )
     ) {
       setSeoOpen(true);
@@ -283,11 +285,16 @@ export function ServiceForm({
     setValues((current) => ({
       ...current,
       title,
-      slug: slugTouched ? current.slug : slugifyTitle(title),
+      slug:
+        mode === "edit" || slugTouched ? current.slug : slugifyTitle(title),
     }));
   };
 
   const handleSlugResetFromTitle = () => {
+    if (mode === "edit") {
+      return;
+    }
+
     setSlugTouched(false);
     setValues((current) => ({
       ...current,
@@ -578,18 +585,6 @@ export function ServiceForm({
                 onChange={(event) => handleTitleChange(event.target.value)}
               />
             </FormField>
-
-            <SlugFormField
-              label="כתובת שירות (slug)"
-              htmlFor="service-slug"
-              required={false}
-              hint="נוצרת אוטומטית מהכותרת. אופציונלית בטיוטה · נדרשת לפרסום"
-              value={values.slug}
-              error={fieldErrors.slug}
-              onChange={(slug) => setField("slug", slug)}
-              onManualEdit={() => setSlugTouched(true)}
-              onResetFromTitle={handleSlugResetFromTitle}
-            />
 
             <FormField
               label="תיאור קצר"
@@ -941,6 +936,20 @@ export function ServiceForm({
             titleSource={values.title}
             descriptionSource={values.short_description}
             fieldErrors={fieldErrors}
+            slug={{
+              label: "כתובת שירות (slug)",
+              htmlFor: "service-slug",
+              value: values.slug,
+              required: false,
+              locked: mode === "edit",
+              hint:
+                mode === "edit"
+                  ? undefined
+                  : "נוצרת אוטומטית מהכותרת. אופציונלית בטיוטה · נדרשת לפרסום",
+              onChange: (slug) => setField("slug", slug),
+              onManualEdit: () => setSlugTouched(true),
+              onResetFromTitle: handleSlugResetFromTitle,
+            }}
             onSeoTitleChange={(title) =>
               setValues((current) => ({
                 ...current,

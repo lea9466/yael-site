@@ -2,7 +2,6 @@ import type { RecipeFormSectionId } from "@/lib/recipes/constants";
 
 const FIELD_SECTION_MAP: Record<string, RecipeFormSectionId> = {
   title: "basic",
-  slug: "basic",
   description: "basic",
   cover_media_id: "basic",
   featured: "basic",

@@ -200,7 +200,12 @@ export async function updateTagAction(
     };
   }
 
-  const uniqueCheck = await validateUniqueFields(parsed.data, parsed.data.id);
+  const lockedInput = {
+    ...parsed.data,
+    slug: existing.slug,
+  };
+
+  const uniqueCheck = await validateUniqueFields(lockedInput, lockedInput.id);
 
   if (!uniqueCheck.success) {
     return uniqueCheck;
@@ -210,19 +215,19 @@ export async function updateTagAction(
   const { error } = await supabase
     .from("tags")
     .update({
-      name: parsed.data.name,
-      slug: parsed.data.slug,
+      name: lockedInput.name,
+      slug: existing.slug,
     })
-    .eq("id", parsed.data.id)
-    .eq("type", parsed.data.type);
+    .eq("id", lockedInput.id)
+    .eq("type", lockedInput.type);
 
   if (error) {
     return mapDatabaseError(error);
   }
 
-  revalidateTagPaths(parsed.data.id);
+  revalidateTagPaths(lockedInput.id);
 
-  return { success: true, data: { id: parsed.data.id } };
+  return { success: true, data: { id: lockedInput.id } };
 }
 
 export async function deleteTagAction(input: {

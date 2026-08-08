@@ -241,25 +241,21 @@ export async function updatePressArticleAction(
     return mediaError;
   }
 
-  const slugError = await validateSlug(parsed.data.slug, idParsed.data.id);
-
-  if (slugError) {
-    return slugError;
-  }
+  const lockedInput = {
+    ...parsed.data,
+    slug: existing.slug,
+  };
 
   const { error } = await adminContext.supabase
     .from("press_articles")
-    .update(toDatabasePayload(parsed.data))
+    .update(toDatabasePayload(lockedInput))
     .eq("id", idParsed.data.id);
 
   if (error) {
     return { success: false, error: PRESS_ERRORS.generic };
   }
 
-  revalidatePressPaths(idParsed.data.id, parsed.data.slug);
-  if (existing.slug !== parsed.data.slug) {
-    revalidatePressPaths(undefined, existing.slug);
-  }
+  revalidatePressPaths(idParsed.data.id, existing.slug);
 
   return { success: true, data: { id: idParsed.data.id } };
 }

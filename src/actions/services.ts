@@ -296,26 +296,9 @@ export async function updateServiceAction(
     return mediaValidation;
   }
 
-  const slugResolution = await resolveServiceSlugForSave(data.slug, {
-    excludeId: data.id,
-    existingSlug: existing.slug,
-  });
-
-  if (!slugResolution.success) {
-    return {
-      success: false,
-      error: slugResolution.error,
-      fieldErrors: slugResolution.fieldErrors,
-    };
-  }
-
-  if (!slugResolution.data) {
-    return { success: false, error: SERVICE_ERRORS.generic };
-  }
-
   const rowInput = {
     ...data,
-    slug: slugResolution.data,
+    slug: existing.slug,
   };
 
   const { error } = await session.supabase
@@ -357,7 +340,10 @@ export async function publishServiceAction(
     return { success: false, error: SERVICE_ERRORS.notFound };
   }
 
-  const data = parsed.data;
+  const data = {
+    ...parsed.data,
+    slug: existing.slug,
+  };
   const mediaValidation = await validateMediaIds(
     data.cover_media_id,
     data.seo_og_media_id
@@ -365,12 +351,6 @@ export async function publishServiceAction(
 
   if (!mediaValidation.success) {
     return mediaValidation;
-  }
-
-  const slugValidation = await validateSlugAvailability(data.slug, data.id);
-
-  if (!slugValidation.success) {
-    return slugValidation;
   }
 
   const { error } = await session.supabase

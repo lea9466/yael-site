@@ -380,7 +380,10 @@ export async function updateRecipeAction(
     return { success: false, error: RECIPE_ERRORS.notFound };
   }
 
-  const data = parsed.data;
+  const data = {
+    ...parsed.data,
+    slug: existing.slug,
+  };
 
   if (!data.cover_media_id) {
     return {
@@ -410,12 +413,6 @@ export async function updateRecipeAction(
     return taxonomyValidation;
   }
 
-  const slugValidation = await validateSlugAvailability(data.slug, data.id);
-
-  if (!slugValidation.success) {
-    return slugValidation;
-  }
-
   const { error } = await session.supabase
     .from("recipes")
     .update(toRecipeUpdateRow(data, existing.published_at))
@@ -436,15 +433,6 @@ export async function updateRecipeAction(
   }
 
   revalidateRecipePaths(data.id, data.slug, existing.category?.slug);
-
-  if (existing.slug !== data.slug) {
-    revalidatePath(`/recipes/${existing.slug}`);
-    if (existing.category?.slug) {
-      revalidatePath(
-        `/recipes/${existing.category.slug}/${existing.slug}`
-      );
-    }
-  }
 
   return { success: true };
 }
@@ -474,7 +462,10 @@ export async function publishRecipeAction(
     return { success: false, error: RECIPE_ERRORS.notFound };
   }
 
-  const data = parsed.data;
+  const data = {
+    ...parsed.data,
+    slug: existing.slug,
+  };
   const mediaValidation = await validateMediaIds(
     data.cover_media_id,
     data.seo_og_media_id,
@@ -493,12 +484,6 @@ export async function publishRecipeAction(
 
   if (!taxonomyValidation.success) {
     return taxonomyValidation;
-  }
-
-  const slugValidation = await validateSlugAvailability(data.slug, data.id);
-
-  if (!slugValidation.success) {
-    return slugValidation;
   }
 
   const { error } = await session.supabase
@@ -521,15 +506,6 @@ export async function publishRecipeAction(
   }
 
   revalidateRecipePaths(data.id, data.slug, existing.category?.slug);
-
-  if (existing.slug !== data.slug) {
-    revalidatePath(`/recipes/${existing.slug}`);
-    if (existing.category?.slug) {
-      revalidatePath(
-        `/recipes/${existing.category.slug}/${existing.slug}`
-      );
-    }
-  }
 
   return { success: true };
 }

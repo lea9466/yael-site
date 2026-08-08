@@ -112,11 +112,18 @@ export function CategoryForm({
     setValues((current) => ({
       ...current,
       name,
-      slug: slugTouched ? current.slug : slugifyCategoryName(name),
+      slug:
+        mode === "edit" || slugTouched
+          ? current.slug
+          : slugifyCategoryName(name),
     }));
   };
 
   const handleSlugResetFromName = () => {
+    if (mode === "edit") {
+      return;
+    }
+
     setSlugTouched(false);
     setValues((current) => ({
       ...current,
@@ -281,7 +288,12 @@ export function CategoryForm({
             label="כתובת (slug)"
             htmlFor="category-slug"
             value={values.slug}
-            hint="נוצר אוטומטית מהשם. ניתן לעריכה ידנית."
+            hint={
+              mode === "edit"
+                ? undefined
+                : "נוצר אוטומטית מהשם. ניתן לעריכה ידנית לפני השמירה הראשונה."
+            }
+            locked={mode === "edit"}
             error={fieldErrors.slug}
             onChange={(slug) => setField("slug", slug)}
             onManualEdit={() => setSlugTouched(true)}

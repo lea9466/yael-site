@@ -6,6 +6,7 @@ import { buildRecipeCategoryPath, buildRecipesPath } from "@/lib/public/recipe-p
 import { getPublicRecipeListing } from "@/lib/public/recipe-listing";
 import { getWebsiteSettings } from "@/lib/public/queries";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { PUBLIC_PAGE_SEO } from "@/lib/seo/public-page-copy";
 import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 import { parsePublicRecipeListingSearchParams } from "@/lib/validations/public-recipe-listing";
 
@@ -25,8 +26,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return buildSiteMetadata(settings, {
     path: buildRecipesPath(),
-    title: "מתכונים",
-    description: "מתכונים בריאים וקלים להכנה",
+    title: PUBLIC_PAGE_SEO.recipes.title,
+    description: PUBLIC_PAGE_SEO.recipes.description,
   });
 }
 

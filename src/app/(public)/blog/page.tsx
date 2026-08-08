@@ -6,6 +6,7 @@ import { buildBlogCategoryPath, buildBlogPath } from "@/lib/public/blog-paths";
 import { getPublicBlogListing } from "@/lib/public/blog-listing";
 import { getWebsiteSettings } from "@/lib/public/queries";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { PUBLIC_PAGE_SEO } from "@/lib/seo/public-page-copy";
 import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 import { parsePublicBlogListingSearchParams } from "@/lib/validations/public-blog-listing";
 
@@ -24,8 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return buildSiteMetadata(settings, {
     path: buildBlogPath(),
-    title: "פוסטים",
-    description: "מאמרים, מדריכים וטיפים לתזונה ואורח חיים בריא.",
+    title: PUBLIC_PAGE_SEO.blog.title,
+    description: PUBLIC_PAGE_SEO.blog.description,
   });
 }
 

@@ -8,6 +8,7 @@ import { getDefaultAboutPageData } from "@/lib/about/defaults";
 import { fetchCertificatesPageData } from "@/lib/certificates/queries";
 import { getWebsiteSettings } from "@/lib/public/queries";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { PUBLIC_PAGE_SEO } from "@/lib/seo/public-page-copy";
 import { shortenForSeoDescription } from "@/lib/seo/resolve";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,11 +27,11 @@ export async function generateMetadata(): Promise<Metadata> {
     (firstParagraph && firstParagraph.type === "paragraph"
       ? firstParagraph.text
       : "") ||
-    settings.siteSettings.default_seo.description;
+    PUBLIC_PAGE_SEO.about.description;
 
   return buildSiteMetadata(settings, {
     path: "/about",
-    title: about.seo?.title?.trim() || about.title,
+    title: about.seo?.title?.trim() || PUBLIC_PAGE_SEO.about.title,
     description: shortenForSeoDescription(descriptionSource),
     ogImage: aboutDetail?.coverPreview?.url ?? settings.ogImage?.url ?? null,
     ogImageAlt:

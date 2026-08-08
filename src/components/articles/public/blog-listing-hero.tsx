@@ -1,4 +1,5 @@
 import type { PublicBlogCategory } from "@/lib/public/blog-listing";
+import { PUBLIC_PAGE_SEO } from "@/lib/seo/public-page-copy";
 import { cn } from "@/lib/utils/cn";
 
 type BlogListingHeroProps = {
@@ -10,10 +11,8 @@ export function BlogListingHero({
   category,
   className,
 }: BlogListingHeroProps) {
-  const title = category ? category.name : "פוסטים";
-  const description = category
-    ? null
-    : "מאמרים, מדריכים וטיפים לתזונה ואורח חיים בריא.";
+  const title = category ? category.name : PUBLIC_PAGE_SEO.blog.heading;
+  const description = category ? null : PUBLIC_PAGE_SEO.blog.intro;
 
   return (
     <header className={cn("recipes-listing-hero", className)}>

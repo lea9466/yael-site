@@ -8,14 +8,15 @@ import {
   getWebsiteSettings,
 } from "@/lib/public/queries";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { PUBLIC_PAGE_SEO } from "@/lib/seo/public-page-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getWebsiteSettings();
 
   return buildSiteMetadata(settings, {
     path: "/services",
-    title: "שירותים",
-    description: "השירותים של יעל קנייבסקי — ליווי תזונתי ואכילה מחוברת.",
+    title: PUBLIC_PAGE_SEO.services.title,
+    description: PUBLIC_PAGE_SEO.services.description,
   });
 }
 
@@ -28,9 +29,9 @@ export default async function PublicServicesPage() {
     <div className="mx-auto w-full max-w-[90rem] px-5 py-12 md:px-20 md:py-16">
       <ServicesListingBreadcrumbJsonLd />
       <header className="mb-10 max-w-2xl space-y-3">
-        <h1 className="text-page-title">שירותים</h1>
+        <h1 className="text-page-title">{PUBLIC_PAGE_SEO.services.heading}</h1>
         <p className="text-lg text-[var(--color-text-muted)]">
-          ליווי אישי, תהליכים מותאמים וכלים מעשיים לאכילה מחוברת.
+          {PUBLIC_PAGE_SEO.services.intro}
         </p>
       </header>
 

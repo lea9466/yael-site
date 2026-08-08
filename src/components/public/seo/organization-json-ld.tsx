@@ -77,11 +77,30 @@ export function SiteStructuredData({ settings }: SiteStructuredDataProps) {
     "@id": personId,
     name: businessProfile.business_name,
     url: `${SITE_ORIGIN}/about`,
-    jobTitle: businessProfile.tagline || "ליווי תזונתי ואכילה מקושרת",
+    jobTitle: businessProfile.tagline || "מאמנת לאכילה מחוברת וליווי תזונתי",
     description,
     image: settings.logo?.url ?? undefined,
     worksFor: { "@id": organizationId },
     sameAs: sameAs.length > 0 ? sameAs : undefined,
+    knowsAbout: [
+      "אכילה מחוברת",
+      "ליווי תזונתי",
+      "ליווי אישי",
+      "סדנאות תזונה בריאה",
+      "מתכונים בריאים",
+      "תזונה",
+    ],
+    homeLocation: businessProfile.city
+      ? {
+          "@type": "Place",
+          name: businessProfile.city,
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: businessProfile.city,
+            addressCountry: "IL",
+          },
+        }
+      : undefined,
   };
 
   const website: Record<string, unknown> = {

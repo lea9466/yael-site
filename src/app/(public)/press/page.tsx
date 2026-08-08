@@ -4,15 +4,15 @@ import { PressPublicListing } from "@/components/press/public/press-public-listi
 import { fetchPublishedPressArticles } from "@/lib/press/queries";
 import { getWebsiteSettings } from "@/lib/public/queries";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { PUBLIC_PAGE_SEO } from "@/lib/seo/public-page-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getWebsiteSettings();
 
   return buildSiteMetadata(settings, {
     path: "/press",
-    title: "כתבות וראיונות",
-    description:
-      "כתבות, ראיונות וסיקור תקשורתי על אכילה מחוברת וליווי תזונתי.",
+    title: PUBLIC_PAGE_SEO.press.title,
+    description: PUBLIC_PAGE_SEO.press.description,
   });
 }
 

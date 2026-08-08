@@ -29,8 +29,9 @@ export function getDefaultBusinessProfile(): BusinessProfileData {
 export function getDefaultSiteSettings(): SiteSettingsData {
   return {
     default_seo: {
-      title: "יעל קנייבסקי | ליווי תזונתי ואכילה מקושרת",
-      description: "ליווי תזונתי ואכילה מקושרת עם יעל קנייבסקי.",
+      title: "יעל קנייבסקי | מאמנת לאכילה מחוברת וליווי תזונתי",
+      description:
+        "מאמנת לאכילה מחוברת — ליווי אישי, סדנאות תזונה בריאה, מתכונים בריאים ומאמרים על תזונה עם יעל קנייבסקי.",
       og_media_id: null,
     },
     ga4_measurement_id: null,

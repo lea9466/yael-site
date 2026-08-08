@@ -17,19 +17,12 @@ import {
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const [settings, homepageContent] = await Promise.all([
-    getWebsiteSettings(),
-    getHomepageContent(),
-  ]);
-
-  const homepage = homepageContent ?? getDefaultHomepageData();
+  const settings = await getWebsiteSettings();
 
   return buildSiteMetadata(settings, {
     path: "/",
     title: settings.siteSettings.default_seo.title,
-    description:
-      homepage.hero.subtitle.trim() ||
-      settings.siteSettings.default_seo.description,
+    description: settings.siteSettings.default_seo.description,
     ogImage: settings.ogImage?.url ?? null,
     ogImageAlt: settings.ogImage?.alt ?? settings.businessProfile.business_name,
   });

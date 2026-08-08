@@ -14,10 +14,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(SITE_ORIGIN),
     title: {
-      default: "יעל קנייבסקי | ליווי תזונתי ואכילה מקושרת",
+      default: "יעל קנייבסקי | מאמנת לאכילה מחוברת וליווי תזונתי",
       template: "%s | יעל קנייבסקי",
     },
-    description: "ליווי תזונתי ואכילה מקושרת עם יעל קנייבסקי.",
+    description:
+      "מאמנת לאכילה מחוברת — ליווי אישי, סדנאות תזונה בריאה, מתכונים בריאים ומאמרים על תזונה עם יעל קנייבסקי.",
     icons: siteMetadata.icons,
   };
 }

@@ -3,11 +3,10 @@
 import { useState } from "react";
 import { GraduationCap } from "lucide-react";
 
-import { CertificatePublicCard } from "@/components/certificates/public/certificate-public-card";
 import { CertificatePublicLightbox } from "@/components/certificates/public/certificate-public-lightbox";
 import { sortCertificatesForDisplay } from "@/components/certificates/public/sort-certificates-for-display";
+import { AboutCertificateCard } from "@/components/about/about-certificate-card";
 import { HomepageReveal } from "@/components/homepage/homepage-reveal";
-import { getCertificateCardSurface } from "@/lib/homepage/certificate-card-display";
 import type { CertificateListItem } from "@/lib/certificates/types";
 
 type AboutCertificatesSectionProps = {
@@ -73,9 +72,8 @@ export function AboutCertificatesSection({
           {certificates.map((certificate, index) => (
             <li key={certificate.id}>
               <HomepageReveal delayMs={Math.min(index * 60, 240)}>
-                <CertificatePublicCard
+                <AboutCertificateCard
                   certificate={certificate}
-                  surface={getCertificateCardSurface(index)}
                   priority={false}
                   onOpen={() => setActiveIndex(index)}
                 />

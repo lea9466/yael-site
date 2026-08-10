@@ -25,11 +25,7 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { FormToast } from "@/components/ui/form-toast";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
-import {
-  CATEGORY_TYPE_LABELS,
-  CATEGORY_TYPES,
-} from "@/lib/categories/constants";
+import { CATEGORY_TYPE_LABELS } from "@/lib/categories/constants";
 import type { CategoryListItem } from "@/lib/categories/types";
 import { slugifyCategoryName } from "@/lib/categories/slug";
 import { ADMIN_LIST_PATHS } from "@/lib/forms/admin-list-paths";
@@ -245,30 +241,6 @@ export function CategoryForm({
 
       <AdminFormBody>
         <AdminFormSection title="מידע כללי">
-          <Select
-            id="category-type"
-            label="סוג"
-            required
-            value={values.type}
-            disabled={mode === "edit"}
-            error={Boolean(fieldErrors.type)}
-            onChange={(event) =>
-              setField("type", event.target.value as CategoryInput["type"])
-            }
-          >
-            {CATEGORY_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {CATEGORY_TYPE_LABELS[type]}
-              </option>
-            ))}
-          </Select>
-
-          {mode === "edit" ? (
-            <p className="text-caption text-[var(--color-text-muted)]">
-              לא ניתן לשנות את סוג הקטגוריה לאחר יצירה.
-            </p>
-          ) : null}
-
           <FormField
             label="שם"
             htmlFor="category-name"

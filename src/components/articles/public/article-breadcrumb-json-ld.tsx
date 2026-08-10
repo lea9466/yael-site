@@ -32,27 +32,20 @@ export function ArticleBreadcrumbJsonLd({
     },
   ];
 
-  let position = 3;
-
   if (category) {
-    const categoryHref = category.slug
-      ? `${SITE_ORIGIN}${buildBlogCategoryPath(category.slug)}`
-      : `${SITE_ORIGIN}${buildBlogPath()}`;
-
     items.push({
       "@type": "ListItem",
-      position,
+      position: 3,
       name: category.name,
-      item: categoryHref,
+      item: `${SITE_ORIGIN}${buildBlogCategoryPath(category.slug)}`,
     });
-    position += 1;
   }
 
   items.push({
     "@type": "ListItem",
-    position,
+    position: category ? 4 : 3,
     name: postTitle,
-    item: `${SITE_ORIGIN}${buildPostPath(category?.slug, postSlug)}`,
+    item: `${SITE_ORIGIN}${buildPostPath(category?.slug ?? null, postSlug)}`,
   });
 
   const jsonLd = {

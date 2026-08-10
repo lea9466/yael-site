@@ -49,13 +49,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/ui/form-field";
 import { FormToast } from "@/components/ui/form-toast";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
-import { ARTICLE_ERRORS } from "@/lib/articles/errors";
 import { calculateReadingTimeMinutes } from "@/lib/articles/reading-time";
 import { formatReadingTimeLabel } from "@/lib/articles/format";
 import { slugifyTitle } from "@/lib/articles/slug";
 import type {
-  ArticleCategorySummary,
   ArticleDetail,
   ArticleTagSummary,
 } from "@/lib/articles/types";
@@ -84,7 +81,6 @@ type ArticleFormProps = {
   mode: "create" | "edit";
   initialArticle?: ArticleDetail;
   initialValues: ArticleDraftInput;
-  categories: ArticleCategorySummary[];
   availableTags: ArticleTagSummary[];
 };
 
@@ -142,7 +138,6 @@ export function ArticleForm({
   mode,
   initialArticle,
   initialValues,
-  categories,
   availableTags,
 }: ArticleFormProps) {
   const router = useRouter();
@@ -173,7 +168,7 @@ export function ArticleForm({
         }
       : null
   );
-  const [slugTouched, setSlugTouched] = useState(mode === "edit");
+  const [slugTouched, setSlugTouched] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
     open: boolean;
@@ -189,7 +184,6 @@ export function ArticleForm({
   const [seoOpen, setSeoOpen] = useState(false);
   const [saveSucceeded, setSaveSucceeded] = useState(false);
 
-  const hasCategories = categories.length > 0;
   const readingTimeMinutes = calculateReadingTimeMinutes(
     editorBlocksToArticleBlocks(content.blocks)
   );
@@ -273,16 +267,11 @@ export function ArticleForm({
     setValues((current) => ({
       ...current,
       title,
-      slug:
-        mode === "edit" || slugTouched ? current.slug : slugifyTitle(title),
+      slug: slugTouched ? current.slug : slugifyTitle(title),
     }));
   };
 
   const handleSlugResetFromTitle = () => {
-    if (mode === "edit") {
-      return;
-    }
-
     setSlugTouched(false);
     setValues((current) => ({
       ...current,
@@ -342,11 +331,6 @@ export function ArticleForm({
   };
 
   const handlePublish = () => {
-    if (!hasCategories) {
-      showToast("error", ARTICLE_ERRORS.categoryMissing);
-      return;
-    }
-
     if (isPending) {
       return;
     }
@@ -500,10 +484,6 @@ export function ArticleForm({
             type="button"
             disabled={isPending}
             onClick={() => {
-              if (!hasCategories) {
-                showToast("error", ARTICLE_ERRORS.categoryMissing);
-                return;
-              }
               handleRestore(true);
             }}
           >
@@ -559,23 +539,8 @@ export function ArticleForm({
               module="articles"
               emoji="📝"
               title="מידע בסיסי"
-              description="כותרת, כתובת, קטגוריה ותמונת כיסוי."
+              description="כותרת, כתובת ותמונת כיסוי."
             />
-
-            {!hasCategories ? (
-              <div
-                role="alert"
-                className="rounded-[var(--radius-lg)] border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] px-4 py-3 text-sm text-[var(--color-warning)]"
-              >
-                <p>{ARTICLE_ERRORS.categoryMissing}</p>
-                <Link
-                  href="/admin/categories/new?type=article"
-                  className="mt-2 inline-flex font-medium underline underline-offset-2"
-                >
-                  יצירת קטגוריית פוסטים
-                </Link>
-              </div>
-            ) : null}
 
             <FormField
               label="כותרת"
@@ -591,40 +556,6 @@ export function ArticleForm({
                 onChange={(event) => handleTitleChange(event.target.value)}
               />
             </FormField>
-
-            {hasCategories ? (
-              <Select
-                id="article-category"
-                label="קטגוריה"
-                value={values.category_id}
-                error={Boolean(fieldErrors.category_id)}
-                onChange={(event) => setField("category_id", event.target.value)}
-              >
-                <option value="" disabled>
-                  בחרי קטגוריה
-                </option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </Select>
-            ) : (
-              <FormField
-                label="קטגוריה"
-                htmlFor="article-category"
-                required
-                error={fieldErrors.category_id ?? ARTICLE_ERRORS.categoryMissing}
-              >
-                <Input
-                  id="article-category"
-                  value=""
-                  disabled
-                  placeholder="אין קטגוריות פוסטים במערכת"
-                  error
-                />
-              </FormField>
-            )}
 
             <ServiceMediaPicker
               fieldId="field-cover-media"
@@ -706,7 +637,7 @@ export function ArticleForm({
               label: "כתובת פוסט (slug)",
               htmlFor: "article-slug",
               value: values.slug,
-              locked: mode === "edit",
+              hint: "נוצרת אוטומטית מהכותרת. אופציונלית בטיוטה · נדרשת לפרסום",
               onChange: (slug) => setField("slug", slug),
               onManualEdit: () => setSlugTouched(true),
               onResetFromTitle: handleSlugResetFromTitle,

@@ -45,7 +45,6 @@ export function ArticlePublicView({
         {showBreadcrumbs ? (
           <ArticleBreadcrumbs
             postTitle={article.title}
-            category={article.category}
           />
         ) : null}
 

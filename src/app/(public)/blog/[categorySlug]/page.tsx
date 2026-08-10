@@ -69,6 +69,10 @@ export default async function PublicBlogCategoryPage({
       permanentRedirect(buildPostPath(post.category.slug, post.slug));
     }
 
+    if (post && !post.category?.slug) {
+      permanentRedirect(`/articles/${post.slug}`);
+    }
+
     notFound();
   }
 

@@ -378,10 +378,15 @@ export async function updateRecipeAction(
     return { success: false, error: RECIPE_ERRORS.notFound };
   }
 
-  const data = {
-    ...parsed.data,
-    slug: existing.slug,
-  };
+  const data = parsed.data;
+
+  // Validate slug availability if it changed
+  if (data.slug !== existing.slug) {
+    const slugValidation = await validateSlugAvailability(data.slug, existing.id);
+    if (!slugValidation.success) {
+      return slugValidation;
+    }
+  }
 
   if (!data.cover_media_id) {
     return {

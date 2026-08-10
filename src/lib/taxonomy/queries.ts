@@ -1,5 +1,9 @@
 import { createClient } from "@/lib/auth/session";
 import type {
+  ArticleCategorySummary,
+  ArticleTagSummary,
+} from "@/lib/articles/types";
+import type {
   RecipeCategorySummary,
   RecipeTagSummary,
 } from "@/lib/recipes/types";
@@ -83,30 +87,9 @@ export async function verifyRecipeTags(tagIds: string[]): Promise<boolean> {
   return data.every((tag) => tag.type === "recipe");
 }
 
-export async function fetchArticleCategories(): Promise<
-  Array<{ id: string; name: string }>
-> {
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("categories")
-      .select("id, name")
-      .eq("type", "article")
-      .order("name", { ascending: true });
-
-    if (error || !data) {
-      return [];
-    }
-
-    return data;
-  } catch {
-    return [];
-  }
-}
-
 export async function fetchArticleTags(
   search = ""
-): Promise<Array<{ id: string; name: string }>> {
+): Promise<ArticleTagSummary[]> {
   try {
     const supabase = await createClient();
     let query = supabase
@@ -122,6 +105,25 @@ export async function fetchArticleTags(
     }
 
     const { data, error } = await query;
+
+    if (error || !data) {
+      return [];
+    }
+
+    return data;
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchArticleCategories(): Promise<ArticleCategorySummary[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("categories")
+      .select("id, name, slug")
+      .eq("type", "article")
+      .order("name", { ascending: true });
 
     if (error || !data) {
       return [];
@@ -163,3 +165,5 @@ export async function verifyArticleTags(tagIds: string[]): Promise<boolean> {
 
   return data.every((tag) => tag.type === "article");
 }
+
+

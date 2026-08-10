@@ -296,10 +296,15 @@ export async function updateServiceAction(
     return mediaValidation;
   }
 
-  const rowInput = {
-    ...data,
-    slug: existing.slug,
-  };
+  // Validate slug availability if it changed
+  if (data.slug !== existing.slug) {
+    const slugValidation = await validateSlugAvailability(data.slug, existing.id);
+    if (!slugValidation.success) {
+      return slugValidation;
+    }
+  }
+
+  const rowInput = data;
 
   const { error } = await session.supabase
     .from("services")

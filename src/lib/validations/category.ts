@@ -46,7 +46,7 @@ export const categoryInputSchema = z.object({
     .min(1, "יש להזין שם קטגוריה")
     .max(CATEGORY_NAME_MAX, "שם הקטגוריה ארוך מדי"),
   slug: slugSchema,
-  type: categoryTypeSchema,
+  type: z.literal("recipe"),
   image_media_id: z
     .union([uuidSchema, z.null()])
     .optional()

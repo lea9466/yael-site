@@ -158,11 +158,6 @@ const articleBaseFieldsSchema = z.object({
   slug: slugSchema,
   cover_media_id: uuidSchema.nullable(),
   seo_og_media_id: uuidSchema.nullable(),
-  category_id: z
-    .string()
-    .trim()
-    .min(1, "יש לבחור קטגוריה")
-    .uuid("יש לבחור קטגוריה תקינה"),
   featured: z.boolean(),
   tag_ids: z.array(uuidSchema).max(30, "יותר מדי תגיות"),
   content: articleContentDraftSchema,

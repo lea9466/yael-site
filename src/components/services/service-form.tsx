@@ -194,7 +194,7 @@ export function ServiceForm({
         }
       : null
   );
-  const [slugTouched, setSlugTouched] = useState(mode === "edit");
+  const [slugTouched, setSlugTouched] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
     open: boolean;
@@ -285,16 +285,11 @@ export function ServiceForm({
     setValues((current) => ({
       ...current,
       title,
-      slug:
-        mode === "edit" || slugTouched ? current.slug : slugifyTitle(title),
+      slug: slugTouched ? current.slug : slugifyTitle(title),
     }));
   };
 
   const handleSlugResetFromTitle = () => {
-    if (mode === "edit") {
-      return;
-    }
-
     setSlugTouched(false);
     setValues((current) => ({
       ...current,
@@ -941,11 +936,7 @@ export function ServiceForm({
               htmlFor: "service-slug",
               value: values.slug,
               required: false,
-              locked: mode === "edit",
-              hint:
-                mode === "edit"
-                  ? undefined
-                  : "נוצרת אוטומטית מהכותרת. אופציונלית בטיוטה · נדרשת לפרסום",
+              hint: "נוצרת אוטומטית מהכותרת. אופציונלית בטיוטה · נדרשת לפרסום",
               onChange: (slug) => setField("slug", slug),
               onManualEdit: () => setSlugTouched(true),
               onResetFromTitle: handleSlugResetFromTitle,

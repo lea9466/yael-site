@@ -94,22 +94,24 @@ export type ArticleTagSummary = {
 export type ArticleCategorySummary = {
   id: string;
   name: string;
-  slug?: string;
+  slug: string;
 };
 
 export type ArticleListItem = ArticleRecord & {
+  categoryName: string | null;
+  categorySlug: string | null;
   coverUrl: string | null;
   coverAlt: string | null;
-  categoryName: string | null;
   tagNames: string[];
 };
 
 export type ArticleDetail = ArticleRecord & {
+  category_id: string;
+  category: ArticleCategorySummary | null;
   coverUrl: string | null;
   coverAlt: string | null;
   ogUrl: string | null;
   ogAlt: string | null;
-  category: ArticleCategorySummary | null;
   tags: ArticleTagSummary[];
   galleryUrls: Array<{
     media_id: string;

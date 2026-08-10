@@ -20,7 +20,7 @@ type PostCardProps = {
 export function PostCard({ post, className }: PostCardProps) {
   const href = buildPostPath(post.categorySlug, post.slug);
   const statusPills = getPostStatusPills(post);
-  const { category, readingTime } = getPostCardMeta(post);
+  const { readingTime } = getPostCardMeta(post);
 
   return (
     <article className={cn("post-card group", className)}>
@@ -59,19 +59,12 @@ export function PostCard({ post, className }: PostCardProps) {
       </div>
 
       <div className="post-card__body">
-        {(category || readingTime) ? (
+        {readingTime ? (
           <div className="post-card__meta-row">
-            {category ? (
-              <span className="post-card__category">{category}</span>
-            ) : (
-              <span />
-            )}
-            {readingTime ? (
-              <span className="post-card__reading">
-                <Clock aria-hidden="true" className="post-card__meta-icon" />
-                {readingTime}
-              </span>
-            ) : null}
+            <span className="post-card__reading">
+              <Clock aria-hidden="true" className="post-card__meta-icon" />
+              {readingTime}
+            </span>
           </div>
         ) : null}
 

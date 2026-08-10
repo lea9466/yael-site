@@ -130,20 +130,6 @@ export function CategoriesListClient({ data }: CategoriesListClientProps) {
             emoji: "🗂️",
           },
           {
-            icon: ChefHat,
-            label: "למתכונים",
-            value: data.items.filter((item) => item.type === "recipe").length,
-            module: "recipes",
-            emoji: "🥗",
-          },
-          {
-            icon: BookOpen,
-            label: "לפוסטים",
-            value: data.items.filter((item) => item.type === "article").length,
-            module: "articles",
-            emoji: "📚",
-          },
-          {
             icon: FolderTree,
             label: "פנויות",
             value: data.items.filter((item) => item.usageCount === 0).length,

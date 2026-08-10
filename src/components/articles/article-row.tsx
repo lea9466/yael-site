@@ -137,7 +137,6 @@ export function ArticleRow({ item }: ArticleRowProps) {
                 {formatArticleExcerpt(item.body)}
               </p>
               <p className="text-sm text-[var(--color-text-muted)]">
-                {item.categoryName ?? "ללא קטגוריה"} ·{" "}
                 {formatReadingTimeLabel(item.reading_time_minutes)}
               </p>
               <div className="flex flex-wrap gap-2">

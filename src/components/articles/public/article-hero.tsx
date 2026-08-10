@@ -1,15 +1,10 @@
 import Image from "next/image";
-import Link from "next/link";
 
 import {
   formatArticleDateShort,
   formatReadingTimeLabel,
 } from "@/lib/articles/format";
 import type { ArticleDetail } from "@/lib/articles/types";
-import {
-  buildBlogCategoryPath,
-  buildBlogPath,
-} from "@/lib/public/blog-paths";
 import { cn } from "@/lib/utils/cn";
 
 type ArticleHeroProps = {
@@ -18,9 +13,6 @@ type ArticleHeroProps = {
 };
 
 export function ArticleHero({ article, className }: ArticleHeroProps) {
-  const categoryHref = article.category?.slug
-    ? buildBlogCategoryPath(article.category.slug)
-    : buildBlogPath();
   const publishedLabel = article.published_at
     ? formatArticleDateShort(article.published_at)
     : null;
@@ -31,15 +23,6 @@ export function ArticleHero({ article, className }: ArticleHeroProps) {
 
   return (
     <header className={cn("post-article__header", className)}>
-      {article.category ? (
-        <Link
-          href={categoryHref}
-          className="post-article__category public-focus-ring"
-        >
-          {article.category.name}
-        </Link>
-      ) : null}
-
       <h1 className="post-article__title">{article.title}</h1>
 
       {(publishedLabel || readingLabel) ? (

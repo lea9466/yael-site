@@ -41,6 +41,37 @@ function escapeIlikePattern(value: string): string {
   return value.replace(/[%_\\]/g, "\\$&");
 }
 
+async function fetchCategoryMap(
+  categoryIds: string[]
+): Promise<Map<string, { name: string; slug: string }>> {
+  const uniqueIds = [...new Set(categoryIds.filter(Boolean))];
+
+  if (uniqueIds.length === 0) {
+    return new Map();
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("categories")
+    .select("id, name, slug")
+    .eq("type", "article")
+    .in("id", uniqueIds);
+
+  if (error || !data) {
+    return new Map();
+  }
+
+  return new Map(
+    data.map((row) => [
+      row.id,
+      {
+        name: row.name,
+        slug: row.slug,
+      },
+    ])
+  );
+}
+
 async function fetchMediaMap(
   mediaIds: string[]
 ): Promise<Map<string, MediaJoinRow>> {
@@ -69,28 +100,6 @@ async function fetchMediaMap(
       },
     ])
   );
-}
-
-async function fetchCategoryMap(
-  categoryIds: string[]
-): Promise<Map<string, string>> {
-  const uniqueIds = [...new Set(categoryIds.filter(Boolean))];
-
-  if (uniqueIds.length === 0) {
-    return new Map();
-  }
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("categories")
-    .select("id, name")
-    .in("id", uniqueIds);
-
-  if (error || !data) {
-    return new Map();
-  }
-
-  return new Map(data.map((row) => [row.id, row.name]));
 }
 
 function parseJoinedTag(
@@ -169,17 +178,19 @@ function toArticleRecord(row: Record<string, unknown>): ArticleRecord {
 function toArticleListItem(
   record: ArticleRecord,
   mediaMap: Map<string, MediaJoinRow>,
-  categoryMap: Map<string, string>,
+  categoryMap: Map<string, { name: string; slug: string }>,
   tagsMap: Map<string, ArticleTagSummary[]>
 ): ArticleListItem {
   const cover = mediaMap.get(record.cover_media_id);
+  const category = categoryMap.get(record.category_id);
   const tags = tagsMap.get(record.id) ?? [];
 
   return {
     ...record,
+    categoryName: category?.name ?? null,
+    categorySlug: category?.slug ?? null,
     coverUrl: cover ? getPublicMediaUrl(cover.storage_path) : null,
     coverAlt: cover?.alt_text ?? null,
-    categoryName: categoryMap.get(record.category_id) ?? null,
     tagNames: tags.map((tag) => tag.name),
   };
 }
@@ -374,10 +385,7 @@ export async function fetchArticleById(id: string): Promise<ArticleDetail | null
 
     return {
       ...record,
-      coverUrl: cover ? getPublicMediaUrl(cover.storage_path) : null,
-      coverAlt: cover?.alt_text ?? null,
-      ogUrl: og ? getPublicMediaUrl(og.storage_path) : null,
-      ogAlt: og?.alt_text ?? null,
+      category_id: record.category_id,
       category:
         categoryData && categoryData.type === "article"
           ? {
@@ -386,6 +394,10 @@ export async function fetchArticleById(id: string): Promise<ArticleDetail | null
               slug: categoryData.slug,
             }
           : null,
+      coverUrl: cover ? getPublicMediaUrl(cover.storage_path) : null,
+      coverAlt: cover?.alt_text ?? null,
+      ogUrl: og ? getPublicMediaUrl(og.storage_path) : null,
+      ogAlt: og?.alt_text ?? null,
       tags,
       galleryUrls: record.content.gallery
         .slice()

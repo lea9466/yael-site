@@ -13,7 +13,6 @@ export function articleDetailToFormInput(
     slug: article.slug,
     cover_media_id: article.cover_media_id,
     seo_og_media_id: article.seo_og_media_id,
-    category_id: article.category_id,
     featured: article.featured,
     status: article.status,
     tag_ids: article.tags.map((tag) => tag.id),
@@ -22,15 +21,12 @@ export function articleDetailToFormInput(
   };
 }
 
-export function createEmptyArticleFormInput(
-  categoryId?: string
-): ArticleDraftInput {
+export function createEmptyArticleFormInput(): ArticleDraftInput {
   return {
     title: "",
     slug: "",
     cover_media_id: null,
     seo_og_media_id: null,
-    category_id: categoryId ?? "",
     featured: false,
     status: "draft",
     tag_ids: [],

@@ -2,16 +2,12 @@ import type { MetadataRoute } from "next";
 
 import { PUBLIC_STATIC_ROUTES } from "@/constants/public-navigation";
 import {
-  getPublishedBlogCategorySlugs,
   getPublishedPostSlugs,
   getPublishedRecipeCategorySlugs,
   getPublishedRecipeSlugs,
   getPublishedServiceSlugs,
 } from "@/lib/public/queries";
-import {
-  buildBlogCategoryPath,
-  buildPostPath,
-} from "@/lib/public/blog-paths";
+import { buildPostPath } from "@/lib/public/blog-paths";
 import { buildRecipeCategoryPath, buildRecipePath } from "@/lib/public/recipe-paths";
 import {
   fetchPublishedPressSlugs,
@@ -26,7 +22,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     recipes,
     recipeCategories,
     posts,
-    blogCategories,
     pressArticles,
     includePressListing,
   ] = await Promise.all([
@@ -34,7 +29,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getPublishedRecipeSlugs(),
     getPublishedRecipeCategorySlugs(),
     getPublishedPostSlugs(),
-    getPublishedBlogCategorySlugs(),
     fetchPublishedPressSlugs(),
     hasPublishedPressArticles(),
   ]);
@@ -82,15 +76,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const blogCategoryEntries: MetadataRoute.Sitemap = blogCategories.map(
-    (item) => ({
-      url: `${origin}${buildBlogCategoryPath(item.slug)}`,
-      lastModified: new Date(item.updated_at),
-      changeFrequency: "weekly",
-      priority: 0.75,
-    })
-  );
-
   const postEntries: MetadataRoute.Sitemap = posts.map((item) => ({
     url: `${origin}${buildPostPath(item.categorySlug, item.slug)}`,
     lastModified: new Date(item.updated_at),
@@ -111,7 +96,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...serviceEntries,
     ...recipeCategoryEntries,
     ...recipeEntries,
-    ...blogCategoryEntries,
     ...postEntries,
     ...pressEntries,
   ];

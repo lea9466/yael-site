@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(SITE_ORIGIN),
     title: {
-      default: "יעל קנייבסקי | מאמנת לאכילה מחוברת וליווי תזונתי",
+      default: "יעל קנייבסקי | מאמנת אישית לאכילה מחוברת",
       template: "%s | יעל קנייבסקי",
     },
     description:

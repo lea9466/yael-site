@@ -59,13 +59,17 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check if user has admin cookie for coming soon page
-  const hasAdminCookie = request.cookies.has(ADMIN_LAST_ACTIVITY_COOKIE);
+  const hasAdminCookie = request.cookies.get(ADMIN_LAST_ACTIVITY_COOKIE) !== undefined;
   const isPublicRoute = !request.nextUrl.pathname.startsWith("/admin") && 
                         !request.nextUrl.pathname.startsWith("/api") &&
                         !request.nextUrl.pathname.startsWith("/login") &&
                         !request.nextUrl.pathname.startsWith("/coming-soon");
 
-  if (isPublicRoute && !hasAdminCookie && !isAdmin) {
+  console.log("Route:", request.nextUrl.pathname, "isAdmin:", isAdmin, "hasAdminCookie:", hasAdminCookie, "isPublicRoute:", isPublicRoute);
+
+  // Redirect to coming-soon only if not authenticated admin and no admin cookie
+  if (isPublicRoute && !isAdmin && !hasAdminCookie) {
+    console.log("Redirecting to coming-soon");
     return NextResponse.redirect(new URL("/coming-soon", request.url));
   }
 

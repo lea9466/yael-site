@@ -7,16 +7,15 @@ import { getPublicMediaUrl } from "@/lib/media/public-url";
 import { normalizeRecipeContent } from "@/lib/recipes/content";
 import type { RecipeDetail } from "@/lib/recipes/types";
 import type { PublicRecipeSummary } from "@/lib/public/types";
-import type { RecipeDifficulty } from "@/lib/recipes/constants";
 import type { StoredSeo } from "@/lib/seo/types";
 import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 import type { ContentStatus } from "@/types/content";
 
 const RECIPE_DETAIL_COLUMNS =
-  "id, title, slug, description, cover_media_id, seo_og_media_id, category_id, prep_duration, servings, difficulty, content, seo, featured, status, published_at, created_at, updated_at";
+  "id, title, slug, description, cover_media_id, seo_og_media_id, category_id, prep_duration, servings, content, seo, featured, status, published_at, created_at, updated_at";
 
 const RECIPE_RELATED_COLUMNS =
-  "id, title, slug, description, cover_media_id, category_id, prep_duration, servings, difficulty, featured, published_at, updated_at, created_at";
+  "id, title, slug, description, cover_media_id, category_id, prep_duration, servings, featured, published_at, updated_at, created_at";
 
 type MediaRow = {
   id: string;
@@ -130,7 +129,6 @@ function mapRelatedRow(
     categorySlug: category?.slug ?? null,
     prep_duration: row.prep_duration as string,
     servings: row.servings as string,
-    difficulty: row.difficulty as RecipeDifficulty,
     featured: Boolean(row.featured),
     published_at: (row.published_at as string | null) ?? null,
   };
@@ -233,7 +231,6 @@ async function fetchRecipeDetailBySlug(
       category_id: data.category_id as string,
       prep_duration: data.prep_duration as string,
       servings: data.servings as string,
-      difficulty: data.difficulty as RecipeDifficulty,
       content,
       seo,
       featured: Boolean(data.featured),

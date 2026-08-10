@@ -8,11 +8,11 @@ import {
   ExternalLink,
   Eye,
   FileText,
-  Gauge,
   Image,
   Layers,
   Sparkles,
   Trash2,
+  Utensils,
 } from "lucide-react";
 
 import {
@@ -62,10 +62,7 @@ import { ADMIN_LIST_PATHS } from "@/lib/forms/admin-list-paths";
 import { redirectAfterSave } from "@/lib/forms/redirect-after-save";
 import { useUnsavedChangesWarning } from "@/lib/hooks/use-unsaved-changes-warning";
 import { buildRecipePath } from "@/lib/public/recipe-paths";
-import {
-  DIFFICULTY_LABELS,
-  RECIPE_DESCRIPTION_MAX,
-} from "@/lib/recipes/constants";
+import { RECIPE_DESCRIPTION_MAX } from "@/lib/recipes/constants";
 import {
   normalizeRecipeSections,
   sanitizeRecipeSectionsForSave,
@@ -753,11 +750,11 @@ export function RecipeForm({
 
         <section id="section-details" className="space-y-5">
           <AdminSectionHeader
-            icon={Gauge}
+            icon={Utensils}
             module="recipes"
             emoji="🍽️"
             title="פרטי המתכון"
-            description="מספר מנות ורמת קושי."
+            description="מספר מנות."
           />
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -779,26 +776,6 @@ export function RecipeForm({
                 }
               />
             </FormField>
-
-            <Select
-              id="recipe-difficulty"
-              label="רמת קושי"
-              required
-              value={values.difficulty}
-              error={Boolean(fieldErrors.difficulty)}
-              onChange={(event) =>
-                setField(
-                  "difficulty",
-                  event.target.value as RecipeDraftInput["difficulty"]
-                )
-              }
-            >
-              {Object.entries(DIFFICULTY_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </Select>
           </div>
         </section>
 

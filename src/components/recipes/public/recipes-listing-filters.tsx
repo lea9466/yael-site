@@ -14,13 +14,11 @@ import {
 } from "@/lib/public/recipe-listing-ui";
 import { buildRecipeListingHref } from "@/lib/public/recipe-paths";
 import type { PublicRecipeTag } from "@/lib/public/recipe-listing";
-import { DIFFICULTY_LABELS, RECIPE_DIFFICULTIES } from "@/lib/recipes/constants";
 import type { PublicRecipeListingQuery } from "@/lib/validations/public-recipe-listing";
 import { cn } from "@/lib/utils/cn";
 
 type DraftFilters = {
   tags: string[];
-  difficulty: PublicRecipeListingQuery["difficulty"];
   sort: PublicRecipeListingQuery["sort"];
 };
 
@@ -34,7 +32,6 @@ type RecipesListingFiltersProps = {
 function toDraft(query: PublicRecipeListingQuery): DraftFilters {
   return {
     tags: parseRecipeListingTagSlugs(query.tag),
-    difficulty: query.difficulty,
     sort: query.sort === "oldest" ? "newest" : query.sort,
   };
 }
@@ -49,7 +46,6 @@ export function RecipesListingFilters({
   const [isPending, startTransition] = useTransition();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [draft, setDraft] = useState<DraftFilters>(() => toDraft(query));
-  const difficultyGroupId = useId();
   const sortGroupId = useId();
   const activeFilterCount = countActiveRecipeListingFilters(query);
 
@@ -63,7 +59,6 @@ export function RecipesListingFilters({
     const href = buildRecipeListingHref(basePath, {
       q: next.q ?? query.q,
       tag: next.tag ?? query.tag,
-      difficulty: next.difficulty ?? query.difficulty,
       sort: next.sort ?? query.sort,
       page: next.page ?? 1,
     });
@@ -89,7 +84,6 @@ export function RecipesListingFilters({
   const applyDraft = () => {
     navigate({
       tag: serializeRecipeListingTagSlugs(draft.tags),
-      difficulty: draft.difficulty,
       sort: draft.sort,
       page: 1,
     });
@@ -99,12 +93,10 @@ export function RecipesListingFilters({
   const clearAndApply = () => {
     setDraft({
       tags: [],
-      difficulty: "all",
       sort: "newest",
     });
     navigate({
       tag: "all",
-      difficulty: "all",
       sort: "newest",
       page: 1,
     });
@@ -137,7 +129,7 @@ export function RecipesListingFilters({
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         title="סינון מתקדם"
-        description="בחרי תגיות, רמת קושי ומיון"
+        description="בחרי תגיות ומיון"
         className="recipes-filter-drawer-overlay"
         panelClassName="recipes-filter-drawer"
         footer={
@@ -162,43 +154,6 @@ export function RecipesListingFilters({
         }
       >
         <div className="recipes-filter-drawer__sections">
-          <fieldset className="recipes-filter-drawer__section">
-            <legend className="recipes-filter-drawer__legend">רמת קושי</legend>
-            <div
-              className="recipes-filter-drawer__radios"
-              role="radiogroup"
-              aria-labelledby={difficultyGroupId}
-            >
-              <span id={difficultyGroupId} className="sr-only">
-                רמת קושי
-              </span>
-              {RECIPE_DIFFICULTIES.map((value) => (
-                <label
-                  key={value}
-                  className={cn(
-                    "recipes-filter-drawer__radio",
-                    draft.difficulty === value &&
-                      "recipes-filter-drawer__radio--active"
-                  )}
-                >
-                  <input
-                    type="radio"
-                    name="recipes-difficulty"
-                    value={value}
-                    checked={draft.difficulty === value}
-                    onChange={() =>
-                      setDraft((current) => ({
-                        ...current,
-                        difficulty: value,
-                      }))
-                    }
-                  />
-                  <span>{DIFFICULTY_LABELS[value]}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
           {tags.length > 0 ? (
             <fieldset className="recipes-filter-drawer__section">
               <legend className="recipes-filter-drawer__legend">תגיות</legend>

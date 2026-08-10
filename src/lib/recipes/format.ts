@@ -1,6 +1,3 @@
-import type { RecipeDifficulty } from "@/lib/recipes/constants";
-import { DIFFICULTY_LABELS } from "@/lib/recipes/constants";
-
 export function formatRecipeDate(value: string): string {
   const date = new Date(value);
 
@@ -15,8 +12,4 @@ export function formatRecipeDate(value: string): string {
     hour: "2-digit",
     minute: "2-digit",
   }).format(date);
-}
-
-export function formatDifficulty(difficulty: RecipeDifficulty): string {
-  return DIFFICULTY_LABELS[difficulty];
 }

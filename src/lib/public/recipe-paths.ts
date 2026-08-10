@@ -20,7 +20,6 @@ export function buildRecipePath(
 export function buildRecipeListingSearchParams(input: {
   q?: string;
   tag?: string;
-  difficulty?: string;
   sort?: string;
   page?: number;
 }): string {
@@ -34,11 +33,6 @@ export function buildRecipeListingSearchParams(input: {
   const tag = input.tag?.trim() ?? "";
   if (tag && tag !== "all") {
     params.set("tag", tag);
-  }
-
-  const difficulty = input.difficulty?.trim() ?? "";
-  if (difficulty && difficulty !== "all") {
-    params.set("difficulty", difficulty);
   }
 
   const sort = input.sort?.trim() ?? "";
@@ -59,7 +53,6 @@ export function buildRecipeListingHref(
   input: {
     q?: string;
     tag?: string;
-    difficulty?: string;
     sort?: string;
     page?: number;
   }

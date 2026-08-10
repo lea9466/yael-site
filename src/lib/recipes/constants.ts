@@ -22,16 +22,6 @@ export const RESERVED_RECIPE_SLUGS = [
   "preview",
 ] as const;
 
-export const RECIPE_DIFFICULTIES = ["easy", "medium", "hard"] as const;
-
-export type RecipeDifficulty = (typeof RECIPE_DIFFICULTIES)[number];
-
-export const DIFFICULTY_LABELS: Record<RecipeDifficulty, string> = {
-  easy: "קל",
-  medium: "בינוני",
-  hard: "מאתגר",
-};
-
 export const RECIPE_REPEATER_LIMITS = {
   sections: { min: 1, max: 20 },
   ingredients: { min: 0, max: 100 },

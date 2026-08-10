@@ -39,8 +39,7 @@ export function RecipesListing({ data }: RecipesListingProps) {
     : buildRecipesPath();
   const hasActiveFilters =
     query.q.length > 0 ||
-    parseRecipeListingTagSlugs(query.tag).length > 0 ||
-    query.difficulty !== "all";
+    parseRecipeListingTagSlugs(query.tag).length > 0;
 
   return (
     <>

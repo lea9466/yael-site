@@ -1,5 +1,4 @@
 import type { StoredSeo } from "@/lib/seo/types";
-import type { RecipeDifficulty } from "@/lib/recipes/constants";
 import type { ContentStatus } from "@/types/content";
 import type {
   RecipeFeaturedFilter,
@@ -48,7 +47,6 @@ export type RecipeRecord = {
   category_id: string;
   prep_duration: string;
   servings: string;
-  difficulty: RecipeDifficulty;
   content: RecipeContent;
   seo: RecipeSeo;
   featured: boolean;

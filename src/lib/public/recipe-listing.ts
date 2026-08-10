@@ -1,7 +1,6 @@
 import { createClient, isSupabaseConfigured } from "@/lib/auth/session";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
 import type { PublicRecipeSummary } from "@/lib/public/types";
-import type { RecipeDifficulty } from "@/lib/recipes/constants";
 import {
   PUBLIC_RECIPES_PAGE_SIZE,
   type PublicRecipeListingQuery,
@@ -9,7 +8,7 @@ import {
 import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 
 const RECIPE_PUBLIC_COLUMNS =
-  "id, title, slug, description, cover_media_id, category_id, prep_duration, servings, difficulty, featured, published_at, updated_at";
+  "id, title, slug, description, cover_media_id, category_id, prep_duration, servings, featured, published_at, updated_at";
 
 export type PublicRecipeCategory = {
   id: string;
@@ -332,10 +331,6 @@ export async function getPublicRecipeListing(options: {
       listQuery = listQuery.ilike("title", pattern);
     }
 
-    if (options.query.difficulty !== "all") {
-      listQuery = listQuery.eq("difficulty", options.query.difficulty);
-    }
-
     if (recipeIdsForTag) {
       listQuery = listQuery.in("id", recipeIdsForTag);
     }
@@ -389,7 +384,6 @@ export async function getPublicRecipeListing(options: {
         categorySlug: recipeCategory?.slug ?? null,
         prep_duration: row.prep_duration as string,
         servings: row.servings as string,
-        difficulty: row.difficulty as RecipeDifficulty,
         featured: Boolean(row.featured),
         published_at: (row.published_at as string | null) ?? null,
       };

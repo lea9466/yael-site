@@ -1,4 +1,3 @@
-import { DIFFICULTY_LABELS } from "@/lib/recipes/constants";
 import type { PublicRecipeTag } from "@/lib/public/recipe-listing";
 import type { PublicRecipeListingQuery } from "@/lib/validations/public-recipe-listing";
 
@@ -41,10 +40,6 @@ export function countActiveRecipeListingFilters(
     count += 1;
   }
 
-  if (query.difficulty !== "all") {
-    count += 1;
-  }
-
   if (query.sort !== "newest") {
     count += 1;
   }
@@ -55,11 +50,11 @@ export function countActiveRecipeListingFilters(
 export function getRecipeListingActiveFilterChips(input: {
   query: PublicRecipeListingQuery;
   tags: PublicRecipeTag[];
-}): Array<{ key: string; label: string; type: "tag" | "difficulty" | "sort" }> {
+}): Array<{ key: string; label: string; type: "tag" | "sort" }> {
   const chips: Array<{
     key: string;
     label: string;
-    type: "tag" | "difficulty" | "sort";
+    type: "tag" | "sort";
   }> = [];
 
   for (const slug of parseRecipeListingTagSlugs(input.query.tag)) {
@@ -68,14 +63,6 @@ export function getRecipeListingActiveFilterChips(input: {
       key: `tag:${slug}`,
       label: tag?.name ?? slug,
       type: "tag",
-    });
-  }
-
-  if (input.query.difficulty !== "all") {
-    chips.push({
-      key: `difficulty:${input.query.difficulty}`,
-      label: DIFFICULTY_LABELS[input.query.difficulty],
-      type: "difficulty",
     });
   }
 

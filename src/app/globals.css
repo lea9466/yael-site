@@ -195,7 +195,7 @@
   --text-page-title: 1.875rem;
   --text-section-title: 1.375rem;
   --text-card-title: 1.0625rem;
-  --text-body: 1rem;
+  --text-body: 1.125rem;
   --text-small: 0.875rem;
   --text-caption: 0.8125rem;
 
@@ -4984,23 +4984,6 @@
     font-size: 1.0625rem;
     font-weight: 750;
     line-height: 1.35;
-  }
-
-  .recipe-metadata__value--difficulty {
-    font-size: 1.0625rem;
-    font-weight: 750;
-  }
-
-  .recipe-metadata__value--easy {
-    color: #3f5f47;
-  }
-
-  .recipe-metadata__value--medium {
-    color: #7a5a31;
-  }
-
-  .recipe-metadata__value--hard {
-    color: #8e4941;
   }
 
   .recipe-actions {

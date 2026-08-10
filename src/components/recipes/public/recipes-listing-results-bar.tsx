@@ -49,12 +49,6 @@ export function RecipesListingResultsBar({
                 tag: serializeRecipeListingTagSlugs(nextTags),
                 page: 1,
               });
-            } else if (chip.type === "difficulty") {
-              href = buildRecipeListingHref(basePath, {
-                ...query,
-                difficulty: "all",
-                page: 1,
-              });
             } else {
               href = buildRecipeListingHref(basePath, {
                 ...query,

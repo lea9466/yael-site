@@ -36,7 +36,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FormToast } from "@/components/ui/form-toast";
 import {
-  formatDifficulty,
   formatRecipeDate,
 } from "@/lib/recipes/format";
 import type { RecipeListItem } from "@/lib/recipes/types";
@@ -133,8 +132,7 @@ export function RecipeRow({ item }: RecipeRowProps) {
                 {item.title}
               </h3>
               <p className="text-sm text-[var(--color-text-muted)]">
-                {item.categoryName ?? "ללא קטגוריה"} ·{" "}
-                {formatDifficulty(item.difficulty)}
+                {item.categoryName ?? "ללא קטגוריה"}
               </p>
               <div className="flex flex-wrap gap-2">
                 <AdminStatusBadge status={item.status} />

@@ -1,7 +1,6 @@
 import type { BusinessProfileData, SiteSettingsData } from "@/lib/validations/site-settings";
 import type { HomepageData } from "@/lib/validations/homepage-hero";
 import type { AboutPageData } from "@/lib/validations/about";
-import type { RecipeDifficulty } from "@/lib/recipes/constants";
 
 export type PublicMediaPreview = {
   id: string;
@@ -39,7 +38,6 @@ export type PublicRecipeSummary = {
   categorySlug: string | null;
   prep_duration: string;
   servings: string;
-  difficulty: RecipeDifficulty;
   featured: boolean;
   published_at: string | null;
 };

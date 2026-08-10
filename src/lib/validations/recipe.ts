@@ -3,7 +3,6 @@ import { z } from "zod";
 import { CONTENT_STATUSES } from "@/types/content";
 import {
   RECIPE_DESCRIPTION_MAX,
-  RECIPE_DIFFICULTIES,
   RECIPE_REPEATER_LIMITS,
 } from "@/lib/recipes/constants";
 import {
@@ -198,9 +197,6 @@ const recipeBaseFieldsSchema = z.object({
     .string()
     .trim()
     .max(120, "תיאור המנות ארוך מדי"),
-  difficulty: z.enum(RECIPE_DIFFICULTIES, {
-    message: "יש לבחור רמת קושי",
-  }),
   featured: z.boolean(),
   tag_ids: z.array(uuidSchema).max(30, "יותר מדי תגיות"),
   content: recipeContentDraftSchema,

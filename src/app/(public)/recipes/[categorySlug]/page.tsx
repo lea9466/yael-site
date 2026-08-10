@@ -24,7 +24,6 @@ type RecipeCategoryPageProps = {
   searchParams: Promise<{
     q?: string | string[];
     tag?: string | string[];
-    difficulty?: string | string[];
     sort?: string | string[];
     page?: string | string[];
   }>;

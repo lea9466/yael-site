@@ -57,7 +57,6 @@ export function RecipeHero({
 
         <RecipeMetadata
           servings={recipe.servings}
-          difficulty={recipe.difficulty}
         />
 
         {showActions ? <RecipeActions title={recipe.title} /> : null}

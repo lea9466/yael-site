@@ -1,38 +1,25 @@
-import { Gauge, Utensils } from "lucide-react";
+import { Utensils } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { getDifficultyDisplay } from "@/lib/recipes/difficulty-display";
-import type { RecipeDifficulty } from "@/lib/recipes/constants";
 import { cn } from "@/lib/utils/cn";
 
 type RecipeMetadataProps = {
   servings: string;
-  difficulty: RecipeDifficulty;
   className?: string;
 };
 
-type MetaItem =
-  | {
-      key: "servings";
-      label: string;
-      value: string;
-      icon: LucideIcon;
-    }
-  | {
-      key: "difficulty";
-      label: string;
-      value: string;
-      icon: LucideIcon;
-      difficulty: RecipeDifficulty;
-    };
+type MetaItem = {
+  key: "servings";
+  label: string;
+  value: string;
+  icon: LucideIcon;
+};
 
 export function RecipeMetadata({
   servings,
-  difficulty,
   className,
 }: RecipeMetadataProps) {
   const yieldText = servings.trim();
-  const difficultyDisplay = getDifficultyDisplay(difficulty);
 
   const items: MetaItem[] = [];
 
@@ -45,13 +32,9 @@ export function RecipeMetadata({
     });
   }
 
-  items.push({
-    key: "difficulty",
-    label: "רמת קושי",
-    value: difficultyDisplay.label,
-    icon: Gauge,
-    difficulty,
-  });
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
     <dl
@@ -74,15 +57,7 @@ export function RecipeMetadata({
               />
               <span className="recipe-metadata__label">{item.label}</span>
             </dt>
-            <dd
-              className={cn(
-                "recipe-metadata__value",
-                item.key === "difficulty" &&
-                  "recipe-metadata__value--difficulty",
-                item.key === "difficulty" &&
-                  `recipe-metadata__value--${item.difficulty}`
-              )}
-            >
+            <dd className="recipe-metadata__value">
               {item.value}
             </dd>
           </div>

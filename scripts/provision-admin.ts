@@ -76,9 +76,9 @@ function parseArgs(): {
   fullName: string;
 } {
   const args = process.argv.slice(2);
-  let email = DEFAULT_ADMIN.email;
-  let password = DEFAULT_ADMIN.password;
-  let fullName = DEFAULT_ADMIN.fullName;
+  let email: string = DEFAULT_ADMIN.email;
+  let password: string = DEFAULT_ADMIN.password;
+  let fullName: string = DEFAULT_ADMIN.fullName;
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];

@@ -43,7 +43,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
 
   return (
-    <main className="flex min-h-full flex-1 items-center justify-center bg-brand-beige/20 px-4 py-10">
+    <main className="flex min-h-screen flex-1 items-center justify-center bg-gradient-to-br from-green-50 via-emerald-50 to-teal-100 px-4 py-10">
       <LoginForm initialMessage={getInitialMessage(params.reason)} />
     </main>
   );

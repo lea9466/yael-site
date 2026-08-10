@@ -43,13 +43,33 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Check if user is an admin
+  let isAdmin = false;
+  if (user) {
+    const { data: adminUser } = await supabase
+      .from("admin_users")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+    isAdmin = !!adminUser;
+  }
+
+  // Check if user has admin cookie for coming soon page
+  const hasAdminCookie = request.cookies.has(ADMIN_LAST_ACTIVITY_COOKIE);
+  const isPublicRoute = !request.nextUrl.pathname.startsWith("/admin") && 
+                        !request.nextUrl.pathname.startsWith("/api") &&
+                        !request.nextUrl.pathname.startsWith("/login") &&
+                        !request.nextUrl.pathname.startsWith("/coming-soon");
+
+  if (isPublicRoute && !hasAdminCookie && !isAdmin) {
+    return NextResponse.redirect(new URL("/coming-soon", request.url));
+  }
 
   if (request.nextUrl.pathname.startsWith("/admin") || request.nextUrl.pathname.startsWith("/api/admin")) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     const isServerAction = isServerActionRequest(request);
 
     if (!user) {

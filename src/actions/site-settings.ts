@@ -41,6 +41,7 @@ function revalidateSettingsPaths() {
   revalidatePath("/admin/settings");
   revalidatePath("/");
   revalidatePath("/about");
+  revalidatePath("/contact");
 }
 
 async function validateMediaReference(

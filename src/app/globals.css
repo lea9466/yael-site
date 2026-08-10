@@ -3545,7 +3545,7 @@
   .recipes-listing-hero__title {
     margin: 0;
     color: var(--color-primary);
-    font-family: var(--font-heading);
+    font-family: var(--font-primary), sans-serif;
     font-size: clamp(1.75rem, 3.2vw, 2.25rem);
     font-weight: 700;
     line-height: 1.2;
@@ -6304,7 +6304,7 @@
   display: block;
   margin-bottom: 0.25rem;
   color: var(--service-beige);
-  font-family: var(--font-primary), Georgia, serif;
+  font-family: var(--font-primary), sans-serif;
   font-size: clamp(4rem, 10vw, 6.5rem);
   font-weight: 600;
   line-height: 0.7;
@@ -7144,7 +7144,7 @@
   --about-olive: #6f8e6e;
   --about-beige: #e3c7a6;
   --about-coral: #d98a80;
-  --about-display: var(--font-editorial-display), var(--font-main), serif;
+  --about-display: var(--font-primary), sans-serif;
   --about-reading: 45rem;
   --about-container: 80rem;
 
@@ -8977,7 +8977,7 @@
   --legal-border: #ece8e2;
   --legal-text: #2e3a31;
   --legal-muted: #4b5a4f;
-  --legal-display: var(--font-editorial-display), var(--font-main), serif;
+  --legal-display: var(--font-primary), sans-serif;
   --legal-reading: 46rem;
 
   color: var(--legal-text);
@@ -9106,7 +9106,7 @@
   flex: 0 0 auto;
   min-width: 1.75rem;
   color: var(--legal-secondary);
-  font-family: var(--font-main), sans-serif;
+  font-family: var(--font-primary), sans-serif;
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.04em;

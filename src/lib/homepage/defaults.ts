@@ -3,7 +3,7 @@ import type { HomepageData } from "@/lib/validations/homepage-hero";
 export function getDefaultHomepageData(): HomepageData {
   return {
     hero: {
-      title: "ליווי תזונתי ואכילה מקושרת",
+      title: "מאמנת אישית לאכילה מחוברת",
       subtitle: "יחד נבנה קשר בריא ומאוזן לאוכל — בלי דיאטות ובלי אשמה",
       primary_button: {
         label: "לשירותים",

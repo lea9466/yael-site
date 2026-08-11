@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Fragment } from "react";
 
 import { HeroResponsiveMedia } from "@/components/homepage/hero-responsive-media";
 import type { HomepageHeroMediaPreview } from "@/lib/homepage/queries";
@@ -187,23 +186,21 @@ function hasSideHeroMedia(hero: HomepageHeroData): boolean {
 }
 
 function HeroTitle({ title }: { title: string }) {
-  const lines = title
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const normalizedTitle = title.replace(/\s+/g, " ").trim();
+  const words = normalizedTitle.split(" ").filter(Boolean);
 
-  if (lines.length <= 1) {
-    return <>{title}</>;
+  if (words.length <= 2) {
+    return <>{normalizedTitle}</>;
   }
+
+  const firstLine = words.slice(0, 2).join(" ");
+  const secondLine = words.slice(2).join(" ");
 
   return (
     <>
-      {lines.map((line, index) => (
-        <Fragment key={`${line}-${index}`}>
-          {index > 0 ? <br /> : null}
-          {line}
-        </Fragment>
-      ))}
+      {firstLine}
+      <br />
+      {secondLine}
     </>
   );
 }

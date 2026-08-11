@@ -3,13 +3,18 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ path: ".env.local" });
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+function requireEnv(name: string): string {
+  const value = process.env[name];
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error("Missing Supabase environment variables");
-  process.exit(1);
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+
+  return value;
 }
+
+const supabaseUrl = requireEnv("NEXT_PUBLIC_SUPABASE_URL");
+const supabaseAnonKey = requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
 
 interface TestResult {
   name: string;
@@ -20,7 +25,7 @@ interface TestResult {
 
 const testResults: TestResult[] = [];
 
-async function runTest(name: string, testFn: () => Promise<void>) {
+async function runTest(name: string, testFn: () => Promise<unknown>) {
   console.log(`\n🧪 Testing: ${name}`);
   try {
     await testFn();

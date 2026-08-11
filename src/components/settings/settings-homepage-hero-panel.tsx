@@ -183,7 +183,11 @@ export function SettingsHomepageHeroPanel({
 }: SettingsHomepageHeroPanelProps) {
   return (
     <div className="space-y-8">
-      <HeroLivePreview formState={formState} heroPreview={heroPreview} />
+      <HeroLivePreview
+        formState={formState}
+        heroPreview={heroPreview}
+        heroSidePreview={heroSidePreview}
+      />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <FormField

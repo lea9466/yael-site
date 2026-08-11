@@ -225,7 +225,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function normalizeHeroMediaType(value: unknown): HomepageHeroData["media_type"] {
+function normalizeHeroMediaType(value: unknown): HomepageHeroData["side_media_type"] {
   if (value === "video") {
     return "video_url";
   }

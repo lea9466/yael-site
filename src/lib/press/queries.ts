@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createClient } from "@/lib/auth/session";
+import { createClient, isSupabaseConfigured } from "@/lib/auth/session";
 import { MEDIA_LIBRARY_SELECT_COLUMNS, PDF_MIME_TYPE } from "@/lib/media/constants";
 import { isPdfMimeType } from "@/lib/media/mime";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
@@ -72,7 +72,7 @@ export async function isPressSlugTaken(
   slug: string,
   excludeId?: string
 ): Promise<boolean> {
-  if (!slug) {
+  if (!slug || !isSupabaseConfigured()) {
     return false;
   }
 
@@ -97,6 +97,10 @@ export async function isPressSlugTaken(
 }
 
 export async function verifyMediaExists(mediaId: string): Promise<boolean> {
+  if (!isSupabaseConfigured()) {
+    return false;
+  }
+
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("media_library")
@@ -111,6 +115,10 @@ export async function verifyMediaMime(
   mediaId: string,
   kind: "pdf"
 ): Promise<boolean> {
+  if (!isSupabaseConfigured()) {
+    return false;
+  }
+
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("media_library")
@@ -132,6 +140,10 @@ export async function verifyMediaMime(
 export async function fetchPressArticlesList(
   query: ListPressArticlesQuery
 ): Promise<PressArticlesListData | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
   try {
     const supabase = await createClient();
     const sort = SORT_CONFIG[query.sort];
@@ -204,6 +216,10 @@ export async function fetchPressArticlesList(
 export async function fetchPressArticleById(
   id: string
 ): Promise<PressArticleDetail | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -235,6 +251,10 @@ export async function fetchPressArticleById(
 export async function fetchPublishedPressArticles(): Promise<
   PressArticlePublicCard[]
 > {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -268,6 +288,10 @@ export async function fetchPublishedPressArticles(): Promise<
 export async function fetchPublishedPressArticleBySlug(
   slug: string
 ): Promise<PressArticlePublicDetail | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -311,6 +335,10 @@ export async function fetchPublishedPressArticleBySlug(
 }
 
 export async function hasPublishedPressArticles(): Promise<boolean> {
+  if (!isSupabaseConfigured()) {
+    return false;
+  }
+
   try {
     const supabase = await createClient();
     const { count, error } = await supabase
@@ -331,6 +359,10 @@ export async function hasPublishedPressArticles(): Promise<boolean> {
 export async function fetchPublishedPressSlugs(): Promise<
   Array<{ slug: string; updated_at: string }>
 > {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
   try {
     const supabase = await createClient();
     const { data, error } = await supabase

@@ -28,12 +28,40 @@ export async function generateMetadata({
 }: PressDetailPageProps): Promise<Metadata> {
   const { slug: rawSlug } = await params;
   const slug = normalizeRouteSlug(rawSlug);
-  const [settings, article] = await Promise.all([
-    getWebsiteSettings(),
-    fetchPublishedPressArticleBySlug(slug),
-  ]);
 
-  if (!article) {
+  try {
+    const [settings, article] = await Promise.all([
+      getWebsiteSettings(),
+      fetchPublishedPressArticleBySlug(slug),
+    ]);
+
+    if (!article) {
+      return buildSiteMetadata(settings, {
+        path: `/press/${slug}`,
+        title: "כתבה לא נמצאה",
+        description: "הכתבה שחיפשתם אינה זמינה.",
+        noIndex: true,
+      });
+    }
+
+    const description =
+      article.seo_description ||
+      article.excerpt ||
+      shortenForSeoDescription(
+        `${article.publication_name} — ${article.title}`
+      );
+
+    return buildSiteMetadata(settings, {
+      path: `/press/${article.slug}`,
+      title: article.seo_title || article.title,
+      description,
+      ogType: "article",
+    });
+  } catch (error) {
+    console.error("Error generating press metadata:", error);
+
+    const settings = await getWebsiteSettings();
+
     return buildSiteMetadata(settings, {
       path: `/press/${slug}`,
       title: "כתבה לא נמצאה",
@@ -41,20 +69,6 @@ export async function generateMetadata({
       noIndex: true,
     });
   }
-
-  const description =
-    article.seo_description ||
-    article.excerpt ||
-    shortenForSeoDescription(
-      `${article.publication_name} — ${article.title}`
-    );
-
-  return buildSiteMetadata(settings, {
-    path: `/press/${article.slug}`,
-    title: article.seo_title || article.title,
-    description,
-    ogType: "article",
-  });
 }
 
 export default async function PublicPressDetailPage({
@@ -62,23 +76,29 @@ export default async function PublicPressDetailPage({
 }: PressDetailPageProps) {
   const { slug: rawSlug } = await params;
   const slug = normalizeRouteSlug(rawSlug);
-  const [article, settings] = await Promise.all([
-    fetchPublishedPressArticleBySlug(slug),
-    getWebsiteSettings(),
-  ]);
 
-  if (!article) {
+  try {
+    const [article, settings] = await Promise.all([
+      fetchPublishedPressArticleBySlug(slug),
+      getWebsiteSettings(),
+    ]);
+
+    if (!article) {
+      notFound();
+    }
+
+    return (
+      <>
+        <PressArticleJsonLd
+          article={article}
+          authorName={settings.businessProfile.business_name}
+        />
+        <PressBreadcrumbJsonLd title={article.title} slug={article.slug} />
+        <PressPublicDetailView article={article} />
+      </>
+    );
+  } catch (error) {
+    console.error("Error rendering press page:", error);
     notFound();
   }
-
-  return (
-    <>
-      <PressArticleJsonLd
-        article={article}
-        authorName={settings.businessProfile.business_name}
-      />
-      <PressBreadcrumbJsonLd title={article.title} slug={article.slug} />
-      <PressPublicDetailView article={article} />
-    </>
-  );
 }

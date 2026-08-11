@@ -60,10 +60,16 @@ export async function middleware(request: NextRequest) {
 
   // Check if user has admin cookie for coming soon page
   const hasAdminCookie = request.cookies.get(ADMIN_LAST_ACTIVITY_COOKIE) !== undefined;
-  const isPublicRoute = !request.nextUrl.pathname.startsWith("/admin") && 
-                        !request.nextUrl.pathname.startsWith("/api") &&
-                        !request.nextUrl.pathname.startsWith("/login") &&
-                        !request.nextUrl.pathname.startsWith("/coming-soon");
+  const isPublicRoute =
+    !request.nextUrl.pathname.startsWith("/admin") &&
+    !request.nextUrl.pathname.startsWith("/api") &&
+    !request.nextUrl.pathname.startsWith("/login") &&
+    !request.nextUrl.pathname.startsWith("/coming-soon") &&
+    !request.nextUrl.pathname.startsWith("/icon") &&
+    !request.nextUrl.pathname.startsWith("/apple-icon") &&
+    request.nextUrl.pathname !== "/manifest.webmanifest" &&
+    !request.nextUrl.pathname.startsWith("/robots.txt") &&
+    !request.nextUrl.pathname.startsWith("/sitemap.xml");
 
   console.log("Route:", request.nextUrl.pathname, "isAdmin:", isAdmin, "hasAdminCookie:", hasAdminCookie, "isPublicRoute:", isPublicRoute);
 

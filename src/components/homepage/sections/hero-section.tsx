@@ -292,7 +292,7 @@ export function HomepageHeroSection({
                   ) : null}
                 </div>
               </div>
-              
+
               {hasSideMedia && (
                 <div className="hero-video-side">
                   <SideHeroMedia

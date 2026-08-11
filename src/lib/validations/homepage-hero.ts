@@ -210,16 +210,16 @@ export type SaveHomepageHeroInput = z.infer<typeof saveHomepageHeroInputSchema>;
 
 export type HomepageHeroActionResult =
   | {
-      success: true;
-      data: {
-        homepageUpdatedAt: string;
-      };
-    }
-  | {
-      success: false;
-      error: string;
-      fieldErrors?: Record<string, string>;
+    success: true;
+    data: {
+      homepageUpdatedAt: string;
     };
+  }
+  | {
+    success: false;
+    error: string;
+    fieldErrors?: Record<string, string>;
+  };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -268,14 +268,14 @@ function normalizeHero(raw: unknown): HomepageHeroData {
     },
     secondary_button:
       secondaryButton &&
-      typeof secondaryButton.label === "string" &&
-      secondaryButton.label.trim().length > 0 &&
-      typeof secondaryButton.url === "string" &&
-      secondaryButton.url.trim().length > 0
+        typeof secondaryButton.label === "string" &&
+        secondaryButton.label.trim().length > 0 &&
+        typeof secondaryButton.url === "string" &&
+        secondaryButton.url.trim().length > 0
         ? {
-            label: secondaryButton.label,
-            url: secondaryButton.url,
-          }
+          label: secondaryButton.label,
+          url: secondaryButton.url,
+        }
         : null,
     background_media_id:
       typeof raw.background_media_id === "string"
@@ -413,11 +413,11 @@ export function formStateToHomepageHero(state: HomepageHeroFormState): HomepageH
     },
     secondary_button:
       state.heroSecondaryButtonLabel.trim().length > 0 &&
-      state.heroSecondaryButtonUrl.trim().length > 0
+        state.heroSecondaryButtonUrl.trim().length > 0
         ? {
-            label: state.heroSecondaryButtonLabel,
-            url: state.heroSecondaryButtonUrl,
-          }
+          label: state.heroSecondaryButtonLabel,
+          url: state.heroSecondaryButtonUrl,
+        }
         : null,
     background_media_id: state.heroBackgroundMediaId,
     background_mobile_media_id: state.heroBackgroundMobileMediaId,

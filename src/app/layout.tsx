@@ -6,6 +6,7 @@ import { buildDefaultSiteMetadata } from "@/lib/seo/metadata";
 import { SITE_ORIGIN } from "@/lib/site/constants";
 
 import "./globals.css";
+import "@/components/homepage/hero-section.css";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getWebsiteSettings();

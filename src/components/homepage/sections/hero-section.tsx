@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { HeroResponsiveMedia } from "@/components/homepage/hero-responsive-media";
+import { HeroVideoPlayer } from "@/components/homepage/hero-video-player";
 import type { HomepageHeroMediaPreview } from "@/lib/homepage/queries";
 import type { HomepageHeroData } from "@/lib/validations/homepage-hero";
 import { cn } from "@/lib/utils/cn";
@@ -137,16 +138,13 @@ function SideHeroMedia({
     if (hero.side_media_id && desktopMediaPreview?.url) {
       const preview = desktopMediaPreview;
       return (
-        <video
-          className="hero-video"
-          muted
-          playsInline
-          controls
-          preload="metadata"
-          aria-label={title}
-        >
-          <source src={preview.url} type={preview.mimeType} />
-        </video>
+        <HeroVideoPlayer
+          src={preview.url}
+          mimeType={preview.mimeType ?? "video/mp4"}
+          posterUrl={null}
+          title={title}
+          reducedMotion={false}
+        />
       );
     }
     // Otherwise use external URL
@@ -270,6 +268,17 @@ export function HomepageHeroSection({
         <div className="hero-stage__container">
           <div className="hero-editorial hero-editorial-enter">
             <div className="hero-content-row">
+              {hasSideMedia && (
+                <div className="hero-video-side">
+                  <SideHeroMedia
+                    hero={hero}
+                    desktopMediaPreview={sideMediaPreview}
+                    mobileMediaPreview={sideMediaPreview}
+                    title={hero.title}
+                  />
+                </div>
+              )}
+
               <div className="hero-content-main">
                 <h1 id="homepage-hero-title" className="hero-title">
                   <HeroTitle title={hero.title} />
@@ -292,17 +301,6 @@ export function HomepageHeroSection({
                   ) : null}
                 </div>
               </div>
-
-              {hasSideMedia && (
-                <div className="hero-video-side">
-                  <SideHeroMedia
-                    hero={hero}
-                    desktopMediaPreview={sideMediaPreview}
-                    mobileMediaPreview={sideMediaPreview}
-                    title={hero.title}
-                  />
-                </div>
-              )}
             </div>
           </div>
         </div>

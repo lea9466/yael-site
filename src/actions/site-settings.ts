@@ -122,16 +122,18 @@ export async function saveSiteSettingsAction(
       "default_seo.og_media_id"
     ),
     validateMediaReference(
-      parsed.data.homepageHero.media_type === "image"
-        ? parsed.data.homepageHero.media_id
-        : null,
-      "hero.media_id"
+      parsed.data.homepageHero.background_media_id,
+      "hero.background_media_id"
     ),
     validateMediaReference(
-      parsed.data.homepageHero.media_type === "image"
-        ? parsed.data.homepageHero.mobile_media_id
+      parsed.data.homepageHero.background_mobile_media_id,
+      "hero.background_mobile_media_id"
+    ),
+    validateMediaReference(
+      parsed.data.homepageHero.side_media_type === "image"
+        ? parsed.data.homepageHero.side_media_id
         : null,
-      "hero.mobile_media_id"
+      "hero.side_media_id"
     ),
   ]);
 

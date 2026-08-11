@@ -95,8 +95,9 @@ export async function fetchSettingsPageData(): Promise<SettingsPageData | null> 
       businessProfile.logo_media_id,
       businessProfile.favicon_media_id,
       siteSettings.default_seo.og_media_id,
-      homepage.hero.media_id,
-      homepage.hero.mobile_media_id,
+      homepage.hero.background_media_id,
+      homepage.hero.background_mobile_media_id,
+      homepage.hero.side_media_id,
     ]);
 
     return {
@@ -117,11 +118,14 @@ export async function fetchSettingsPageData(): Promise<SettingsPageData | null> 
         ogImage: siteSettings.default_seo.og_media_id
           ? previews.get(siteSettings.default_seo.og_media_id) ?? null
           : null,
-        heroImage: homepage.hero.media_id
-          ? previews.get(homepage.hero.media_id) ?? null
+        heroImage: homepage.hero.background_media_id
+          ? previews.get(homepage.hero.background_media_id) ?? null
           : null,
-        heroMobileImage: homepage.hero.mobile_media_id
-          ? previews.get(homepage.hero.mobile_media_id) ?? null
+        heroMobileImage: homepage.hero.background_mobile_media_id
+          ? previews.get(homepage.hero.background_mobile_media_id) ?? null
+          : null,
+        heroSideImage: homepage.hero.side_media_id
+          ? previews.get(homepage.hero.side_media_id) ?? null
           : null,
       },
     };

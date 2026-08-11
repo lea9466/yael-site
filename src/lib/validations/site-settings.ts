@@ -376,6 +376,7 @@ export type SettingsPageData = {
     ogImage: SettingsMediaPreview | null;
     heroImage: SettingsMediaPreview | null;
     heroMobileImage: SettingsMediaPreview | null;
+    heroSideImage: SettingsMediaPreview | null;
   };
 };
 
@@ -412,11 +413,12 @@ export type SettingsFormState = {
   heroPrimaryButtonUrl: string;
   heroSecondaryButtonLabel: string;
   heroSecondaryButtonUrl: string;
-  heroMediaType: HomepageHeroData["media_type"];
-  heroMediaId: string | null;
-  heroMobileMediaId: string | null;
-  heroVideoUrl: string;
-  heroAnimationUrl: string;
+  heroBackgroundMediaId: string | null;
+  heroBackgroundMobileMediaId: string | null;
+  heroSideMediaType: HomepageHeroData["side_media_type"];
+  heroSideMediaId: string | null;
+  heroSideVideoUrl: string;
+  heroSideAnimationUrl: string;
   shortAboutTitle: string;
   shortAboutText: string;
 };

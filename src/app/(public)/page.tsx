@@ -54,6 +54,7 @@ export default async function PublicHomePage() {
   const homepage = homepageContent ?? getDefaultHomepageData();
   const heroDesktopMediaPreview = heroPageData?.heroDesktopMediaPreview ?? null;
   const heroMobileMediaPreview = heroPageData?.heroMobileMediaPreview ?? null;
+  const heroSideMediaPreview = heroPageData?.heroSideMediaPreview ?? null;
   const aboutCoverPreview = aboutDetail?.coverPreview ?? null;
 
   const homepageServices = selectHomepageItems(services, "services");
@@ -70,6 +71,7 @@ export default async function PublicHomePage() {
       homepage={homepage}
       heroDesktopMediaPreview={heroDesktopMediaPreview}
       heroMobileMediaPreview={heroMobileMediaPreview}
+      heroSideMediaPreview={heroSideMediaPreview}
       aboutCoverPreview={aboutCoverPreview}
       settings={settings}
       services={homepageServices}

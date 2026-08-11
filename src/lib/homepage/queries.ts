@@ -26,6 +26,7 @@ export type HomepageHeroPageData = {
   homepageUpdatedAt: string;
   heroDesktopMediaPreview: HomepageHeroMediaPreview | null;
   heroMobileMediaPreview: HomepageHeroMediaPreview | null;
+  heroSideMediaPreview: HomepageHeroMediaPreview | null;
 };
 
 async function fetchHeroMediaPreview(
@@ -98,9 +99,10 @@ export async function fetchHomepageHeroPageData(): Promise<HomepageHeroPageData 
     return null;
   }
 
-  const [heroDesktopMediaPreview, heroMobileMediaPreview] = await Promise.all([
-    fetchHeroMediaPreview(row.data.hero.media_id),
-    fetchHeroMediaPreview(row.data.hero.mobile_media_id),
+  const [heroDesktopMediaPreview, heroMobileMediaPreview, heroSideMediaPreview] = await Promise.all([
+    fetchHeroMediaPreview(row.data.hero.background_media_id),
+    fetchHeroMediaPreview(row.data.hero.background_mobile_media_id),
+    fetchHeroMediaPreview(row.data.hero.side_media_id),
   ]);
 
   return {
@@ -109,5 +111,6 @@ export async function fetchHomepageHeroPageData(): Promise<HomepageHeroPageData 
     homepageUpdatedAt: row.updatedAt,
     heroDesktopMediaPreview,
     heroMobileMediaPreview,
+    heroSideMediaPreview,
   };
 }

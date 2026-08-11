@@ -47,32 +47,28 @@ function HeroVideoMedia({ url, title }: { url: string; title: string }) {
 
   if (embedUrl) {
     return (
-      <div className="hero-media-stack">
-        <iframe
-          src={embedUrl}
-          title={title}
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="hero-video border-0"
-        />
-      </div>
+      <iframe
+        src={embedUrl}
+        title={title}
+        loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="hero-video border-0"
+      />
     );
   }
 
   return (
-    <div className="hero-media-stack">
-      <video
-        className="hero-video"
-        muted
-        playsInline
-        controls
-        preload="metadata"
-        aria-label={title}
-      >
-        <source src={url} type="video/mp4" />
-      </video>
-    </div>
+    <video
+      className="hero-video"
+      muted
+      playsInline
+      controls
+      preload="metadata"
+      aria-label={title}
+    >
+      <source src={url} type="video/mp4" />
+    </video>
   );
 }
 
@@ -81,31 +77,27 @@ function HeroAnimationMedia({ url, title }: { url: string; title: string }) {
 
   if (lowerUrl.endsWith(".gif") || lowerUrl.endsWith(".webp") || lowerUrl.endsWith(".png")) {
     return (
-      <div className="hero-media-stack">
-        <div className="hero-image-wrap">
-          <Image
-            src={url}
-            alt={title}
-            fill
-            sizes="100vw"
-            className="hero-image"
-            unoptimized
-          />
-        </div>
+      <div className="hero-image-wrap">
+        <Image
+          src={url}
+          alt={title}
+          fill
+          sizes="100vw"
+          className="hero-image"
+          unoptimized
+        />
       </div>
     );
   }
 
   return (
-    <div className="hero-media-stack">
-      <iframe
-        src={url}
-        title={title}
-        loading="lazy"
-        sandbox="allow-scripts allow-same-origin"
-        className="hero-video border-0"
-      />
-    </div>
+    <iframe
+      src={url}
+      title={title}
+      loading="lazy"
+      sandbox="allow-scripts allow-same-origin"
+      className="hero-video border-0"
+    />
   );
 }
 
@@ -115,7 +107,23 @@ function HeroMedia({
   mobileMediaPreview,
   title,
 }: HeroMediaProps) {
-  if (hero.media_type === "image") {
+  // Always use background media for the main hero background
+  return (
+    <HeroResponsiveMedia
+      desktopPreview={desktopMediaPreview}
+      mobilePreview={mobileMediaPreview}
+      title={title}
+    />
+  );
+}
+
+function SideHeroMedia({
+  hero,
+  desktopMediaPreview,
+  mobileMediaPreview,
+  title,
+}: HeroMediaProps) {
+  if (hero.side_media_type === "image") {
     return (
       <HeroResponsiveMedia
         desktopPreview={desktopMediaPreview}
@@ -125,12 +133,31 @@ function HeroMedia({
     );
   }
 
-  if (hero.media_type === "video_url" && hero.video_url) {
-    return <HeroVideoMedia url={hero.video_url} title={title} />;
+  if (hero.side_media_type === "video_url") {
+    // If there's a media ID from the library, use that first
+    if (hero.side_media_id && desktopMediaPreview?.url) {
+      const preview = desktopMediaPreview;
+      return (
+        <video
+          className="hero-video"
+          muted
+          playsInline
+          controls
+          preload="metadata"
+          aria-label={title}
+        >
+          <source src={preview.url} type={preview.mimeType} />
+        </video>
+      );
+    }
+    // Otherwise use external URL
+    if (hero.side_video_url) {
+      return <HeroVideoMedia url={hero.side_video_url} title={title} />;
+    }
   }
 
-  if (hero.media_type === "animation_url" && hero.animation_url) {
-    return <HeroAnimationMedia url={hero.animation_url} title={title} />;
+  if (hero.side_media_type === "animation_url" && hero.side_animation_url) {
+    return <HeroAnimationMedia url={hero.side_animation_url} title={title} />;
   }
 
   return null;
@@ -140,16 +167,20 @@ function hasHeroVisualMedia(
   hero: HomepageHeroData,
   desktopMediaPreview: HomepageHeroMediaPreview | null
 ): boolean {
-  if (hero.media_type === "image") {
-    return Boolean(desktopMediaPreview?.url);
+  return Boolean(hero.background_media_id && desktopMediaPreview?.url);
+}
+
+function hasSideHeroMedia(hero: HomepageHeroData): boolean {
+  if (hero.side_media_type === "image") {
+    return Boolean(hero.side_media_id);
   }
 
-  if (hero.media_type === "video_url") {
-    return Boolean(hero.video_url);
+  if (hero.side_media_type === "video_url") {
+    return Boolean(hero.side_media_id || hero.side_video_url);
   }
 
-  if (hero.media_type === "animation_url") {
-    return Boolean(hero.animation_url);
+  if (hero.side_media_type === "animation_url") {
+    return Boolean(hero.side_animation_url);
   }
 
   return false;
@@ -201,15 +232,18 @@ type HomepageHeroSectionProps = {
   hero: HomepageHeroData;
   desktopMediaPreview: HomepageHeroMediaPreview | null;
   mobileMediaPreview: HomepageHeroMediaPreview | null;
+  sideMediaPreview: HomepageHeroMediaPreview | null;
 };
 
 export function HomepageHeroSection({
   hero,
   desktopMediaPreview,
   mobileMediaPreview,
+  sideMediaPreview,
 }: HomepageHeroSectionProps) {
   const hasSecondary = Boolean(hero.secondary_button);
   const hasVisualMedia = hasHeroVisualMedia(hero, desktopMediaPreview);
+  const hasSideMedia = hasSideHeroMedia(hero);
 
   return (
     <section className="hero" aria-labelledby="homepage-hero-title">
@@ -238,25 +272,40 @@ export function HomepageHeroSection({
       <div className="hero-stage">
         <div className="hero-stage__container">
           <div className="hero-editorial hero-editorial-enter">
-            <h1 id="homepage-hero-title" className="hero-title">
-              <HeroTitle title={hero.title} />
-            </h1>
+            <div className="hero-content-row">
+              <div className="hero-content-main">
+                <h1 id="homepage-hero-title" className="hero-title">
+                  <HeroTitle title={hero.title} />
+                </h1>
 
-            <p className="hero-lead">{hero.subtitle}</p>
+                <p className="hero-lead">{hero.subtitle}</p>
 
-            <div className="hero-actions">
-              <HeroButton
-                label={hero.primary_button.label}
-                href={hero.primary_button.url}
-                variant="primary"
-              />
-              {hasSecondary && hero.secondary_button ? (
-                <HeroButton
-                  label={hero.secondary_button.label}
-                  href={hero.secondary_button.url}
-                  variant="secondary"
-                />
-              ) : null}
+                <div className="hero-actions">
+                  <HeroButton
+                    label={hero.primary_button.label}
+                    href={hero.primary_button.url}
+                    variant="primary"
+                  />
+                  {hasSecondary && hero.secondary_button ? (
+                    <HeroButton
+                      label={hero.secondary_button.label}
+                      href={hero.secondary_button.url}
+                      variant="secondary"
+                    />
+                  ) : null}
+                </div>
+              </div>
+              
+              {hasSideMedia && (
+                <div className="hero-video-side">
+                  <SideHeroMedia
+                    hero={hero}
+                    desktopMediaPreview={sideMediaPreview}
+                    mobileMediaPreview={sideMediaPreview}
+                    title={hero.title}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

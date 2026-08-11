@@ -24,6 +24,7 @@ export type HomepageViewProps = {
   homepage: HomepageData;
   heroDesktopMediaPreview: HomepageHeroMediaPreview | null;
   heroMobileMediaPreview: HomepageHeroMediaPreview | null;
+  heroSideMediaPreview: HomepageHeroMediaPreview | null;
   aboutCoverPreview: AboutMediaPreview | null;
   settings: WebsiteSettingsPublic;
   services: PublicServiceSummary[];
@@ -37,6 +38,7 @@ export function HomepageView({
   homepage,
   heroDesktopMediaPreview,
   heroMobileMediaPreview,
+  heroSideMediaPreview,
   aboutCoverPreview,
   settings,
   services,
@@ -51,6 +53,7 @@ export function HomepageView({
         hero={homepage.hero}
         desktopMediaPreview={heroDesktopMediaPreview}
         mobileMediaPreview={heroMobileMediaPreview}
+        sideMediaPreview={heroSideMediaPreview}
       />
       <ShortAboutSection
         content={homepage.short_about}

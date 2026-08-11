@@ -108,39 +108,46 @@ export const homepageHeroSchema = z
       .max(HOMEPAGE_HERO_SUBTITLE_MAX, "כותרת המשנה ארוכה מדי"),
     primary_button: homepageButtonSchema,
     secondary_button: optionalSecondaryButtonSchema,
-    media_type: z.enum(HOMEPAGE_HERO_MEDIA_TYPES, {
+    background_media_id: z.union([uuidSchema, z.null()]),
+    background_mobile_media_id: z.union([uuidSchema, z.null()]),
+    side_media_type: z.enum(HOMEPAGE_HERO_MEDIA_TYPES, {
       message: "סוג מדיה לא תקין",
     }),
-    media_id: z.union([uuidSchema, z.null()]),
-    mobile_media_id: z.union([uuidSchema, z.null()]),
-    video_url: z.union([externalMediaUrlSchema, z.null()]),
-    animation_url: z.union([externalMediaUrlSchema, z.null()]),
+    side_media_id: z.union([uuidSchema, z.null()]),
+    side_video_url: z.union([externalMediaUrlSchema, z.null()]),
+    side_animation_url: z.union([externalMediaUrlSchema, z.null()]),
   })
   .strict()
   .superRefine((value, context) => {
-    if (value.media_type === "image") {
-      if (!value.media_id) {
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "יש לבחור תמונה מהספרייה",
-          path: ["media_id"],
-        });
-      }
-    }
-
-    if (value.media_type === "video_url" && !value.video_url) {
+    if (!value.background_media_id) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "יש להזין כתובת וידאו חיצונית",
-        path: ["video_url"],
+        message: "יש לבחור תמונת רקע מהספרייה",
+        path: ["background_media_id"],
       });
     }
 
-    if (value.media_type === "animation_url" && !value.animation_url) {
+    if (value.side_media_type === "image" && !value.side_media_id) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "יש לבחור תמונה מהספרייה",
+        path: ["side_media_id"],
+      });
+    }
+
+    if (value.side_media_type === "video_url" && !value.side_media_id && !value.side_video_url) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "יש לבחור סרטון מהספרייה או להזין כתובת וידאו חיצונית",
+        path: ["side_media_id"],
+      });
+    }
+
+    if (value.side_media_type === "animation_url" && !value.side_animation_url) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message: "יש להזין כתובת אנימציה חיצונית",
-        path: ["animation_url"],
+        path: ["side_animation_url"],
       });
     }
   });
@@ -270,31 +277,37 @@ function normalizeHero(raw: unknown): HomepageHeroData {
             url: secondaryButton.url,
           }
         : null,
-    media_type: normalizeHeroMediaType(raw.media_type),
-    media_id:
-      typeof raw.media_id === "string"
-        ? raw.media_id
-        : raw.media_id === null
+    background_media_id:
+      typeof raw.background_media_id === "string"
+        ? raw.background_media_id
+        : raw.background_media_id === null
           ? null
-          : defaults.media_id,
-    mobile_media_id:
-      typeof raw.mobile_media_id === "string"
-        ? raw.mobile_media_id
-        : raw.mobile_media_id === null || raw.mobile_media_id === undefined
+          : (typeof raw.media_id === "string" ? raw.media_id : null), // Fallback to old field
+    background_mobile_media_id:
+      typeof raw.background_mobile_media_id === "string"
+        ? raw.background_mobile_media_id
+        : raw.background_mobile_media_id === null || raw.background_mobile_media_id === undefined
           ? null
-          : defaults.mobile_media_id,
-    video_url:
-      typeof raw.video_url === "string"
-        ? raw.video_url
-        : raw.video_url === null
+          : (typeof raw.mobile_media_id === "string" ? raw.mobile_media_id : null), // Fallback to old field
+    side_media_type: normalizeHeroMediaType(raw.side_media_type),
+    side_media_id:
+      typeof raw.side_media_id === "string"
+        ? raw.side_media_id
+        : raw.side_media_id === null
           ? null
-          : defaults.video_url,
-    animation_url:
-      typeof raw.animation_url === "string"
-        ? raw.animation_url
-        : raw.animation_url === null
+          : defaults.side_media_id,
+    side_video_url:
+      typeof raw.side_video_url === "string"
+        ? raw.side_video_url
+        : raw.side_video_url === null
           ? null
-          : (defaults.animation_url ?? null),
+          : defaults.side_video_url,
+    side_animation_url:
+      typeof raw.side_animation_url === "string"
+        ? raw.side_animation_url
+        : raw.side_animation_url === null
+          ? null
+          : (defaults.side_animation_url ?? null),
   };
 
   const parsed = homepageHeroSchema.safeParse(merged);
@@ -365,11 +378,12 @@ export type HomepageHeroFormState = {
   heroPrimaryButtonUrl: string;
   heroSecondaryButtonLabel: string;
   heroSecondaryButtonUrl: string;
-  heroMediaType: HomepageHeroData["media_type"];
-  heroMediaId: string | null;
-  heroMobileMediaId: string | null;
-  heroVideoUrl: string;
-  heroAnimationUrl: string;
+  heroBackgroundMediaId: string | null;
+  heroBackgroundMobileMediaId: string | null;
+  heroSideMediaType: HomepageHeroData["side_media_type"];
+  heroSideMediaId: string | null;
+  heroSideVideoUrl: string;
+  heroSideAnimationUrl: string;
 };
 
 export function homepageHeroToFormState(hero: HomepageHeroData): HomepageHeroFormState {
@@ -380,11 +394,12 @@ export function homepageHeroToFormState(hero: HomepageHeroData): HomepageHeroFor
     heroPrimaryButtonUrl: hero.primary_button.url,
     heroSecondaryButtonLabel: hero.secondary_button?.label ?? "",
     heroSecondaryButtonUrl: hero.secondary_button?.url ?? "",
-    heroMediaType: hero.media_type,
-    heroMediaId: hero.media_id,
-    heroMobileMediaId: hero.mobile_media_id,
-    heroVideoUrl: hero.video_url ?? "",
-    heroAnimationUrl: hero.animation_url ?? "",
+    heroBackgroundMediaId: hero.background_media_id,
+    heroBackgroundMobileMediaId: hero.background_mobile_media_id,
+    heroSideMediaType: hero.side_media_type,
+    heroSideMediaId: hero.side_media_id,
+    heroSideVideoUrl: hero.side_video_url ?? "",
+    heroSideAnimationUrl: hero.side_animation_url ?? "",
   };
 }
 
@@ -404,16 +419,12 @@ export function formStateToHomepageHero(state: HomepageHeroFormState): HomepageH
             url: state.heroSecondaryButtonUrl,
           }
         : null,
-    media_type: state.heroMediaType,
-    media_id: state.heroMediaType === "image" ? state.heroMediaId : null,
-    mobile_media_id:
-      state.heroMediaType === "image" ? state.heroMobileMediaId : null,
-    video_url:
-      state.heroMediaType === "video_url" ? state.heroVideoUrl || null : null,
-    animation_url:
-      state.heroMediaType === "animation_url"
-        ? state.heroAnimationUrl || null
-        : null,
+    background_media_id: state.heroBackgroundMediaId,
+    background_mobile_media_id: state.heroBackgroundMobileMediaId,
+    side_media_type: state.heroSideMediaType,
+    side_media_id: state.heroSideMediaId,
+    side_video_url: state.heroSideVideoUrl || null,
+    side_animation_url: state.heroSideAnimationUrl || null,
   });
 }
 

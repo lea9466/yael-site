@@ -3,18 +3,19 @@ import type { HomepageData } from "@/lib/validations/homepage-hero";
 export function getDefaultHomepageData(): HomepageData {
   return {
     hero: {
-      title: "מאמנת אישית לאכילה מחוברת",
+      title: "מאמנת לאכילה\nמחוברת",
       subtitle: "יחד נבנה קשר בריא ומאוזן לאוכל — בלי דיאטות ובלי אשמה",
       primary_button: {
         label: "לשירותים",
         url: "/services",
       },
       secondary_button: null,
-      media_type: "image",
-      media_id: null,
-      mobile_media_id: null,
-      video_url: null,
-      animation_url: null,
+      background_media_id: null,
+      background_mobile_media_id: null,
+      side_media_type: "image",
+      side_media_id: null,
+      side_video_url: null,
+      side_animation_url: null,
     },
     short_about: {
       title: "מי אני?",

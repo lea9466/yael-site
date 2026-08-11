@@ -56,6 +56,9 @@ export function SettingsPageClient({ data }: SettingsPageClientProps) {
   );
   const [heroMobilePreview, setHeroMobilePreview] =
     useState<SettingsMediaPreview | null>(data.mediaPreviews.heroMobileImage);
+  const [heroSidePreview, setHeroSidePreview] = useState<SettingsMediaPreview | null>(
+    data.mediaPreviews.heroSideImage ?? null
+  );
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState("");
@@ -84,6 +87,7 @@ export function SettingsPageClient({ data }: SettingsPageClientProps) {
     setOgPreview(data.mediaPreviews.ogImage);
     setHeroPreview(data.mediaPreviews.heroImage);
     setHeroMobilePreview(data.mediaPreviews.heroMobileImage);
+    setHeroSidePreview(data.mediaPreviews.heroSideImage ?? null);
     setTimestamps({
       businessProfileUpdatedAt: data.businessProfileUpdatedAt,
       siteSettingsUpdatedAt: data.siteSettingsUpdatedAt,
@@ -152,6 +156,7 @@ export function SettingsPageClient({ data }: SettingsPageClientProps) {
             ogPreview={ogPreview}
             heroPreview={heroPreview}
             heroMobilePreview={heroMobilePreview}
+            heroSidePreview={heroSidePreview}
             onChange={handleChange}
             onLogoChange={(mediaId, preview) => {
               handleChange("logoMediaId", mediaId);
@@ -166,12 +171,16 @@ export function SettingsPageClient({ data }: SettingsPageClientProps) {
               setOgPreview(preview);
             }}
             onHeroImageChange={(mediaId, preview) => {
-              handleChange("heroMediaId", mediaId);
+              handleChange("heroBackgroundMediaId", mediaId);
               setHeroPreview(preview);
             }}
             onHeroMobileImageChange={(mediaId, preview) => {
-              handleChange("heroMobileMediaId", mediaId);
+              handleChange("heroBackgroundMobileMediaId", mediaId);
               setHeroMobilePreview(preview);
+            }}
+            onHeroSideImageChange={(mediaId, preview) => {
+              handleChange("heroSideMediaId", mediaId);
+              setHeroSidePreview(preview);
             }}
           />
         </div>

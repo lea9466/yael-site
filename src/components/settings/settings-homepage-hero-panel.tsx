@@ -23,6 +23,7 @@ type SettingsHomepageHeroPanelProps = {
   fieldErrors: Record<string, string>;
   heroPreview: SettingsMediaPreview | null;
   heroMobilePreview: SettingsMediaPreview | null;
+  heroSidePreview: SettingsMediaPreview | null;
   onChange: <K extends keyof SettingsFormState>(
     key: K,
     value: SettingsFormState[K]
@@ -32,6 +33,10 @@ type SettingsHomepageHeroPanelProps = {
     preview: SettingsMediaPreview | null
   ) => void;
   onHeroMobileImageChange: (
+    mediaId: string | null,
+    preview: SettingsMediaPreview | null
+  ) => void;
+  onHeroSideImageChange: (
     mediaId: string | null,
     preview: SettingsMediaPreview | null
   ) => void;
@@ -82,9 +87,11 @@ function CharacterCount({
 function HeroLivePreview({
   formState,
   heroPreview,
+  heroSidePreview,
 }: {
   formState: SettingsFormState;
   heroPreview: SettingsMediaPreview | null;
+  heroSidePreview: SettingsMediaPreview | null;
 }) {
   const hasSecondary =
     formState.heroSecondaryButtonLabel.trim().length > 0 &&
@@ -116,40 +123,49 @@ function HeroLivePreview({
         </div>
 
         <div className="relative min-h-[220px] bg-[var(--color-surface-soft)] lg:min-h-[320px]">
-          {formState.heroMediaType === "image" && heroPreview?.url ? (
+          {heroPreview?.url ? (
             <MediaPreviewRender
               url={heroPreview.url}
               alt={heroPreview.alt}
               mimeType={heroPreview.mimeType ?? "image/webp"}
               sizes="(max-width: 1024px) 100vw, 40vw"
             />
-          ) : formState.heroMediaType === "video_url" &&
-            formState.heroVideoUrl.trim() ? (
-            <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
-              <p className="text-sm font-medium text-[var(--color-text)]">
-                וידאו חיצוני
-              </p>
-              <p className="break-all text-caption text-[var(--color-text-muted)]" dir="ltr">
-                {formState.heroVideoUrl}
-              </p>
-            </div>
-          ) : formState.heroMediaType === "animation_url" &&
-            formState.heroAnimationUrl.trim() ? (
-            <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
-              <p className="text-sm font-medium text-[var(--color-text)]">
-                אנימציה חיצונית
-              </p>
-              <p className="break-all text-caption text-[var(--color-text-muted)]" dir="ltr">
-                {formState.heroAnimationUrl}
-              </p>
-            </div>
           ) : (
             <div className="flex h-full items-center justify-center p-6 text-center text-sm text-[var(--color-text-muted)]">
-              בחרו מדיה ל-Hero
+              בחרו תמונת רקע
             </div>
           )}
         </div>
       </div>
+      
+      {formState.heroSideMediaType && formState.heroSideMediaType !== "image" ? (
+        <div className="border-t border-[var(--color-border)] p-4 bg-[var(--color-surface-soft)]">
+          <p className="text-caption font-medium text-[var(--color-text-muted)] mb-2">
+            סרטון בצד
+          </p>
+          {formState.heroSideMediaType === "video_url" ? (
+            <>
+              {heroSidePreview?.url ? (
+                <p className="text-caption text-[var(--color-text)]">
+                  סרטון מספריית המדיה
+                </p>
+              ) : formState.heroSideVideoUrl.trim() ? (
+                <p className="break-all text-caption text-[var(--color-text-muted)]" dir="ltr">
+                  {formState.heroSideVideoUrl}
+                </p>
+              ) : (
+                <p className="text-caption text-[var(--color-text-muted)]">
+                  לא נבחר סרטון
+                </p>
+              )}
+            </>
+          ) : formState.heroSideMediaType === "animation_url" && formState.heroSideAnimationUrl.trim() ? (
+            <p className="break-all text-caption text-[var(--color-text-muted)]" dir="ltr">
+              {formState.heroSideAnimationUrl}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -159,9 +175,11 @@ export function SettingsHomepageHeroPanel({
   fieldErrors,
   heroPreview,
   heroMobilePreview,
+  heroSidePreview,
   onChange,
   onHeroImageChange,
   onHeroMobileImageChange,
+  onHeroSideImageChange,
 }: SettingsHomepageHeroPanelProps) {
   return (
     <div className="space-y-8">
@@ -315,117 +333,160 @@ export function SettingsHomepageHeroPanel({
         </div>
       </div>
 
-      <fieldset className="space-y-4">
-        <legend className="text-sm font-medium text-[var(--color-text)]">
-          סוג מדיה ב-Hero
-        </legend>
-        <div className="flex flex-wrap gap-3">
-          {HOMEPAGE_HERO_MEDIA_TYPES.map((mediaType) => {
-            const checked = formState.heroMediaType === mediaType;
-
-            return (
-              <label
-                key={mediaType}
-                className={cn(
-                  "admin-interactive inline-flex cursor-pointer items-center gap-2 rounded-[var(--radius-full)] px-4 py-2.5 text-sm font-medium ring-1",
-                  checked
-                    ? "bg-[var(--color-primary)] text-[var(--color-text-on-primary)] ring-[var(--color-primary)]"
-                    : "bg-[var(--color-surface)] text-[var(--color-text-muted)] ring-[var(--color-border)] hover:text-[var(--color-text)]"
-                )}
-              >
-                <input
-                  type="radio"
-                  name="hero-media-type"
-                  className="sr-only"
-                  checked={checked}
-                  onChange={() => onChange("heroMediaType", mediaType)}
-                />
-                {MEDIA_TYPE_LABELS[mediaType]}
-              </label>
-            );
-          })}
-        </div>
-        {fieldErrors["hero.media_type"] ?? fieldErrors.heroMediaType ? (
-          <p className="text-sm text-[var(--color-error)]" role="alert">
-            {fieldErrors["hero.media_type"] ?? fieldErrors.heroMediaType}
+      <div className="space-y-8">
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-[var(--color-text)]">
+            תמונת רקע
+          </h3>
+          <p className="text-caption text-[var(--color-text-muted)]">
+            תמונת רקע לדף הבית — תמיד נדרשת
           </p>
-        ) : null}
-      </fieldset>
+          <div className="space-y-8">
+            <ServiceMediaPicker
+              fieldId="field-hero-background-desktop"
+              label="רקע לדסקטופ"
+              description="בחרו תמונה מספריית המדיה או העלו קובץ חדש"
+              value={formState.heroBackgroundMediaId}
+              preview={heroPreview}
+              required
+              error={fieldErrors["hero.background_media_id"] ?? fieldErrors.heroBackgroundMediaId}
+              onChange={onHeroImageChange}
+            />
+            <HeroVideoWeightHint preview={heroPreview} />
 
-      {formState.heroMediaType === "image" ? (
-        <div className="space-y-8">
-          <ServiceMediaPicker
-            fieldId="field-hero-desktop-media"
-            label="Hero לדסקטופ"
-            description="בחרו תמונה או וידאו מספריית המדיה או העלו קובץ חדש"
-            value={formState.heroMediaId}
-            preview={heroPreview}
-            required
-            error={fieldErrors["hero.media_id"] ?? fieldErrors.heroMediaId}
-            onChange={onHeroImageChange}
-          />
-          <HeroVideoWeightHint preview={heroPreview} />
-
-          <ServiceMediaPicker
-            fieldId="field-hero-mobile-media"
-            label="Hero למובייל"
-            description="אופציונלי — אם לא נבחרה מדיה למובייל, יוצג הקובץ של הדסקטופ."
-            value={formState.heroMobileMediaId}
-            preview={heroMobilePreview}
-            error={
-              fieldErrors["hero.mobile_media_id"] ?? fieldErrors.heroMobileMediaId
-            }
-            onChange={onHeroMobileImageChange}
-          />
-          <HeroVideoWeightHint preview={heroMobilePreview} />
+            <ServiceMediaPicker
+              fieldId="field-hero-background-mobile"
+              label="רקע למובייל"
+              description="אופציונלי — אם לא נבחרה מדיה למובייל, יוצג הקובץ של הדסקטופ."
+              value={formState.heroBackgroundMobileMediaId}
+              preview={heroMobilePreview}
+              error={
+                fieldErrors["hero.background_mobile_media_id"] ?? fieldErrors.heroBackgroundMobileMediaId
+              }
+              onChange={onHeroMobileImageChange}
+            />
+            <HeroVideoWeightHint preview={heroMobilePreview} />
+          </div>
         </div>
-      ) : null}
 
-      {formState.heroMediaType === "video_url" ? (
-        <FormField
-          label="כתובת וידאו חיצונית"
-          htmlFor="field-hero-video-url"
-          hint="הזינו קישור https לווידאו חיצוני — ללא העלאה לספריית המדיה"
-          error={fieldErrors["hero.video_url"] ?? fieldErrors.heroVideoUrl}
-        >
-          <Input
-            id="field-hero-video-url"
-            type="url"
-            dir="ltr"
-            placeholder="https://"
-            value={formState.heroVideoUrl}
-            error={Boolean(
-              fieldErrors["hero.video_url"] ?? fieldErrors.heroVideoUrl
-            )}
-            onChange={(event) => onChange("heroVideoUrl", event.target.value)}
-          />
-        </FormField>
-      ) : null}
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-[var(--color-text)]">
+            סרטון בצד
+          </h3>
+          <p className="text-caption text-[var(--color-text-muted)]">
+            אופציונלי — סרטון קטן שיופיע משמאל, מעל הכותרת
+          </p>
+          
+          <fieldset className="space-y-4">
+            <legend className="text-sm font-medium text-[var(--color-text)]">
+              סוג מדיה בצד
+            </legend>
+            <div className="flex flex-wrap gap-3">
+              {HOMEPAGE_HERO_MEDIA_TYPES.map((mediaType) => {
+                const checked = formState.heroSideMediaType === mediaType;
 
-      {formState.heroMediaType === "animation_url" ? (
-        <FormField
-          label="כתובת אנימציה חיצונית"
-          htmlFor="field-hero-animation-url"
-          hint="הזינו קישור https לאנימציה חיצונית"
-          error={
-            fieldErrors["hero.animation_url"] ?? fieldErrors.heroAnimationUrl
-          }
-        >
-          <Input
-            id="field-hero-animation-url"
-            type="url"
-            dir="ltr"
-            placeholder="https://"
-            value={formState.heroAnimationUrl}
-            error={Boolean(
-              fieldErrors["hero.animation_url"] ?? fieldErrors.heroAnimationUrl
-            )}
-            onChange={(event) =>
-              onChange("heroAnimationUrl", event.target.value)
-            }
-          />
-        </FormField>
-      ) : null}
+                return (
+                  <label
+                    key={mediaType}
+                    className={cn(
+                      "admin-interactive inline-flex cursor-pointer items-center gap-2 rounded-[var(--radius-full)] px-4 py-2.5 text-sm font-medium ring-1",
+                      checked
+                        ? "bg-[var(--color-primary)] text-[var(--color-text-on-primary)] ring-[var(--color-primary)]"
+                        : "bg-[var(--color-surface)] text-[var(--color-text-muted)] ring-[var(--color-border)] hover:text-[var(--color-text)]"
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="hero-side-media-type"
+                      className="sr-only"
+                      checked={checked}
+                      onChange={() => onChange("heroSideMediaType", mediaType)}
+                    />
+                    {MEDIA_TYPE_LABELS[mediaType]}
+                  </label>
+                );
+              })}
+            </div>
+            {fieldErrors["hero.side_media_type"] ?? fieldErrors.heroSideMediaType ? (
+              <p className="text-sm text-[var(--color-error)]" role="alert">
+                {fieldErrors["hero.side_media_type"] ?? fieldErrors.heroSideMediaType}
+              </p>
+            ) : null}
+          </fieldset>
+
+          {formState.heroSideMediaType === "image" ? (
+            <ServiceMediaPicker
+              fieldId="field-hero-side-image"
+              label="תמונה בצד"
+              description="בחרו תמונה מספריית המדיה או העלו קובץ חדש"
+              value={formState.heroSideMediaId}
+              preview={heroSidePreview}
+              error={fieldErrors["hero.side_media_id"] ?? fieldErrors.heroSideMediaId}
+              onChange={onHeroSideImageChange}
+            />
+          ) : null}
+
+          {formState.heroSideMediaType === "video_url" ? (
+            <div className="space-y-4">
+              <ServiceMediaPicker
+                fieldId="field-hero-side-video"
+                label="סרטון מספריית המדיה"
+                description="בחרו סרטון מספריית המדיה או העלו קובץ חדש"
+                value={formState.heroSideMediaId}
+                preview={heroSidePreview}
+                error={fieldErrors["hero.side_media_id"] ?? fieldErrors.heroSideMediaId}
+                onChange={onHeroSideImageChange}
+              />
+              <div className="text-center text-sm text-[var(--color-text-muted)]">
+                או
+              </div>
+              <FormField
+                label="כתובת וידאו חיצונית"
+                htmlFor="field-hero-side-video-url"
+                hint="הזינו קישור https לווידאו חיצוני (YouTube, Vimeo)"
+                error={fieldErrors["hero.side_video_url"] ?? fieldErrors.heroSideVideoUrl}
+              >
+                <Input
+                  id="field-hero-side-video-url"
+                  type="url"
+                  dir="ltr"
+                  placeholder="https://"
+                  value={formState.heroSideVideoUrl}
+                  error={Boolean(
+                    fieldErrors["hero.side_video_url"] ?? fieldErrors.heroSideVideoUrl
+                  )}
+                  onChange={(event) => onChange("heroSideVideoUrl", event.target.value)}
+                />
+              </FormField>
+            </div>
+          ) : null}
+
+          {formState.heroSideMediaType === "animation_url" ? (
+            <FormField
+              label="כתובת אנימציה חיצונית"
+              htmlFor="field-hero-side-animation-url"
+              hint="הזינו קישור https לאנימציה חיצונית"
+              error={
+                fieldErrors["hero.side_animation_url"] ?? fieldErrors.heroSideAnimationUrl
+              }
+            >
+              <Input
+                id="field-hero-side-animation-url"
+                type="url"
+                dir="ltr"
+                placeholder="https://"
+                value={formState.heroSideAnimationUrl}
+                error={Boolean(
+                  fieldErrors["hero.side_animation_url"] ?? fieldErrors.heroSideAnimationUrl
+                )}
+                onChange={(event) =>
+                  onChange("heroSideAnimationUrl", event.target.value)
+                }
+              />
+            </FormField>
+          ) : null}
+        </div>
+      </div>
 
       <p className="text-caption text-[var(--color-text-muted)]">
         סדר מקטעי דף הבית, מספר הפריטים בכל מקטע וקישורי הניווט נשארים קבועים

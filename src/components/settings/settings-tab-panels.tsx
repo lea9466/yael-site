@@ -26,6 +26,7 @@ type SettingsTabPanelsProps = {
   ogPreview: SelectedMedia | null;
   heroPreview: SelectedMedia | null;
   heroMobilePreview: SelectedMedia | null;
+  heroSidePreview: SelectedMedia | null;
   onChange: <K extends keyof SettingsFormState>(
     key: K,
     value: SettingsFormState[K]
@@ -41,6 +42,10 @@ type SettingsTabPanelsProps = {
     preview: SettingsMediaPreview | null
   ) => void;
   onHeroMobileImageChange: (
+    mediaId: string | null,
+    preview: SettingsMediaPreview | null
+  ) => void;
+  onHeroSideImageChange: (
     mediaId: string | null,
     preview: SettingsMediaPreview | null
   ) => void;
@@ -93,12 +98,14 @@ export function SettingsTabPanels({
   ogPreview,
   heroPreview,
   heroMobilePreview,
+  heroSidePreview,
   onChange,
   onLogoChange,
   onFaviconChange,
   onOgChange,
   onHeroImageChange,
   onHeroMobileImageChange,
+  onHeroSideImageChange,
 }: SettingsTabPanelsProps) {
   return (
     <div className="min-w-0 flex-1">
@@ -192,9 +199,11 @@ export function SettingsTabPanels({
             fieldErrors={fieldErrors}
             heroPreview={heroPreview}
             heroMobilePreview={heroMobilePreview}
+            heroSidePreview={heroSidePreview}
             onChange={onChange}
             onHeroImageChange={onHeroImageChange}
             onHeroMobileImageChange={onHeroMobileImageChange}
+            onHeroSideImageChange={onHeroSideImageChange}
           />
           <SettingsHomepageShortAboutPanel
             formState={formState}

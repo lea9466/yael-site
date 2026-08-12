@@ -169,15 +169,23 @@
     min-width: 0;
     text-align: right;
     direction: rtl;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-self: start;
+    margin-top: 0;
+    padding-top: 0;
 }
 
 .hero-video-side {
     position: relative;
     grid-column: 1;
     justify-self: start;
+    align-self: start;
     width: 100%;
     max-width: 36rem;
     aspect-ratio: 16 / 9;
+    transform: translateY(15px);
     overflow: hidden;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
@@ -213,7 +221,8 @@
 }
 
 .hero-title {
-    margin: 0 0 1rem;
+    margin: 0;
+    padding: 0;
     color: var(--color-primary);
     font-size: 3rem;
     font-weight: 700;

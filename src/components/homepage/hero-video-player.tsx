@@ -12,8 +12,8 @@ type HeroVideoPlayerProps = {
   mimeType: string;
   posterUrl: string | null;
   title: string;
-  reducedMotion: boolean;
-};
+  reducedMotion: boolean;  controls?: boolean;
+  muted?: boolean;};
 
 function HeroVideoPosterOnly({
   posterUrl,
@@ -38,6 +38,8 @@ function HeroVideoPlayerAutoplay({
   mimeType,
   posterUrl,
   title,
+  controls = false,
+  muted = true,
 }: Omit<HeroVideoPlayerProps, "reducedMotion">) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [readiness, setReadiness] = useState<HeroVideoReadiness>("loading");
@@ -52,32 +54,35 @@ function HeroVideoPlayerAutoplay({
 
   const showVideo = readiness === "ready";
   const showPosterLayer = !showVideo;
+  const shouldAutoplay = !controls;
+  const shouldLoop = !controls;
 
   return (
     <div className="hero-media-stack">
       {posterUrl ? (
         <div
-          aria-hidden="true"
+          aria-hidden={!controls}
           className={cn("hero-poster", !showPosterLayer && "hero-poster--hidden")}
         >
           <HeroPosterImage url={posterUrl} alt={title} priority />
         </div>
       ) : (
         <div
-          aria-hidden="true"
+          aria-hidden={!controls}
           className={cn("hero-fallback", !showPosterLayer && "hero-poster--hidden")}
         />
       )}
 
       <video
         ref={videoRef}
-        aria-hidden="true"
+        aria-hidden={!controls}
         className={cn("hero-video", showVideo && "hero-video--visible")}
-        autoPlay
-        muted
-        loop
+        autoPlay={shouldAutoplay}
+        muted={muted}
+        loop={shouldLoop}
+        controls={controls}
         playsInline
-        preload="auto"
+        preload={controls ? "metadata" : "auto"}
         onLoadedData={markReady}
         onCanPlay={markReady}
         onError={markError}
@@ -94,6 +99,8 @@ export function HeroVideoPlayer({
   posterUrl,
   title,
   reducedMotion,
+  controls,
+  muted,
 }: HeroVideoPlayerProps) {
   if (reducedMotion) {
     return <HeroVideoPosterOnly posterUrl={posterUrl} title={title} />;
@@ -106,6 +113,8 @@ export function HeroVideoPlayer({
       mimeType={mimeType}
       posterUrl={posterUrl}
       title={title}
+      controls={controls}
+      muted={muted}
     />
   );
 }

@@ -144,27 +144,22 @@ function SideHeroMedia({
           posterUrl={null}
           title={title}
           reducedMotion={false}
+          controls
+          muted={false}
         />
       );
     }
-    // Otherwise use external URL
+
     if (hero.side_video_url) {
       return <HeroVideoMedia url={hero.side_video_url} title={title} />;
     }
   }
 
-  if (hero.side_media_type === "animation_url" && hero.side_animation_url) {
-    return <HeroAnimationMedia url={hero.side_animation_url} title={title} />;
+  if (hero.side_media_type === "animation_url") {
+    return <HeroAnimationMedia url={hero.side_animation_url ?? ""} title={title} />;
   }
 
   return null;
-}
-
-function hasHeroVisualMedia(
-  hero: HomepageHeroData,
-  desktopMediaPreview: HomepageHeroMediaPreview | null
-): boolean {
-  return Boolean(hero.background_media_id && desktopMediaPreview?.url);
 }
 
 function hasSideHeroMedia(hero: HomepageHeroData): boolean {
@@ -181,6 +176,17 @@ function hasSideHeroMedia(hero: HomepageHeroData): boolean {
   }
 
   return false;
+}
+
+function hasHeroVisualMedia(
+  hero: HomepageHeroData,
+  desktopMediaPreview: HomepageHeroMediaPreview | null
+): boolean {
+  return Boolean(
+    desktopMediaPreview?.url ||
+      hero.background_media_id ||
+      hero.background_mobile_media_id
+  );
 }
 
 function HeroTitle({ title }: { title: string }) {

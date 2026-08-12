@@ -137,7 +137,7 @@ function HeroLivePreview({
           )}
         </div>
       </div>
-
+      
       {formState.heroSideMediaType && formState.heroSideMediaType !== "image" ? (
         <div className="border-t border-[var(--color-border)] p-4 bg-[var(--color-surface-soft)]">
           <p className="text-caption font-medium text-[var(--color-text-muted)] mb-2">
@@ -245,7 +245,7 @@ export function SettingsHomepageHeroPanel({
               value={formState.heroPrimaryButtonLabel}
               error={Boolean(
                 fieldErrors["hero.primary_button.label"] ??
-                fieldErrors.heroPrimaryButtonLabel
+                  fieldErrors.heroPrimaryButtonLabel
               )}
               onChange={(event) =>
                 onChange("heroPrimaryButtonLabel", event.target.value)
@@ -272,7 +272,7 @@ export function SettingsHomepageHeroPanel({
               value={formState.heroPrimaryButtonUrl}
               error={Boolean(
                 fieldErrors["hero.primary_button.url"] ??
-                fieldErrors.heroPrimaryButtonUrl
+                  fieldErrors.heroPrimaryButtonUrl
               )}
               onChange={(event) =>
                 onChange("heroPrimaryButtonUrl", event.target.value)
@@ -304,7 +304,7 @@ export function SettingsHomepageHeroPanel({
               value={formState.heroSecondaryButtonLabel}
               error={Boolean(
                 fieldErrors["hero.secondary_button.label"] ??
-                fieldErrors.heroSecondaryButtonLabel
+                  fieldErrors.heroSecondaryButtonLabel
               )}
               onChange={(event) =>
                 onChange("heroSecondaryButtonLabel", event.target.value)
@@ -327,7 +327,7 @@ export function SettingsHomepageHeroPanel({
               value={formState.heroSecondaryButtonUrl}
               error={Boolean(
                 fieldErrors["hero.secondary_button.url"] ??
-                fieldErrors.heroSecondaryButtonUrl
+                  fieldErrors.heroSecondaryButtonUrl
               )}
               onChange={(event) =>
                 onChange("heroSecondaryButtonUrl", event.target.value)
@@ -380,7 +380,7 @@ export function SettingsHomepageHeroPanel({
           <p className="text-caption text-[var(--color-text-muted)]">
             אופציונלי — סרטון קטן שיופיע משמאל, מעל הכותרת
           </p>
-
+          
           <fieldset className="space-y-4">
             <legend className="text-sm font-medium text-[var(--color-text)]">
               סוג מדיה בצד

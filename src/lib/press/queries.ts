@@ -1,6 +1,9 @@
 import "server-only";
 
-import { createClient, isSupabaseConfigured } from "@/lib/auth/session";
+import {
+  createPublicClient,
+  isSupabaseConfigured,
+} from "@/lib/auth/session";
 import { MEDIA_LIBRARY_SELECT_COLUMNS, PDF_MIME_TYPE } from "@/lib/media/constants";
 import { isPdfMimeType } from "@/lib/media/mime";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
@@ -76,7 +79,7 @@ export async function isPressSlugTaken(
     return false;
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   let query = supabase
     .from("press_articles")
     .select("id")
@@ -101,7 +104,7 @@ export async function verifyMediaExists(mediaId: string): Promise<boolean> {
     return false;
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("media_library")
     .select("id")
@@ -119,7 +122,7 @@ export async function verifyMediaMime(
     return false;
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("media_library")
     .select("mime_type")
@@ -145,7 +148,7 @@ export async function fetchPressArticlesList(
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const sort = SORT_CONFIG[query.sort];
     const from = (query.page - 1) * PRESS_PAGE_SIZE;
     const to = from + PRESS_PAGE_SIZE - 1;
@@ -221,7 +224,7 @@ export async function fetchPressArticleById(
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("press_articles")
       .select(
@@ -256,7 +259,7 @@ export async function fetchPublishedPressArticles(): Promise<
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("press_articles")
       .select(PRESS_SELECT_COLUMNS)
@@ -293,7 +296,7 @@ export async function fetchPublishedPressArticleBySlug(
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("press_articles")
       .select(
@@ -340,7 +343,7 @@ export async function hasPublishedPressArticles(): Promise<boolean> {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { count, error } = await supabase
       .from("press_articles")
       .select("*", { count: "exact", head: true })
@@ -364,7 +367,7 @@ export async function fetchPublishedPressSlugs(): Promise<
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("press_articles")
       .select("slug, updated_at")

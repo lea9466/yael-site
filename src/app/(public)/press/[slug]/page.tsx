@@ -13,6 +13,9 @@ import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { shortenForSeoDescription } from "@/lib/seo/resolve";
 
+/** Avoid Next.js cache-tag header crash on non-ASCII (Hebrew) slugs. */
+export const dynamic = "force-dynamic";
+
 type PressDetailPageProps = {
   params: Promise<{ slug: string }>;
 };

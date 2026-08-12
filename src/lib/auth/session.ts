@@ -44,6 +44,21 @@ export async function createClient() {
   });
 }
 
+export function createPublicClient() {
+  const env = getSupabaseEnv();
+
+  if (!env) {
+    throw new Error("Missing Supabase environment variables.");
+  }
+
+  return createServerClient(env.url, env.anonKey, {
+    cookies: {
+      getAll: async () => [],
+      setAll: async () => {},
+    },
+  });
+}
+
 export async function createActionClient(rememberMe: boolean) {
   const env = getSupabaseEnv();
 

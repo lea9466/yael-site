@@ -1,4 +1,7 @@
-import { createClient, isSupabaseConfigured } from "@/lib/auth/session";
+import {
+  createPublicClient,
+  isSupabaseConfigured,
+} from "@/lib/auth/session";
 import { getAboutPageContent } from "@/lib/about/queries";
 import { getHomepageContent as fetchHomepageContent } from "@/lib/homepage/queries";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
@@ -79,7 +82,7 @@ async function fetchMediaPreviewsByIds(
     return new Map();
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("media_library")
     .select(MEDIA_SELECT_COLUMNS)
@@ -113,7 +116,7 @@ async function fetchCoverMediaMap(
     return new Map();
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("media_library")
     .select("id, storage_path, alt_text")
@@ -143,7 +146,7 @@ async function fetchCategorySummaries(
     return new Map();
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("categories")
     .select("id, name, slug")
@@ -173,7 +176,7 @@ async function fetchServiceTitles(
     return titles;
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("services")
     .select("id, title")
@@ -195,7 +198,7 @@ export async function getWebsiteSettings(): Promise<WebsiteSettingsPublic> {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("site_content")
       .select("key, data")
@@ -256,7 +259,7 @@ export async function getPublishedServices(): Promise<PublicServiceSummary[]> {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("services")
       .select(SERVICE_PUBLIC_COLUMNS)
@@ -301,7 +304,7 @@ export async function getPublishedServiceBySlug(
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("services")
       .select(SERVICE_DETAIL_COLUMNS)
@@ -354,7 +357,7 @@ export async function getPublishedRecipes(options?: {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const categorySlug = options?.categorySlug?.trim();
 
     let categoryId: string | null = null;
@@ -435,7 +438,7 @@ export async function getRecipeCategoryBySlug(
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("categories")
       .select("id, name, slug")
@@ -459,7 +462,7 @@ export async function getPublishedPosts(): Promise<PublicPostSummary[]> {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("articles")
       .select(ARTICLE_PUBLIC_COLUMNS)
@@ -508,7 +511,7 @@ export async function getPublishedTestimonials(): Promise<
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("testimonials")
       .select(TESTIMONIAL_PUBLIC_COLUMNS)
@@ -547,7 +550,7 @@ export async function getPublishedTestimonialsByServiceId(
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("testimonials")
       .select(TESTIMONIAL_PUBLIC_COLUMNS)
@@ -582,7 +585,7 @@ export async function getPublishedServiceSlugs(): Promise<PublicContentSlug[]> {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("services")
       .select("slug, updated_at")
@@ -609,7 +612,7 @@ export async function getPublishedRecipeSlugs(): Promise<
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("recipes")
       .select("slug, updated_at, category_id")
@@ -641,7 +644,7 @@ export async function getPublishedRecipeCategorySlugs(): Promise<
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("categories")
       .select("slug, created_at")
@@ -666,7 +669,7 @@ export async function getPublishedPostSlugs(): Promise<PublicPostSitemapEntry[]>
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("articles")
       .select("slug, category_id, updated_at")
@@ -698,7 +701,7 @@ export async function getPublishedBlogCategorySlugs(): Promise<
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("categories")
       .select("slug, created_at")

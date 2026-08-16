@@ -37,7 +37,12 @@ function revalidateContactMessagePaths(messageId?: string) {
   }
 }
 
-function mapDatabaseError(): ContactMessageActionResult {
+function mapDatabaseError(
+  context: string,
+  error: unknown
+): ContactMessageActionResult {
+  console.error(`[contact-messages] ${context}`, error);
+
   return {
     success: false,
     error: CONTACT_MESSAGE_ERRORS.generic,
@@ -76,7 +81,7 @@ export async function updateContactMessageStatusAction(input: {
     .eq("id", parsed.data.id);
 
   if (error) {
-    return mapDatabaseError();
+    return mapDatabaseError("updateContactMessageStatusAction update failed", error);
   }
 
   revalidateContactMessagePaths(parsed.data.id);
@@ -121,7 +126,7 @@ export async function deleteContactMessageAction(input: {
     .eq("id", existing.id);
 
   if (error) {
-    return mapDatabaseError();
+    return mapDatabaseError("deleteContactMessageAction delete failed", error);
   }
 
   revalidateContactMessagePaths(existing.id);

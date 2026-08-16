@@ -36,6 +36,12 @@ export async function fetchCertificatesContentSnapshot(): Promise<CertificatesCo
       .maybeSingle();
 
     if (error || !data) {
+      if (error) {
+        console.error(
+          "[certificates] fetchCertificatesContentSnapshot query failed",
+          error
+        );
+      }
       return null;
     }
 
@@ -43,6 +49,10 @@ export async function fetchCertificatesContentSnapshot(): Promise<CertificatesCo
     const parsed = certificatesDataSchema.safeParse(row.data);
 
     if (!parsed.success) {
+      console.error(
+        "[certificates] fetchCertificatesContentSnapshot invalid stored data",
+        parsed.error
+      );
       return null;
     }
 
@@ -50,7 +60,8 @@ export async function fetchCertificatesContentSnapshot(): Promise<CertificatesCo
       data: parsed.data,
       updatedAt: row.updated_at,
     };
-  } catch {
+  } catch (err) {
+    console.error("[certificates] fetchCertificatesContentSnapshot threw", err);
     return null;
   }
 }

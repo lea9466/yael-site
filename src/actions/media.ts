@@ -222,6 +222,7 @@ export async function updateMediaAltTextAction(
       .maybeSingle();
 
     if (error) {
+      console.error("[media] updateMediaAltTextAction update failed", error);
       return { success: false, error: MEDIA_ERRORS.generic };
     }
 
@@ -233,7 +234,8 @@ export async function updateMediaAltTextAction(
       success: true,
       media: updated as MediaRecord,
     };
-  } catch {
+  } catch (err) {
+    console.error("[media] updateMediaAltTextAction threw", err);
     return { success: false, error: MEDIA_ERRORS.generic };
   }
 }
@@ -263,6 +265,9 @@ export async function searchMediaPickerAction(
   const data = await fetchMediaLibrary(parsed.data);
 
   if (!data) {
+    console.error(
+      "[media] searchMediaPickerAction: fetchMediaLibrary returned null"
+    );
     return { success: false, items: [], totalPages: 1, error: MEDIA_ERRORS.generic };
   }
 

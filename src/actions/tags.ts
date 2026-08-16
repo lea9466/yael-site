@@ -93,6 +93,8 @@ function mapDatabaseError(error: {
   code?: string;
   message?: string;
 }): TagActionResult {
+  console.error("[tags] database error", error);
+
   if (error.code === "23505") {
     if (error.message?.includes("slug")) {
       return {

@@ -251,6 +251,7 @@ async function syncRecipeTags(
     .eq("recipe_id", recipeId);
 
   if (deleteError) {
+    console.error("[recipes] syncRecipeTags delete failed", deleteError);
     return false;
   }
 
@@ -264,6 +265,10 @@ async function syncRecipeTags(
   }));
 
   const { error: insertError } = await supabase.from("recipe_tags").insert(rows);
+
+  if (insertError) {
+    console.error("[recipes] syncRecipeTags insert failed", insertError);
+  }
 
   return !insertError;
 }
@@ -333,6 +338,7 @@ export async function createRecipeAction(
     .single();
 
   if (error || !inserted) {
+    console.error("[recipes] createRecipeAction insert failed", error);
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
@@ -422,6 +428,7 @@ export async function updateRecipeAction(
     .eq("id", data.id);
 
   if (error) {
+    console.error("[recipes] recipe update failed", error);
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
@@ -495,6 +502,7 @@ export async function publishRecipeAction(
     .eq("id", data.id);
 
   if (error) {
+    console.error("[recipes] recipe update failed", error);
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
@@ -561,6 +569,7 @@ export async function duplicateRecipeAction(
     .single();
 
   if (error || !inserted) {
+    console.error("[recipes] duplicateRecipeAction insert failed", error);
     return { success: false, error: RECIPE_ERRORS.duplicateFailed };
   }
 
@@ -618,6 +627,7 @@ export async function quickPublishRecipeAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[recipes] quickPublishRecipeAction update failed", error);
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
@@ -661,6 +671,7 @@ export async function unpublishRecipeAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[recipes] unpublishRecipeAction update failed", error);
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
@@ -700,6 +711,7 @@ export async function archiveRecipeAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[recipes] archiveRecipeAction update failed", error);
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
@@ -739,6 +751,7 @@ export async function restoreRecipeToDraftAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[recipes] restoreRecipeToDraftAction update failed", error);
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
@@ -784,6 +797,7 @@ export async function restoreAndPublishRecipeAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[recipes] restoreAndPublishRecipeAction update failed", error);
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
@@ -823,6 +837,10 @@ export async function permanentlyDeleteRecipeAction(
     .eq("recipe_id", parsed.data.id);
 
   if (tagsError) {
+    console.error(
+      "[recipes] permanentlyDeleteRecipeAction tag delete failed",
+      tagsError
+    );
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 
@@ -832,6 +850,7 @@ export async function permanentlyDeleteRecipeAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[recipes] permanentlyDeleteRecipeAction delete failed", error);
     return { success: false, error: RECIPE_ERRORS.generic };
   }
 

@@ -246,6 +246,7 @@ export async function createServiceAction(
     .single();
 
   if (error || !inserted) {
+    console.error("[services] createServiceAction insert failed", error);
     return { success: false, error: SERVICE_ERRORS.generic };
   }
 
@@ -312,6 +313,7 @@ export async function updateServiceAction(
     .eq("id", data.id);
 
   if (error) {
+    console.error("[services] updateServiceAction update failed", error);
     return { success: false, error: SERVICE_ERRORS.generic };
   }
 
@@ -364,6 +366,7 @@ export async function publishServiceAction(
     .eq("id", data.id);
 
   if (error) {
+    console.error("[services] publishServiceAction update failed", error);
     return { success: false, error: SERVICE_ERRORS.generic };
   }
 
@@ -418,6 +421,7 @@ export async function duplicateServiceAction(
     .single();
 
   if (error || !inserted) {
+    console.error("[services] duplicateServiceAction insert failed", error);
     return { success: false, error: SERVICE_ERRORS.duplicateFailed };
   }
 
@@ -475,6 +479,7 @@ export async function quickPublishServiceAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[services] quickPublishServiceAction update failed", error);
     return { success: false, error: SERVICE_ERRORS.generic };
   }
 
@@ -514,6 +519,7 @@ export async function unpublishServiceAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[services] unpublishServiceAction update failed", error);
     return { success: false, error: SERVICE_ERRORS.generic };
   }
 
@@ -543,6 +549,7 @@ export async function archiveServiceAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[services] archiveServiceAction update failed", error);
     return { success: false, error: SERVICE_ERRORS.generic };
   }
 
@@ -602,6 +609,7 @@ export async function restoreServiceAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[services] restoreServiceAction update failed", error);
     return { success: false, error: SERVICE_ERRORS.generic };
   }
 
@@ -637,6 +645,7 @@ export async function permanentlyDeleteServiceAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[services] permanentlyDeleteServiceAction delete failed", error);
     return { success: false, error: SERVICE_ERRORS.generic };
   }
 

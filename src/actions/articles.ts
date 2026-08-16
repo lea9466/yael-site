@@ -225,6 +225,7 @@ async function syncArticleTags(
     .eq("article_id", articleId);
 
   if (deleteError) {
+    console.error("[articles] syncArticleTags delete failed", deleteError);
     return false;
   }
 
@@ -238,6 +239,10 @@ async function syncArticleTags(
   }));
 
   const { error: insertError } = await supabase.from("article_tags").insert(rows);
+
+  if (insertError) {
+    console.error("[articles] syncArticleTags insert failed", insertError);
+  }
 
   return !insertError;
 }
@@ -308,6 +313,7 @@ export async function createArticleAction(
     .single();
 
   if (error || !inserted) {
+    console.error("[articles] createArticleAction insert failed", error);
     return { success: false, error: ARTICLE_ERRORS.generic };
   }
 
@@ -398,6 +404,7 @@ export async function updateArticleAction(
     .eq("id", data.id);
 
   if (error) {
+    console.error("[articles] article update failed", error);
     return { success: false, error: ARTICLE_ERRORS.generic };
   }
 
@@ -472,6 +479,7 @@ export async function publishArticleAction(
     .eq("id", data.id);
 
   if (error) {
+    console.error("[articles] article update failed", error);
     return { success: false, error: ARTICLE_ERRORS.generic };
   }
 
@@ -537,6 +545,7 @@ export async function duplicateArticleAction(
     .single();
 
   if (error || !inserted) {
+    console.error("[articles] duplicateArticleAction insert failed", error);
     return { success: false, error: ARTICLE_ERRORS.duplicateFailed };
   }
 
@@ -594,6 +603,7 @@ export async function quickPublishArticleAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[articles] quickPublishArticleAction update failed", error);
     return { success: false, error: ARTICLE_ERRORS.generic };
   }
 
@@ -633,6 +643,7 @@ export async function unpublishArticleAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[articles] unpublishArticleAction update failed", error);
     return { success: false, error: ARTICLE_ERRORS.generic };
   }
 
@@ -662,6 +673,7 @@ export async function archiveArticleAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[articles] archiveArticleAction update failed", error);
     return { success: false, error: ARTICLE_ERRORS.generic };
   }
 
@@ -697,6 +709,7 @@ export async function restoreArticleToDraftAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[articles] restoreArticleToDraftAction update failed", error);
     return { success: false, error: ARTICLE_ERRORS.generic };
   }
 
@@ -738,6 +751,10 @@ export async function restoreAndPublishArticleAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error(
+      "[articles] restoreAndPublishArticleAction update failed",
+      error
+    );
     return { success: false, error: ARTICLE_ERRORS.generic };
   }
 
@@ -773,6 +790,10 @@ export async function permanentlyDeleteArticleAction(
     .eq("article_id", parsed.data.id);
 
   if (tagsError) {
+    console.error(
+      "[articles] permanentlyDeleteArticleAction tag delete failed",
+      tagsError
+    );
     return { success: false, error: ARTICLE_ERRORS.generic };
   }
 
@@ -782,6 +803,7 @@ export async function permanentlyDeleteArticleAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[articles] permanentlyDeleteArticleAction delete failed", error);
     return { success: false, error: ARTICLE_ERRORS.generic };
   }
 

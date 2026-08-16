@@ -48,7 +48,8 @@ export async function loginAction(input: LoginInput): Promise<LoginResult> {
     }
 
     return { success: true };
-  } catch {
+  } catch (err) {
+    console.error("[auth] loginAction threw", err);
     return {
       success: false,
       error: AUTH_ERRORS.generic,
@@ -65,7 +66,8 @@ export async function logoutAction(): Promise<LogoutResult> {
     cookieStore.delete(ADMIN_LAST_ACTIVITY_COOKIE);
 
     return { success: true };
-  } catch {
+  } catch (err) {
+    console.error("[auth] logoutAction threw", err);
     return {
       success: false,
       error: AUTH_ERRORS.generic,

@@ -53,7 +53,12 @@ function revalidateCertificatePaths() {
   revalidatePath("/");
 }
 
-function mapDatabaseError(): CertificateActionResult {
+function mapDatabaseError(
+  context: string,
+  error?: unknown
+): CertificateActionResult {
+  console.error(`[certificates] ${context}`, error);
+
   return {
     success: false,
     error: CERTIFICATE_ERRORS.generic,
@@ -99,7 +104,7 @@ async function persistCertificatesData(
     .maybeSingle();
 
   if (error) {
-    return mapDatabaseError();
+    return mapDatabaseError("persistCertificatesData update failed", error);
   }
 
   if (!data) {
@@ -132,7 +137,7 @@ async function loadCertificatesForMutation(): Promise<
   const snapshot = await fetchCertificatesContentSnapshot();
 
   if (!snapshot) {
-    return mapDatabaseError();
+    return mapDatabaseError("loadCertificatesForMutation snapshot missing");
   }
 
   return {

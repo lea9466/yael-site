@@ -54,7 +54,12 @@ function revalidateTestimonialPaths(
   revalidatePath("/admin/services", "layout");
 }
 
-function mapDatabaseError(): TestimonialActionResult {
+function mapDatabaseError(
+  context: string,
+  error: unknown
+): TestimonialActionResult {
+  console.error(`[testimonials] ${context}`, error);
+
   return {
     success: false,
     error: TESTIMONIAL_ERRORS.generic,
@@ -121,7 +126,7 @@ export async function createTestimonialAction(
     .single();
 
   if (error || !data) {
-    return mapDatabaseError();
+    return mapDatabaseError("createTestimonialAction insert failed", error);
   }
 
   revalidateTestimonialPaths(data.id, parsed.data.service_id);
@@ -167,7 +172,7 @@ export async function updateTestimonialAction(
     .eq("id", parsed.data.id);
 
   if (error) {
-    return mapDatabaseError();
+    return mapDatabaseError("updateTestimonialAction update failed", error);
   }
 
   revalidateTestimonialPaths(
@@ -213,7 +218,7 @@ export async function deleteTestimonialAction(input: {
     .eq("id", existing.id);
 
   if (error) {
-    return mapDatabaseError();
+    return mapDatabaseError("deleteTestimonialAction delete failed", error);
   }
 
   revalidateTestimonialPaths(existing.id, existing.service_id);
@@ -285,7 +290,10 @@ export async function linkTestimonialToServiceAction(input: {
     .eq("id", testimonial.id);
 
   if (error) {
-    return mapDatabaseError();
+    return mapDatabaseError(
+      "linkTestimonialToServiceAction update failed",
+      error
+    );
   }
 
   revalidateTestimonialPaths(testimonial.id, parsed.data.serviceId);
@@ -334,7 +342,10 @@ export async function unlinkTestimonialFromServiceAction(input: {
     .eq("service_id", parsed.data.serviceId);
 
   if (error) {
-    return mapDatabaseError();
+    return mapDatabaseError(
+      "unlinkTestimonialFromServiceAction update failed",
+      error
+    );
   }
 
   revalidateTestimonialPaths(testimonial.id, parsed.data.serviceId);

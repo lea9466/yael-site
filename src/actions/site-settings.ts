@@ -83,6 +83,7 @@ async function persistSiteContentRow(
     .maybeSingle();
 
   if (error) {
+    console.error(`[site-settings] persistSiteContentRow(${key}) failed`, error);
     return { success: false, error: SETTINGS_ERRORS.generic };
   }
 
@@ -168,6 +169,9 @@ export async function saveSiteSettingsAction(
   const existingHomepage = await fetchHomepageSiteContent();
 
   if (!existingHomepage) {
+    console.error(
+      "[site-settings] saveSiteSettingsAction: fetchHomepageSiteContent returned null"
+    );
     return { success: false, error: HOMEPAGE_ERRORS.generic };
   }
 

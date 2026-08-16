@@ -95,6 +95,7 @@ export async function saveAboutPageAction(
     .maybeSingle();
 
   if (error) {
+    console.error("[about] saveAboutPageAction update failed", error);
     return { success: false, error: ABOUT_ERRORS.generic };
   }
 

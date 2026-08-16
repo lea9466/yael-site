@@ -97,6 +97,8 @@ function mapDatabaseError(error: {
   code?: string;
   message?: string;
 }): CategoryActionResult {
+  console.error("[categories] database error", error);
+
   if (error.code === "23505") {
     if (error.message?.includes("slug")) {
       return {

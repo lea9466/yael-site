@@ -192,6 +192,7 @@ export async function createPressArticleAction(
     .single();
 
   if (error || !data) {
+    console.error("[press] createPressArticleAction insert failed", error);
     return { success: false, error: PRESS_ERRORS.generic };
   }
 
@@ -252,6 +253,7 @@ export async function updatePressArticleAction(
     .eq("id", idParsed.data.id);
 
   if (error) {
+    console.error("[press] updatePressArticleAction update failed", error);
     return { success: false, error: PRESS_ERRORS.generic };
   }
 
@@ -287,6 +289,7 @@ export async function deletePressArticleAction(
     .eq("id", parsed.data.id);
 
   if (error) {
+    console.error("[press] deletePressArticleAction delete failed", error);
     return { success: false, error: PRESS_ERRORS.generic };
   }
 

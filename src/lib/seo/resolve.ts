@@ -109,14 +109,7 @@ export function resolveRecipeSeo(input: {
   });
 }
 
-export function buildArticleCanonicalUrl(
-  slug: string,
-  categorySlug?: string | null
-): string {
-  if (categorySlug) {
-    return buildCanonicalUrl(`/blog/${categorySlug}/${slug}`);
-  }
-
+export function buildArticleCanonicalUrl(slug: string): string {
   return buildCanonicalUrl(buildContentPath("/blog", slug));
 }
 
@@ -124,7 +117,6 @@ export function resolveArticleSeo(input: {
   title: string;
   body: string;
   slug: string;
-  categorySlug?: string | null;
   seo: StoredSeo;
 }): ResolvedSeo {
   return resolveStoredSeo({
@@ -132,7 +124,6 @@ export function resolveArticleSeo(input: {
     description: input.body,
     slug: input.slug,
     seo: input.seo,
-    buildCanonical: (resolvedSlug) =>
-      buildArticleCanonicalUrl(resolvedSlug, input.categorySlug),
+    buildCanonical: buildArticleCanonicalUrl,
   });
 }

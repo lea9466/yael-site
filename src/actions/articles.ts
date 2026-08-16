@@ -533,7 +533,6 @@ export async function duplicateArticleAction(
       body: source.body,
       cover_media_id: source.cover_media_id,
       seo_og_media_id: source.seo_og_media_id,
-      category_id: source.category_id,
       reading_time_minutes: source.reading_time_minutes,
       content: source.content,
       seo: source.seo,

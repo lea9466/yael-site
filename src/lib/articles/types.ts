@@ -75,7 +75,6 @@ export type ArticleRecord = {
   body: string;
   cover_media_id: string;
   seo_og_media_id: string | null;
-  category_id: string;
   reading_time_minutes: number;
   content: ArticleContent;
   seo: ArticleSeo;
@@ -91,23 +90,13 @@ export type ArticleTagSummary = {
   name: string;
 };
 
-export type ArticleCategorySummary = {
-  id: string;
-  name: string;
-  slug: string;
-};
-
 export type ArticleListItem = ArticleRecord & {
-  categoryName: string | null;
-  categorySlug: string | null;
   coverUrl: string | null;
   coverAlt: string | null;
   tagNames: string[];
 };
 
 export type ArticleDetail = ArticleRecord & {
-  category_id: string;
-  category: ArticleCategorySummary | null;
   coverUrl: string | null;
   coverAlt: string | null;
   ogUrl: string | null;
@@ -134,12 +123,10 @@ export type ArticlesListData = {
     q: string;
     status: ArticleStatusFilter;
     featured: ArticleFeaturedFilter;
-    category: string;
     tag: string;
     sort: ArticleSortValue;
     page: number;
   };
-  categories: ArticleCategorySummary[];
   tags: ArticleTagSummary[];
 };
 

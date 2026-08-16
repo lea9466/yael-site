@@ -11,14 +11,11 @@ import type {
   ArticlesListData,
   ArticleTagSummary,
 } from "@/lib/articles/types";
-import {
-  fetchArticleCategories,
-  fetchArticleTags,
-} from "@/lib/taxonomy/queries";
+import { fetchArticleTags } from "@/lib/taxonomy/queries";
 import type { ListArticlesQuery, ArticleSortValue } from "@/lib/validations/article";
 
 const ARTICLE_SELECT_COLUMNS =
-  "id, title, slug, body, cover_media_id, seo_og_media_id, category_id, reading_time_minutes, content, seo, featured, status, published_at, created_at, updated_at";
+  "id, title, slug, body, cover_media_id, seo_og_media_id, reading_time_minutes, content, seo, featured, status, published_at, created_at, updated_at";
 
 type SortConfig = {
   column: "created_at" | "updated_at" | "title";
@@ -39,37 +36,6 @@ type MediaJoinRow = {
 
 function escapeIlikePattern(value: string): string {
   return value.replace(/[%_\\]/g, "\\$&");
-}
-
-async function fetchCategoryMap(
-  categoryIds: string[]
-): Promise<Map<string, { name: string; slug: string }>> {
-  const uniqueIds = [...new Set(categoryIds.filter(Boolean))];
-
-  if (uniqueIds.length === 0) {
-    return new Map();
-  }
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("categories")
-    .select("id, name, slug")
-    .eq("type", "article")
-    .in("id", uniqueIds);
-
-  if (error || !data) {
-    return new Map();
-  }
-
-  return new Map(
-    data.map((row) => [
-      row.id,
-      {
-        name: row.name,
-        slug: row.slug,
-      },
-    ])
-  );
 }
 
 async function fetchMediaMap(
@@ -178,17 +144,13 @@ function toArticleRecord(row: Record<string, unknown>): ArticleRecord {
 function toArticleListItem(
   record: ArticleRecord,
   mediaMap: Map<string, MediaJoinRow>,
-  categoryMap: Map<string, { name: string; slug: string }>,
   tagsMap: Map<string, ArticleTagSummary[]>
 ): ArticleListItem {
   const cover = mediaMap.get(record.cover_media_id);
-  const category = categoryMap.get(record.category_id);
   const tags = tagsMap.get(record.id) ?? [];
 
   return {
     ...record,
-    categoryName: category?.name ?? null,
-    categorySlug: category?.slug ?? null,
     coverUrl: cover ? getPublicMediaUrl(cover.storage_path) : null,
     coverAlt: cover?.alt_text ?? null,
     tagNames: tags.map((tag) => tag.name),
@@ -221,10 +183,6 @@ export async function fetchArticlesList(
       listQuery = listQuery.eq("featured", true);
     }
 
-    if (query.category !== "all") {
-      listQuery = listQuery.eq("category_id", query.category);
-    }
-
     if (query.tag !== "all") {
       const { data: tagRows, error: tagError } = await supabase
         .from("article_tags")
@@ -238,10 +196,7 @@ export async function fetchArticlesList(
       const articleIds = (tagRows ?? []).map((row) => row.article_id);
 
       if (articleIds.length === 0) {
-        const [categories, tags] = await Promise.all([
-          fetchArticleCategories(),
-          fetchArticleTags(),
-        ]);
+        const tags = await fetchArticleTags();
 
         return {
           items: [],
@@ -255,12 +210,10 @@ export async function fetchArticlesList(
             q: query.q,
             status: query.status,
             featured: query.featured,
-            category: query.category,
             tag: query.tag,
             sort: query.sort,
             page: query.page,
           },
-          categories,
           tags,
         };
       }
@@ -282,20 +235,14 @@ export async function fetchArticlesList(
     const mediaMap = await fetchMediaMap(
       records.map((record) => record.cover_media_id)
     );
-    const categoryMap = await fetchCategoryMap(
-      records.map((record) => record.category_id)
-    );
     const tagsMap = await fetchArticleTagsMap(records.map((record) => record.id));
-    const [categories, tags] = await Promise.all([
-      fetchArticleCategories(),
-      fetchArticleTags(),
-    ]);
+    const tags = await fetchArticleTags();
 
     const filteredCount = count ?? 0;
 
     return {
       items: records.map((record) =>
-        toArticleListItem(record, mediaMap, categoryMap, tagsMap)
+        toArticleListItem(record, mediaMap, tagsMap)
       ),
       pagination: {
         page: query.page,
@@ -307,12 +254,10 @@ export async function fetchArticlesList(
         q: query.q,
         status: query.status,
         featured: query.featured,
-        category: query.category,
         tag: query.tag,
         sort: query.sort,
         page: query.page,
       },
-      categories,
       tags,
     };
   } catch {
@@ -350,12 +295,6 @@ export async function fetchArticleById(id: string): Promise<ArticleDetail | null
       ? mediaMap.get(record.seo_og_media_id)
       : undefined;
 
-    const { data: categoryData } = await supabase
-      .from("categories")
-      .select("id, name, slug, type")
-      .eq("id", record.category_id)
-      .maybeSingle();
-
     const { data: tagRows } = await supabase
       .from("article_tags")
       .select("tag_id, tags(id, name, type)")
@@ -385,15 +324,6 @@ export async function fetchArticleById(id: string): Promise<ArticleDetail | null
 
     return {
       ...record,
-      category_id: record.category_id,
-      category:
-        categoryData && categoryData.type === "article"
-          ? {
-              id: categoryData.id,
-              name: categoryData.name,
-              slug: categoryData.slug,
-            }
-          : null,
       coverUrl: cover ? getPublicMediaUrl(cover.storage_path) : null,
       coverAlt: cover?.alt_text ?? null,
       ogUrl: og ? getPublicMediaUrl(og.storage_path) : null,

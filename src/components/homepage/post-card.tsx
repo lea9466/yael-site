@@ -18,7 +18,7 @@ type PostCardProps = {
 };
 
 export function PostCard({ post, className }: PostCardProps) {
-  const href = buildPostPath(post.categorySlug, post.slug);
+  const href = buildPostPath(post.slug);
   const statusPills = getPostStatusPills(post);
   const { readingTime } = getPostCardMeta(post);
 

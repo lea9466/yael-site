@@ -11,7 +11,6 @@ type ArticlesPageProps = {
     q?: string;
     status?: string;
     featured?: string;
-    category?: string;
     tag?: string;
     sort?: string;
     page?: string;
@@ -39,7 +38,7 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
 
   return (
     <ArticlesListClient
-      key={`${data.query.q}-${data.query.status}-${data.query.featured}-${data.query.category}-${data.query.tag}-${data.query.sort}-${data.query.page}`}
+      key={`${data.query.q}-${data.query.status}-${data.query.featured}-${data.query.tag}-${data.query.sort}-${data.query.page}`}
       data={data}
     />
   );

@@ -3,7 +3,6 @@ import { BookOpen } from "lucide-react";
 
 import { PostCard } from "@/components/homepage/post-card";
 import { PublicEmptyState } from "@/components/public/states/public-empty-state";
-import { BlogCategoryPills } from "@/components/articles/public/blog-category-pills";
 import {
   BlogListingBreadcrumbJsonLd,
   BlogListingBreadcrumbs,
@@ -13,10 +12,7 @@ import { BlogListingHero } from "@/components/articles/public/blog-listing-hero"
 import { BlogListingPagination } from "@/components/articles/public/blog-listing-pagination";
 import { BlogListingResultsBar } from "@/components/articles/public/blog-listing-results-bar";
 import { BlogListingSearch } from "@/components/articles/public/blog-listing-search";
-import {
-  buildBlogCategoryPath,
-  buildBlogPath,
-} from "@/lib/public/blog-paths";
+import { buildBlogPath } from "@/lib/public/blog-paths";
 import { parseBlogListingTagSlugs } from "@/lib/public/blog-listing-ui";
 import type { PublicBlogListingResult } from "@/lib/public/blog-listing";
 import { cn } from "@/lib/utils/cn";
@@ -26,33 +22,23 @@ type BlogListingProps = {
 };
 
 export function BlogListing({ data }: BlogListingProps) {
-  const {
-    category,
-    posts,
-    categories,
-    tags,
-    query,
-    totalCount,
-    totalPages,
-  } = data;
-  const basePath = category
-    ? buildBlogCategoryPath(category.slug)
-    : buildBlogPath();
+  const { posts, tags, query, totalCount, totalPages } = data;
+  const basePath = buildBlogPath();
   const hasActiveFilters =
     query.q.length > 0 || parseBlogListingTagSlugs(query.tag).length > 0;
 
   return (
     <>
-      <BlogListingBreadcrumbJsonLd category={category} />
+      <BlogListingBreadcrumbJsonLd />
 
       <section
         aria-labelledby="blog-page-title"
         className="recipes-section recipes-page recipes-listing"
       >
         <div className="recipes-section__inner recipes-listing__inner">
-          <BlogListingBreadcrumbs category={category} />
+          <BlogListingBreadcrumbs />
 
-          <BlogListingHero category={category} />
+          <BlogListingHero />
 
           <div className="recipes-listing-toolbar">
             <BlogListingSearch basePath={basePath} query={query} />
@@ -62,13 +48,6 @@ export function BlogListing({ data }: BlogListingProps) {
               tags={tags}
             />
           </div>
-
-          {categories.length > 0 ? (
-            <BlogCategoryPills
-              categories={categories}
-              activeSlug={category?.slug}
-            />
-          ) : null}
 
           <BlogListingResultsBar
             basePath={basePath}
@@ -102,19 +81,11 @@ export function BlogListing({ data }: BlogListingProps) {
           ) : (
             <PublicEmptyState
               icon={BookOpen}
-              title={
-                hasActiveFilters
-                  ? "לא נמצאו פוסטים"
-                  : category
-                    ? "עדיין אין פוסטים בקטגוריה הזו"
-                    : "עדיין אין פוסטים לפרסום"
-              }
+              title={hasActiveFilters ? "לא נמצאו פוסטים" : "עדיין אין פוסטים לפרסום"}
               description={
                 hasActiveFilters
                   ? "נסי לשנות את החיפוש או את הסינון."
-                  : category
-                    ? "נשמח לעדכן אותה בקרוב."
-                    : "בקרוב יתווספו כאן פוסטים חדשים."
+                  : "בקרוב יתווספו כאן פוסטים חדשים."
               }
               action={
                 hasActiveFilters ? (
@@ -123,13 +94,6 @@ export function BlogListing({ data }: BlogListingProps) {
                     className="recipes-listing__empty-action public-focus-ring"
                   >
                     איפוס סינון
-                  </Link>
-                ) : category ? (
-                  <Link
-                    href={buildBlogPath()}
-                    className="recipes-listing__empty-action public-focus-ring"
-                  >
-                    לכל הפוסטים
                   </Link>
                 ) : undefined
               }

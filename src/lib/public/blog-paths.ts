@@ -2,18 +2,7 @@ export function buildBlogPath(): string {
   return "/blog";
 }
 
-export function buildBlogCategoryPath(categorySlug: string): string {
-  return `/blog/${categorySlug}`;
-}
-
-export function buildPostPath(
-  categorySlug: string | null | undefined,
-  postSlug: string
-): string {
-  if (categorySlug) {
-    return `/blog/${categorySlug}/${postSlug}`;
-  }
-
+export function buildPostPath(postSlug: string): string {
   return `/blog/${postSlug}`;
 }
 

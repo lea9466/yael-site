@@ -50,7 +50,7 @@ const RECIPE_PUBLIC_COLUMNS =
   "id, title, slug, description, cover_media_id, category_id, prep_duration, servings, featured, published_at, updated_at";
 
 const ARTICLE_PUBLIC_COLUMNS =
-  "id, title, slug, body, cover_media_id, category_id, reading_time_minutes, featured, published_at, updated_at";
+  "id, title, slug, body, cover_media_id, reading_time_minutes, featured, published_at, updated_at";
 
 const TESTIMONIAL_PUBLIC_COLUMNS =
   "id, name, city, content, service_id, featured, is_published, updated_at";
@@ -476,13 +476,9 @@ export async function getPublishedPosts(): Promise<PublicPostSummary[]> {
     const mediaMap = await fetchCoverMediaMap(
       data.map((row) => row.cover_media_id as string)
     );
-    const categoryMap = await fetchCategorySummaries(
-      data.map((row) => row.category_id as string)
-    );
 
     return data.map((row) => {
       const cover = mediaMap.get(row.cover_media_id as string);
-      const category = categoryMap.get(row.category_id as string);
 
       return {
         id: row.id,
@@ -491,8 +487,6 @@ export async function getPublishedPosts(): Promise<PublicPostSummary[]> {
         excerpt: shortenForSeoDescription(row.body as string, 180),
         coverUrl: cover?.url ?? null,
         coverAlt: cover?.alt ?? null,
-        categoryName: category?.name ?? null,
-        categorySlug: category?.slug ?? null,
         reading_time_minutes: row.reading_time_minutes,
         featured: row.featured,
         published_at: row.published_at,
@@ -672,48 +666,16 @@ export async function getPublishedPostSlugs(): Promise<PublicPostSitemapEntry[]>
     const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("articles")
-      .select("slug, category_id, updated_at")
+      .select("slug, updated_at")
       .eq("status", "published");
 
     if (error || !data) {
       return [];
     }
 
-    const categoryMap = await fetchCategorySummaries(
-      data.map((row) => row.category_id as string)
-    );
-
     return data.map((row) => ({
       slug: row.slug,
-      categorySlug: categoryMap.get(row.category_id as string)?.slug ?? null,
       updated_at: row.updated_at,
-    }));
-  } catch {
-    return [];
-  }
-}
-
-export async function getPublishedBlogCategorySlugs(): Promise<
-  PublicContentSlug[]
-> {
-  if (!isSupabaseConfigured()) {
-    return [];
-  }
-
-  try {
-    const supabase = createPublicClient();
-    const { data, error } = await supabase
-      .from("categories")
-      .select("slug, created_at")
-      .eq("type", "article");
-
-    if (error || !data) {
-      return [];
-    }
-
-    return data.map((row) => ({
-      slug: row.slug as string,
-      updated_at: row.created_at as string,
     }));
   } catch {
     return [];

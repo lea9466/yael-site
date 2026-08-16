@@ -1,8 +1,5 @@
 import { createClient } from "@/lib/auth/session";
-import type {
-  ArticleCategorySummary,
-  ArticleTagSummary,
-} from "@/lib/articles/types";
+import type { ArticleTagSummary } from "@/lib/articles/types";
 import type {
   RecipeCategorySummary,
   RecipeTagSummary,
@@ -114,38 +111,6 @@ export async function fetchArticleTags(
   } catch {
     return [];
   }
-}
-
-export async function fetchArticleCategories(): Promise<ArticleCategorySummary[]> {
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("categories")
-      .select("id, name, slug")
-      .eq("type", "article")
-      .order("name", { ascending: true });
-
-    if (error || !data) {
-      return [];
-    }
-
-    return data;
-  } catch {
-    return [];
-  }
-}
-
-export async function verifyArticleCategory(
-  categoryId: string
-): Promise<boolean> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("categories")
-    .select("id, type")
-    .eq("id", categoryId)
-    .maybeSingle();
-
-  return !error && data?.type === "article";
 }
 
 export async function verifyArticleTags(tagIds: string[]): Promise<boolean> {

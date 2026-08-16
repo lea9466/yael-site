@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { ArticleBreadcrumbJsonLd } from "@/components/articles/public/article-breadcrumb-json-ld";
 import { ArticleJsonLd } from "@/components/articles/public/article-json-ld";
@@ -24,15 +24,13 @@ import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 export const dynamic = "force-dynamic";
 
 type PostDetailPageProps = {
-  params: Promise<{ categorySlug: string; postSlug: string }>;
+  params: Promise<{ postSlug: string }>;
 };
 
 export async function generateMetadata({
   params,
 }: PostDetailPageProps): Promise<Metadata> {
-  const { categorySlug: rawCategorySlug, postSlug: rawPostSlug } =
-    await params;
-  const categorySlug = normalizeRouteSlug(rawCategorySlug);
+  const { postSlug: rawPostSlug } = await params;
   const postSlug = normalizeRouteSlug(rawPostSlug);
   const [settings, article] = await Promise.all([
     getWebsiteSettings(),
@@ -41,13 +39,12 @@ export async function generateMetadata({
 
   if (!article) {
     return buildSiteMetadata(settings, {
-      path: buildPostPath(categorySlug, postSlug),
+      path: buildPostPath(postSlug),
       title: "הפוסט לא נמצא",
       noIndex: true,
     });
   }
 
-  const resolvedCategorySlug = article.category?.slug ?? categorySlug;
   const title = article.seo.title.trim() || article.title;
   const description =
     article.seo.description.trim() ||
@@ -57,7 +54,7 @@ export async function generateMetadata({
   const ogImageAlt = article.ogAlt ?? article.coverAlt ?? article.title;
 
   const metadata = buildSiteMetadata(settings, {
-    path: buildPostPath(resolvedCategorySlug, article.slug),
+    path: buildPostPath(article.slug),
     title,
     description,
     ogImage,
@@ -80,9 +77,7 @@ export async function generateMetadata({
 export default async function PublicPostDetailPage({
   params,
 }: PostDetailPageProps) {
-  const { categorySlug: rawCategorySlug, postSlug: rawPostSlug } =
-    await params;
-  const categorySlug = normalizeRouteSlug(rawCategorySlug);
+  const { postSlug: rawPostSlug } = await params;
   const postSlug = normalizeRouteSlug(rawPostSlug);
   const article = await getPublishedPostBySlug(postSlug);
 
@@ -90,16 +85,11 @@ export default async function PublicPostDetailPage({
     notFound();
   }
 
-  if (article.category?.slug && article.category.slug !== categorySlug) {
-    permanentRedirect(buildPostPath(article.category.slug, article.slug));
-  }
-
   const [settings, homepageContent, relatedPosts] = await Promise.all([
     getWebsiteSettings(),
     getHomepageContent(),
     getRelatedPosts({
       articleId: article.id,
-      categoryId: article.category_id,
       limit: 3,
     }),
   ]);
@@ -112,11 +102,7 @@ export default async function PublicPostDetailPage({
         article={article}
         authorName={settings.businessProfile.business_name}
       />
-      <ArticleBreadcrumbJsonLd
-        postTitle={article.title}
-        postSlug={article.slug}
-        category={article.category}
-      />
+      <ArticleBreadcrumbJsonLd postTitle={article.title} postSlug={article.slug} />
 
       <div className="post-page">
         <div className="post-page__main">

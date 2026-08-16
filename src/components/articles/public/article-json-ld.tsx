@@ -34,13 +34,13 @@ export function ArticleJsonLd({
     "@context": "https://schema.org",
     "@type": "Article",
     headline: article.title,
-    url: buildArticleCanonicalUrl(article.slug, article.category?.slug),
+    url: buildArticleCanonicalUrl(article.slug),
     dateModified: article.updated_at,
     author,
     publisher,
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": buildArticleCanonicalUrl(article.slug, article.category?.slug),
+      "@id": buildArticleCanonicalUrl(article.slug),
     },
     inLanguage: "he",
   };
@@ -55,10 +55,6 @@ export function ArticleJsonLd({
 
   if (article.published_at) {
     jsonLd.datePublished = article.published_at;
-  }
-
-  if (article.category?.name) {
-    jsonLd.articleSection = article.category.name;
   }
 
   if (article.tags.length > 0) {

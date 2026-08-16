@@ -192,12 +192,6 @@ export const listArticlesQuerySchema = z.object({
     .pipe(z.string().max(100, "חיפוש ארוך מדי")),
   status: z.enum(ARTICLE_STATUS_FILTERS).optional().default("all"),
   featured: z.enum(ARTICLE_FEATURED_FILTERS).optional().default("all"),
-  category: z
-    .string()
-    .optional()
-    .default("all")
-    .transform((value) => (value === "all" ? "all" : value))
-    .pipe(z.union([z.literal("all"), uuidSchema])),
   tag: z
     .string()
     .optional()

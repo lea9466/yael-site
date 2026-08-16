@@ -58,11 +58,9 @@ export function getPostStatusPills(post: PublicPostSummary): PostCardPill[] {
 }
 
 export function getPostCardMeta(post: PublicPostSummary): {
-  category: string | null;
   readingTime: string | null;
 } {
   return {
-    category: post.categoryName,
     readingTime:
       post.reading_time_minutes > 0
         ? formatReadingTimeLabel(post.reading_time_minutes)

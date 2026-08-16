@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpen, FolderTree, Plus, RefreshCw, Star, Tags } from "lucide-react";
+import { BookOpen, Plus, RefreshCw, Star, Tags } from "lucide-react";
 
 import {
   AdminListFilters,
@@ -61,7 +61,6 @@ function buildArticlesUrl(
   if (params.q.length > 0) search.set("q", params.q);
   if (params.status !== "all") search.set("status", params.status);
   if (params.featured !== "all") search.set("featured", params.featured);
-  if (params.category !== "all") search.set("category", params.category);
   if (params.tag !== "all") search.set("tag", params.tag);
   if (params.sort !== "newest") search.set("sort", params.sort);
   if (params.page > 1) search.set("page", String(params.page));
@@ -93,7 +92,6 @@ export function ArticlesListClient({ data }: ArticlesListClientProps) {
     data.query.q.length > 0 ||
     data.query.status !== "all" ||
     data.query.featured !== "all" ||
-    data.query.category !== "all" ||
     data.query.tag !== "all";
 
   return (
@@ -117,13 +115,6 @@ export function ArticlesListClient({ data }: ArticlesListClientProps) {
             value: data.pagination.totalCount,
             module: "articles",
             emoji: "📚",
-          },
-          {
-            icon: FolderTree,
-            label: "קטגוריות",
-            value: data.categories.length,
-            module: "categories",
-            emoji: "🌿",
           },
           {
             icon: Tags,
@@ -191,27 +182,6 @@ export function ArticlesListClient({ data }: ArticlesListClientProps) {
           {ARTICLE_FEATURED_FILTERS.map((value) => (
             <option key={value} value={value}>
               {FEATURED_FILTER_LABELS[value]}
-            </option>
-          ))}
-        </Select>
-
-        <Select
-          label="קטגוריה"
-          value={data.query.category}
-          onChange={(event) =>
-            router.push(
-              buildArticlesUrl(pathname, {
-                ...data.query,
-                category: event.target.value,
-                page: 1,
-              })
-            )
-          }
-        >
-          <option value="all">הכל</option>
-          {data.categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
             </option>
           ))}
         </Select>

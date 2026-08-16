@@ -150,11 +150,6 @@ export function ArticlePublicView({
           </div>
 
           <div className="flex flex-wrap gap-3 text-sm text-[var(--color-text-muted)]">
-            {article.category ? (
-              <span>קטגוריה: {escapeHtml(article.category.name)}</span>
-            ) : (
-              <span>ללא קטגוריה</span>
-            )}
             <span>{formatReadingTimeLabel(article.reading_time_minutes)}</span>
             <span>
               {article.published_at ? "פורסם" : "עודכן"}:{" "}

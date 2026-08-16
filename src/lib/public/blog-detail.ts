@@ -8,10 +8,10 @@ import type { StoredSeo } from "@/lib/seo/types";
 import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 
 const ARTICLE_DETAIL_COLUMNS =
-  "id, title, slug, body, cover_media_id, seo_og_media_id, category_id, reading_time_minutes, content, seo, featured, status, published_at, created_at, updated_at";
+  "id, title, slug, body, cover_media_id, seo_og_media_id, reading_time_minutes, content, seo, featured, status, published_at, created_at, updated_at";
 
 const ARTICLE_RELATED_COLUMNS =
-  "id, title, slug, body, cover_media_id, category_id, reading_time_minutes, featured, published_at, updated_at, created_at";
+  "id, title, slug, body, cover_media_id, reading_time_minutes, featured, published_at, updated_at, created_at";
 
 type MediaRow = {
   id: string;
@@ -57,37 +57,6 @@ async function fetchMediaMap(
   return new Map((data as MediaRow[]).map((row) => [row.id, row]));
 }
 
-async function fetchCategorySummaries(
-  categoryIds: string[]
-): Promise<Map<string, { name: string; slug: string }>> {
-  const uniqueIds = [...new Set(categoryIds.filter(Boolean))];
-
-  if (uniqueIds.length === 0) {
-    return new Map();
-  }
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("categories")
-    .select("id, name, slug")
-    .eq("type", "article")
-    .in("id", uniqueIds);
-
-  if (error || !data) {
-    return new Map();
-  }
-
-  return new Map(
-    data.map((row) => [
-      row.id,
-      {
-        name: row.name,
-        slug: row.slug,
-      },
-    ])
-  );
-}
-
 function parseJoinedTag(
   value: unknown
 ): { id: string; name: string; type: string } | null {
@@ -108,11 +77,9 @@ function parseJoinedTag(
 
 function mapRelatedRow(
   row: Record<string, unknown>,
-  mediaMap: Map<string, MediaRow>,
-  categoryMap: Map<string, { name: string; slug: string }>
+  mediaMap: Map<string, MediaRow>
 ): PublicPostSummary {
   const cover = mediaMap.get(row.cover_media_id as string);
-  const category = categoryMap.get(row.category_id as string);
 
   return {
     id: row.id as string,
@@ -121,8 +88,6 @@ function mapRelatedRow(
     excerpt: shortenForSeoDescription(row.body as string, 180),
     coverUrl: cover ? getPublicMediaUrl(cover.storage_path) : null,
     coverAlt: cover?.alt_text ?? null,
-    categoryName: category?.name ?? null,
-    categorySlug: category?.slug ?? null,
     reading_time_minutes: row.reading_time_minutes as number,
     featured: Boolean(row.featured),
     published_at: (row.published_at as string | null) ?? null,
@@ -194,12 +159,6 @@ export async function getPublishedPostBySlug(
       ? mediaMap.get(data.seo_og_media_id as string)
       : undefined;
 
-    const { data: categoryData } = await supabase
-      .from("categories")
-      .select("id, name, slug, type")
-      .eq("id", data.category_id as string)
-      .maybeSingle();
-
     const { data: tagRows } = await supabase
       .from("article_tags")
       .select("tag_id, tags(id, name, type)")
@@ -234,7 +193,6 @@ export async function getPublishedPostBySlug(
       body: data.body as string,
       cover_media_id: data.cover_media_id as string,
       seo_og_media_id: (data.seo_og_media_id as string | null) ?? null,
-      category_id: data.category_id as string,
       reading_time_minutes: data.reading_time_minutes as number,
       content,
       seo,
@@ -247,14 +205,6 @@ export async function getPublishedPostBySlug(
       coverAlt: cover?.alt_text ?? null,
       ogUrl: og ? getPublicMediaUrl(og.storage_path) : null,
       ogAlt: og?.alt_text ?? null,
-      category:
-        categoryData && categoryData.type === "article"
-          ? {
-              id: categoryData.id,
-              name: categoryData.name,
-              slug: categoryData.slug,
-            }
-          : null,
       tags,
       galleryUrls: (content.gallery ?? [])
         .slice()
@@ -278,7 +228,6 @@ export async function getPublishedPostBySlug(
 
 export async function getRelatedPosts(input: {
   articleId: string;
-  categoryId: string;
   limit?: number;
 }): Promise<PublicPostSummary[]> {
   if (!isSupabaseConfigured()) {
@@ -290,57 +239,21 @@ export async function getRelatedPosts(input: {
   try {
     const supabase = await createClient();
 
-    const { data: sameCategoryData, error: sameCategoryError } = await supabase
+    const { data: recentData, error: recentError } = await supabase
       .from("articles")
       .select(ARTICLE_RELATED_COLUMNS)
       .eq("status", "published")
-      .eq("category_id", input.categoryId)
       .neq("id", input.articleId)
       .order("published_at", { ascending: false, nullsFirst: false })
       .limit(limit);
 
-    if (sameCategoryError) {
+    if (recentError || !recentData) {
       return [];
     }
 
-    const sameCategory = sortArticlesByRecency(
-      (sameCategoryData ?? []) as Array<Record<string, unknown>>
-    );
-    const collected = sameCategory.slice(0, limit);
-    const collectedIds = new Set(collected.map((row) => row.id as string));
-
-    if (collected.length < limit) {
-      const { data: recentData, error: recentError } = await supabase
-        .from("articles")
-        .select(ARTICLE_RELATED_COLUMNS)
-        .eq("status", "published")
-        .neq("id", input.articleId)
-        .order("published_at", { ascending: false, nullsFirst: false })
-        .limit(limit * 3);
-
-      if (!recentError && recentData) {
-        const recent = sortArticlesByRecency(
-          recentData as Array<Record<string, unknown>>
-        );
-
-        for (const row of recent) {
-          const id = row.id as string;
-
-          if (collectedIds.has(id)) {
-            continue;
-          }
-
-          collected.push(row);
-          collectedIds.add(id);
-
-          if (collected.length >= limit) {
-            break;
-          }
-        }
-      }
-    }
-
-    const rows = collected.slice(0, limit);
+    const rows = sortArticlesByRecency(
+      recentData as Array<Record<string, unknown>>
+    ).slice(0, limit);
 
     if (rows.length === 0) {
       return [];
@@ -349,11 +262,8 @@ export async function getRelatedPosts(input: {
     const mediaMap = await fetchMediaMap(
       rows.map((row) => row.cover_media_id as string)
     );
-    const categoryMap = await fetchCategorySummaries(
-      rows.map((row) => row.category_id as string)
-    );
 
-    return rows.map((row) => mapRelatedRow(row, mediaMap, categoryMap));
+    return rows.map((row) => mapRelatedRow(row, mediaMap));
   } catch {
     return [];
   }

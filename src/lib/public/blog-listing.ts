@@ -6,16 +6,9 @@ import {
   PUBLIC_BLOG_PAGE_SIZE,
   type PublicBlogListingQuery,
 } from "@/lib/validations/public-blog-listing";
-import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 
 const ARTICLE_PUBLIC_COLUMNS =
-  "id, title, slug, body, cover_media_id, category_id, reading_time_minutes, featured, published_at, updated_at";
-
-export type PublicBlogCategory = {
-  id: string;
-  name: string;
-  slug: string;
-};
+  "id, title, slug, body, cover_media_id, reading_time_minutes, featured, published_at, updated_at";
 
 export type PublicBlogTag = {
   id: string;
@@ -25,13 +18,11 @@ export type PublicBlogTag = {
 
 export type PublicBlogListingResult = {
   posts: PublicPostSummary[];
-  categories: PublicBlogCategory[];
   tags: PublicBlogTag[];
   totalCount: number;
   heroCount: number;
   totalPages: number;
   query: PublicBlogListingQuery;
-  category: PublicBlogCategory | null;
 };
 
 type MediaPreview = {
@@ -73,65 +64,6 @@ async function fetchCoverMediaMap(
   );
 }
 
-async function fetchCategoryMap(
-  categoryIds: string[]
-): Promise<Map<string, PublicBlogCategory>> {
-  const uniqueIds = [...new Set(categoryIds.filter(Boolean))];
-
-  if (uniqueIds.length === 0) {
-    return new Map();
-  }
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("categories")
-    .select("id, name, slug")
-    .eq("type", "article")
-    .in("id", uniqueIds);
-
-  if (error || !data) {
-    return new Map();
-  }
-
-  return new Map(
-    data.map((row) => [
-      row.id as string,
-      {
-        id: row.id as string,
-        name: row.name as string,
-        slug: row.slug as string,
-      },
-    ])
-  );
-}
-
-export async function getPublicBlogCategories(): Promise<PublicBlogCategory[]> {
-  if (!isSupabaseConfigured()) {
-    return [];
-  }
-
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("categories")
-      .select("id, name, slug")
-      .eq("type", "article")
-      .order("name", { ascending: true });
-
-    if (error || !data) {
-      return [];
-    }
-
-    return data.map((row) => ({
-      id: row.id as string,
-      name: row.name as string,
-      slug: row.slug as string,
-    }));
-  } catch {
-    return [];
-  }
-}
-
 export async function getPublicBlogTags(): Promise<PublicBlogTag[]> {
   if (!isSupabaseConfigured()) {
     return [];
@@ -159,55 +91,16 @@ export async function getPublicBlogTags(): Promise<PublicBlogTag[]> {
   }
 }
 
-export async function getPublicBlogCategoryBySlug(
-  slug: string
-): Promise<PublicBlogCategory | null> {
-  if (!isSupabaseConfigured()) {
-    return null;
-  }
-
-  const normalized = normalizeRouteSlug(slug);
-
-  if (!normalized) {
-    return null;
-  }
-
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("categories")
-      .select("id, name, slug")
-      .eq("type", "article")
-      .eq("slug", normalized)
-      .maybeSingle();
-
-    if (error || !data) {
-      return null;
-    }
-
-    return {
-      id: data.id as string,
-      name: data.name as string,
-      slug: data.slug as string,
-    };
-  } catch {
-    return null;
-  }
-}
-
 export async function getPublicBlogListing(options: {
-  categorySlug?: string | null;
   query: PublicBlogListingQuery;
 }): Promise<PublicBlogListingResult> {
   const empty: PublicBlogListingResult = {
     posts: [],
-    categories: [],
     tags: [],
     totalCount: 0,
     heroCount: 0,
     totalPages: 1,
     query: options.query,
-    category: null,
   };
 
   if (!isSupabaseConfigured()) {
@@ -216,38 +109,12 @@ export async function getPublicBlogListing(options: {
 
   try {
     const supabase = await createClient();
-    const [categories, tags] = await Promise.all([
-      getPublicBlogCategories(),
-      getPublicBlogTags(),
-    ]);
+    const tags = await getPublicBlogTags();
 
-    let category: PublicBlogCategory | null = null;
-    const categorySlug = options.categorySlug?.trim();
-
-    if (categorySlug) {
-      category =
-        categories.find((item) => item.slug === categorySlug) ??
-        (await getPublicBlogCategoryBySlug(categorySlug));
-
-      if (!category) {
-        return {
-          ...empty,
-          categories,
-          tags,
-        };
-      }
-    }
-
-    let heroCountQuery = supabase
+    const { count: heroCountValue } = await supabase
       .from("articles")
       .select("id", { count: "exact", head: true })
       .eq("status", "published");
-
-    if (category) {
-      heroCountQuery = heroCountQuery.eq("category_id", category.id);
-    }
-
-    const { count: heroCountValue } = await heroCountQuery;
     const heroCount = heroCountValue ?? 0;
 
     let articleIdsForTag: string[] | null = null;
@@ -274,9 +141,7 @@ export async function getPublicBlogListing(options: {
       if (matchedTagIds.length === 0) {
         return {
           ...empty,
-          categories,
           tags,
-          category,
           heroCount,
           query: options.query,
         };
@@ -290,9 +155,7 @@ export async function getPublicBlogListing(options: {
       if (tagError) {
         return {
           ...empty,
-          categories,
           tags,
-          category,
           heroCount,
         };
       }
@@ -304,9 +167,7 @@ export async function getPublicBlogListing(options: {
       if (articleIdsForTag.length === 0) {
         return {
           ...empty,
-          categories,
           tags,
-          category,
           heroCount,
           query: options.query,
         };
@@ -320,10 +181,6 @@ export async function getPublicBlogListing(options: {
       .from("articles")
       .select(ARTICLE_PUBLIC_COLUMNS, { count: "exact" })
       .eq("status", "published");
-
-    if (category) {
-      listQuery = listQuery.eq("category_id", category.id);
-    }
 
     if (options.query.q.length > 0) {
       const pattern = `%${escapeIlikePattern(options.query.q)}%`;
@@ -358,9 +215,7 @@ export async function getPublicBlogListing(options: {
     if (error || !data) {
       return {
         ...empty,
-        categories,
         tags,
-        category,
         heroCount,
       };
     }
@@ -368,14 +223,10 @@ export async function getPublicBlogListing(options: {
     const mediaMap = await fetchCoverMediaMap(
       data.map((row) => row.cover_media_id as string)
     );
-    const categoryMap = await fetchCategoryMap(
-      data.map((row) => row.category_id as string)
-    );
 
     const totalCount = count ?? 0;
     const posts: PublicPostSummary[] = data.map((row) => {
       const cover = mediaMap.get(row.cover_media_id as string);
-      const postCategory = categoryMap.get(row.category_id as string);
 
       return {
         id: row.id as string,
@@ -384,8 +235,6 @@ export async function getPublicBlogListing(options: {
         excerpt: shortenForSeoDescription(row.body as string, 180),
         coverUrl: cover?.url ?? null,
         coverAlt: cover?.alt ?? null,
-        categoryName: postCategory?.name ?? null,
-        categorySlug: postCategory?.slug ?? null,
         reading_time_minutes: row.reading_time_minutes as number,
         featured: Boolean(row.featured),
         published_at: (row.published_at as string | null) ?? null,
@@ -394,13 +243,11 @@ export async function getPublicBlogListing(options: {
 
     return {
       posts,
-      categories,
       tags,
       totalCount,
       heroCount,
       totalPages: Math.max(1, Math.ceil(totalCount / PUBLIC_BLOG_PAGE_SIZE)),
       query: options.query,
-      category,
     };
   } catch {
     return empty;

@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { ZodError } from "zod";
 
 import { saveSiteSettingsAction } from "@/actions/site-settings";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
@@ -18,6 +19,41 @@ import {
   type SettingsMediaPreview,
   type SettingsPageData,
 } from "@/lib/validations/site-settings";
+
+// formStateToSavePayload builds its payload with schema.parse() (throws on
+// invalid data, e.g. clearing the hero side video without also switching
+// side_media_type away from "video_url"). Mapping the known hero schema
+// paths to their form-state keys lets the UI show an inline error instead
+// of crashing the settings page.
+const HERO_ZOD_PATH_TO_FIELD_KEY: Record<string, keyof SettingsFormState> = {
+  title: "heroTitle",
+  subtitle: "heroSubtitle",
+  "primary_button.label": "heroPrimaryButtonLabel",
+  "primary_button.url": "heroPrimaryButtonUrl",
+  "secondary_button.label": "heroSecondaryButtonLabel",
+  "secondary_button.url": "heroSecondaryButtonUrl",
+  background_media_id: "heroBackgroundMediaId",
+  background_mobile_media_id: "heroBackgroundMobileMediaId",
+  side_media_type: "heroSideMediaType",
+  side_media_id: "heroSideMediaId",
+  side_video_url: "heroSideVideoUrl",
+  side_animation_url: "heroSideAnimationUrl",
+};
+
+function mapSavePayloadZodError(error: ZodError): Record<string, string> {
+  const fieldErrors: Record<string, string> = {};
+
+  for (const issue of error.issues) {
+    const path = issue.path.join(".");
+    const key = HERO_ZOD_PATH_TO_FIELD_KEY[path] ?? path;
+
+    if (!fieldErrors[key]) {
+      fieldErrors[key] = issue.message;
+    }
+  }
+
+  return fieldErrors;
+}
 
 type SettingsPageClientProps = {
   data: SettingsPageData;
@@ -106,7 +142,20 @@ export function SettingsPageClient({ data }: SettingsPageClientProps) {
       setFieldErrors({});
       setFormError("");
 
-      const payload = formStateToSavePayload(formState, timestamps);
+      let payload: ReturnType<typeof formStateToSavePayload>;
+
+      try {
+        payload = formStateToSavePayload(formState, timestamps);
+      } catch (error) {
+        if (error instanceof ZodError) {
+          setFormError("יש לתקן את השדות המסומנים.");
+          setFieldErrors(mapSavePayloadZodError(error));
+          return;
+        }
+
+        throw error;
+      }
+
       const result = await saveSiteSettingsAction(payload);
 
       if (!result.success) {

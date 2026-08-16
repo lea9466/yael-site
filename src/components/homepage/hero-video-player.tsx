@@ -59,6 +59,7 @@ function HeroVideoPlayerFrame({
         className="hero-video hero-video--visible"
         style={{ border: 0 }}
         allow="autoplay"
+        sandbox="allow-scripts allow-popups allow-presentation"
       />
     </div>
   );

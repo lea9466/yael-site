@@ -49,10 +49,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/ui/form-field";
 import { FormToast } from "@/components/ui/form-toast";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { ARTICLE_ERRORS } from "@/lib/articles/errors";
 import { calculateReadingTimeMinutes } from "@/lib/articles/reading-time";
 import { formatReadingTimeLabel } from "@/lib/articles/format";
 import { slugifyTitle } from "@/lib/articles/slug";
 import type {
+  ArticleCategorySummary,
   ArticleDetail,
   ArticleTagSummary,
 } from "@/lib/articles/types";
@@ -82,6 +85,7 @@ type ArticleFormProps = {
   initialArticle?: ArticleDetail;
   initialValues: ArticleDraftInput;
   availableTags: ArticleTagSummary[];
+  categories: ArticleCategorySummary[];
 };
 
 function toEditorContent(
@@ -139,8 +143,10 @@ export function ArticleForm({
   initialArticle,
   initialValues,
   availableTags,
+  categories,
 }: ArticleFormProps) {
   const router = useRouter();
+  const hasCategories = categories.length > 0;
   const [isPending, startTransition] = useTransition();
   const [values, setValues] = useState(initialValues);
   const [content, setContent] = useState(() =>
@@ -331,6 +337,11 @@ export function ArticleForm({
   };
 
   const handlePublish = () => {
+    if (!hasCategories) {
+      showToast("error", ARTICLE_ERRORS.categoryMissing);
+      return;
+    }
+
     if (isPending) {
       return;
     }
@@ -484,6 +495,10 @@ export function ArticleForm({
             type="button"
             disabled={isPending}
             onClick={() => {
+              if (!hasCategories) {
+                showToast("error", ARTICLE_ERRORS.categoryMissing);
+                return;
+              }
               handleRestore(true);
             }}
           >
@@ -542,6 +557,21 @@ export function ArticleForm({
               description="כותרת, כתובת ותמונת כיסוי."
             />
 
+            {!hasCategories ? (
+              <div
+                role="alert"
+                className="rounded-[var(--radius-lg)] border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] px-4 py-3 text-sm text-[var(--color-warning)]"
+              >
+                <p>{ARTICLE_ERRORS.categoryMissing}</p>
+                <Link
+                  href="/admin/categories/new?type=article"
+                  className="mt-2 inline-flex font-medium underline underline-offset-2"
+                >
+                  יצירת קטגוריית פוסטים
+                </Link>
+              </div>
+            ) : null}
+
             <FormField
               label="כותרת"
               htmlFor="article-title"
@@ -556,6 +586,41 @@ export function ArticleForm({
                 onChange={(event) => handleTitleChange(event.target.value)}
               />
             </FormField>
+
+            {hasCategories ? (
+              <Select
+                id="article-category"
+                label="קטגוריה"
+                required
+                value={values.category_id}
+                error={Boolean(fieldErrors.category_id)}
+                onChange={(event) => setField("category_id", event.target.value)}
+              >
+                <option value="" disabled>
+                  בחרו קטגוריה
+                </option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </Select>
+            ) : (
+              <FormField
+                label="קטגוריה"
+                htmlFor="article-category"
+                required
+                error={fieldErrors.category_id ?? ARTICLE_ERRORS.categoryMissing}
+              >
+                <Input
+                  id="article-category"
+                  value=""
+                  disabled
+                  placeholder="אין קטגוריות פוסטים במערכת"
+                  error
+                />
+              </FormField>
+            )}
 
             <ServiceMediaPicker
               fieldId="field-cover-media"
@@ -675,6 +740,7 @@ export function ArticleForm({
         isPending={isPending}
         saveLabel="שמירה"
         publishLabel="פרסום"
+        publishDisabled={!hasCategories}
       />
 
       {initialArticle ? (

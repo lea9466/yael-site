@@ -37,6 +37,13 @@ export const viewport: Viewport = {
 // node that's no longer where React expects, which throws and crashes the
 // whole app. This makes those two DOM calls no-ops instead of throwing when
 // the node isn't actually where React thinks it is.
+//
+// This same script also reports the first uncaught error/rejection on the
+// page to /api/client-error-log, since whatever is crashing the page for
+// filtered visitors happens entirely in their browser — our server never
+// sees it otherwise. Registered here (beforeInteractive) so it's armed
+// before hydration, catching failures even if React's own error boundary
+// never gets a chance to run.
 const DOM_MUTATION_GUARD_SCRIPT = `(function () {
   if (typeof Node !== "function" || !Node.prototype) return;
 
@@ -55,6 +62,54 @@ const DOM_MUTATION_GUARD_SCRIPT = `(function () {
     }
     return originalInsertBefore.apply(this, arguments);
   };
+
+  var reported = false;
+
+  function reportError(message, stack, source) {
+    if (reported) return;
+    reported = true;
+
+    try {
+      var body = JSON.stringify({
+        message: String(message || "").slice(0, 500),
+        stack: String(stack || "").slice(0, 2000),
+        source: source,
+        url: location.href,
+        userAgent: navigator.userAgent,
+      });
+
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(
+          "/api/client-error-log",
+          new Blob([body], { type: "application/json" })
+        );
+      } else {
+        fetch("/api/client-error-log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: body,
+          keepalive: true,
+        });
+      }
+    } catch (e) {}
+  }
+
+  window.addEventListener("error", function (event) {
+    reportError(
+      event.message,
+      event.error && event.error.stack,
+      "window.onerror"
+    );
+  });
+
+  window.addEventListener("unhandledrejection", function (event) {
+    var reason = event.reason;
+    reportError(
+      reason && reason.message ? reason.message : String(reason),
+      reason && reason.stack,
+      "unhandledrejection"
+    );
+  });
 })();`;
 
 export default function RootLayout({

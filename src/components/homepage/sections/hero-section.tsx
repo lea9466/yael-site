@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { HeroMediaErrorBoundary } from "@/components/homepage/hero-media-error-boundary";
+import { HeroRawVideoMedia } from "@/components/homepage/hero-raw-video-media";
 import { HeroResponsiveMedia } from "@/components/homepage/hero-responsive-media";
 import { HeroVideoPlayer } from "@/components/homepage/hero-video-player";
 import type { HomepageHeroMediaPreview } from "@/lib/homepage/queries";
@@ -14,63 +16,11 @@ type HeroMediaProps = {
   title: string;
 };
 
-function getYouTubeEmbedUrl(url: string): string | null {
-  try {
-    const parsed = new URL(url);
-
-    if (parsed.hostname.includes("youtu.be")) {
-      const id = parsed.pathname.replace("/", "");
-
-      return id ? `https://www.youtube.com/embed/${id}` : null;
-    }
-
-    if (parsed.hostname.includes("youtube.com")) {
-      const id = parsed.searchParams.get("v");
-
-      return id ? `https://www.youtube.com/embed/${id}` : null;
-    }
-
-    if (parsed.hostname.includes("vimeo.com")) {
-      const id = parsed.pathname.split("/").filter(Boolean).at(-1);
-
-      return id ? `https://player.vimeo.com/video/${id}` : null;
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
-}
-
-function HeroVideoMedia({ url, title }: { url: string; title: string }) {
-  const embedUrl = getYouTubeEmbedUrl(url);
-
-  if (embedUrl) {
-    return (
-      <iframe
-        src={embedUrl}
-        title={title}
-        loading="lazy"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        className="hero-video border-0"
-      />
-    );
-  }
-
-  return (
-    <video
-      className="hero-video"
-      muted
-      playsInline
-      controls
-      preload="metadata"
-      aria-label={title}
-    >
-      <source src={url} type="video/mp4" />
-    </video>
-  );
-}
+const heroMediaFallback = (
+  <div className="hero-media-stack">
+    <div aria-hidden="true" className="hero-fallback" />
+  </div>
+);
 
 function HeroAnimationMedia({ url, title }: { url: string; title: string }) {
   const lowerUrl = url.toLowerCase();
@@ -151,7 +101,7 @@ function SideHeroMedia({
     }
 
     if (hero.side_video_url) {
-      return <HeroVideoMedia url={hero.side_video_url} title={title} />;
+      return <HeroRawVideoMedia url={hero.side_video_url} title={title} />;
     }
   }
 
@@ -250,12 +200,14 @@ export function HomepageHeroSection({
     <section className="hero" aria-labelledby="homepage-hero-title">
       <div className="hero-canvas">
         {hasVisualMedia ? (
-          <HeroMedia
-            hero={hero}
-            desktopMediaPreview={desktopMediaPreview}
-            mobileMediaPreview={mobileMediaPreview}
-            title={hero.title}
-          />
+          <HeroMediaErrorBoundary fallback={heroMediaFallback}>
+            <HeroMedia
+              hero={hero}
+              desktopMediaPreview={desktopMediaPreview}
+              mobileMediaPreview={mobileMediaPreview}
+              title={hero.title}
+            />
+          </HeroMediaErrorBoundary>
         ) : (
           <div className="hero-media-stack">
             <div className="hero-fallback" />
@@ -276,12 +228,14 @@ export function HomepageHeroSection({
             <div className="hero-content-row">
               {hasSideMedia && (
                 <div className="hero-video-side">
-                  <SideHeroMedia
-                    hero={hero}
-                    desktopMediaPreview={sideMediaPreview}
-                    mobileMediaPreview={sideMediaPreview}
-                    title={hero.title}
-                  />
+                  <HeroMediaErrorBoundary fallback={heroMediaFallback}>
+                    <SideHeroMedia
+                      hero={hero}
+                      desktopMediaPreview={sideMediaPreview}
+                      mobileMediaPreview={sideMediaPreview}
+                      title={hero.title}
+                    />
+                  </HeroMediaErrorBoundary>
                 </div>
               )}
 

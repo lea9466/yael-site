@@ -1,5 +1,9 @@
+import { EmbedIframePlayer } from "@/components/embed/embed-iframe-player";
 import { EmbedVideoPlayer } from "@/components/embed/embed-video-player";
-import { isAllowedHeroVideoSrc } from "@/lib/homepage/hero-video-embed";
+import {
+  getYouTubeOrVimeoEmbedUrl,
+  isAllowedHeroVideoSrc,
+} from "@/lib/homepage/hero-video-embed";
 
 type HeroVideoEmbedSearchParams = {
   src?: string;
@@ -24,12 +28,19 @@ export default async function HeroVideoEmbedPage({
     return null;
   }
 
+  const title = params.title || "";
+  const providerEmbedUrl = getYouTubeOrVimeoEmbedUrl(src);
+
+  if (providerEmbedUrl) {
+    return <EmbedIframePlayer src={providerEmbedUrl} title={title} />;
+  }
+
   return (
     <EmbedVideoPlayer
       src={src}
       mimeType={params.type || "video/mp4"}
       posterUrl={params.poster || null}
-      title={params.title || ""}
+      title={title}
       autoplay={params.autoplay !== "0"}
       loop={params.loop !== "0"}
       muted={params.muted !== "0"}

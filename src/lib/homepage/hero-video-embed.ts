@@ -42,6 +42,34 @@ export function buildHeroVideoEmbedSrc({
   return `/embed/hero-video?${params.toString()}`;
 }
 
+export function getYouTubeOrVimeoEmbedUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+
+    if (parsed.hostname.includes("youtu.be")) {
+      const id = parsed.pathname.replace("/", "");
+
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+
+    if (parsed.hostname.includes("youtube.com")) {
+      const id = parsed.searchParams.get("v");
+
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+
+    if (parsed.hostname.includes("vimeo.com")) {
+      const id = parsed.pathname.split("/").filter(Boolean).at(-1);
+
+      return id ? `https://player.vimeo.com/video/${id}` : null;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 // The embed page is a public route, so this only needs to stop it being
 // abused as an open redirect / arbitrary-content frame (non-https schemes
 // like javascript:/data:). The video URLs it receives already come from

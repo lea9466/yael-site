@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import { SITE_DOMAIN } from "./src/lib/site/constants";
+
 function getSupabaseImageHostname(): string {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -30,6 +32,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: getSupabaseImageHostname(),
         pathname: "/storage/v1/object/public/**",
+      },
+      {
+        protocol: "https",
+        hostname: SITE_DOMAIN,
+        pathname: "/api/media/**",
       },
     ],
   },

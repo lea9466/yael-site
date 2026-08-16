@@ -73,11 +73,14 @@ export async function middleware(request: NextRequest) {
 
   console.log("Route:", request.nextUrl.pathname, "isAdmin:", isAdmin, "hasAdminCookie:", hasAdminCookie, "isPublicRoute:", isPublicRoute);
 
-  // Redirect to coming-soon only if not authenticated admin and no admin cookie
-  if (isPublicRoute && !isAdmin && !hasAdminCookie) {
-    console.log("Redirecting to coming-soon");
-    return NextResponse.redirect(new URL("/coming-soon", request.url));
-  }
+  // Temporarily disabled: the site needs to be publicly visible so NetFree's
+  // own team can load and diagnose the real page (not the coming-soon
+  // placeholder) while investigating why they're blocking it. Re-enable by
+  // uncommenting once that's resolved.
+  // if (isPublicRoute && !isAdmin && !hasAdminCookie) {
+  //   console.log("Redirecting to coming-soon");
+  //   return NextResponse.redirect(new URL("/coming-soon", request.url));
+  // }
 
   if (request.nextUrl.pathname.startsWith("/admin") || request.nextUrl.pathname.startsWith("/api/admin")) {
     const isServerAction = isServerActionRequest(request);

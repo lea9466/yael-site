@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { buildHeroVideoEmbedSrc } from "@/lib/homepage/hero-video-embed";
 
 function getYouTubeEmbedUrl(url: string): string | null {
   try {
@@ -31,7 +31,6 @@ function getYouTubeEmbedUrl(url: string): string | null {
 }
 
 export function HeroRawVideoMedia({ url, title }: { url: string; title: string }) {
-  const [hasError, setHasError] = useState(false);
   const embedUrl = getYouTubeEmbedUrl(url);
 
   if (embedUrl) {
@@ -47,25 +46,20 @@ export function HeroRawVideoMedia({ url, title }: { url: string; title: string }
     );
   }
 
-  if (hasError) {
-    return (
-      <div className="hero-media-stack">
-        <div aria-hidden="true" className="hero-fallback" />
-      </div>
-    );
-  }
+  const heroEmbedSrc = buildHeroVideoEmbedSrc({
+    src: url,
+    autoplay: false,
+    loop: false,
+    muted: true,
+    controls: true,
+  });
 
   return (
-    <video
-      className="hero-video"
-      muted
-      playsInline
-      controls
-      preload="metadata"
-      aria-label={title}
-      onError={() => setHasError(true)}
-    >
-      <source src={url} type="video/mp4" />
-    </video>
+    <iframe
+      src={heroEmbedSrc}
+      title={title}
+      className="hero-video border-0"
+      allow="autoplay"
+    />
   );
 }

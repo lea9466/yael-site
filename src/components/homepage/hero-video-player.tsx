@@ -1,19 +1,17 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-
 import { HeroPosterImage } from "@/components/homepage/hero-poster-image";
-import { cn } from "@/lib/utils/cn";
-
-export type HeroVideoReadiness = "idle" | "loading" | "ready" | "error";
+import { buildHeroVideoEmbedSrc } from "@/lib/homepage/hero-video-embed";
 
 type HeroVideoPlayerProps = {
   src: string;
   mimeType: string;
   posterUrl: string | null;
   title: string;
-  reducedMotion: boolean;  controls?: boolean;
-  muted?: boolean;};
+  reducedMotion: boolean;
+  controls?: boolean;
+  muted?: boolean;
+};
 
 function HeroVideoPosterOnly({
   posterUrl,
@@ -33,7 +31,7 @@ function HeroVideoPosterOnly({
   );
 }
 
-function HeroVideoPlayerAutoplay({
+function HeroVideoPlayerFrame({
   src,
   mimeType,
   posterUrl,
@@ -41,54 +39,27 @@ function HeroVideoPlayerAutoplay({
   controls = false,
   muted = true,
 }: Omit<HeroVideoPlayerProps, "reducedMotion">) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [readiness, setReadiness] = useState<HeroVideoReadiness>("loading");
-
-  const markReady = useCallback(() => {
-    setReadiness((current) => (current === "error" ? current : "ready"));
-  }, []);
-
-  const markError = useCallback(() => {
-    setReadiness("error");
-  }, []);
-
-  const showVideo = readiness === "ready";
-  const showPosterLayer = !showVideo;
-  const shouldAutoplay = !controls;
-  const shouldLoop = !controls;
+  const embedSrc = buildHeroVideoEmbedSrc({
+    src,
+    mimeType,
+    posterUrl,
+    title,
+    autoplay: !controls,
+    loop: !controls,
+    muted,
+    controls,
+  });
 
   return (
     <div className="hero-media-stack">
-      {posterUrl ? (
-        <div
-          aria-hidden={!controls}
-          className={cn("hero-poster", !showPosterLayer && "hero-poster--hidden")}
-        >
-          <HeroPosterImage url={posterUrl} alt={title} priority />
-        </div>
-      ) : (
-        <div
-          aria-hidden={!controls}
-          className={cn("hero-fallback", !showPosterLayer && "hero-poster--hidden")}
-        />
-      )}
-
-      <video
-        ref={videoRef}
-        aria-hidden={!controls}
-        className={cn("hero-video", showVideo && "hero-video--visible")}
-        autoPlay={shouldAutoplay}
-        muted={muted}
-        loop={shouldLoop}
-        controls={controls}
-        playsInline
-        preload={controls ? "metadata" : "auto"}
-        onLoadedData={markReady}
-        onCanPlay={markReady}
-        onError={markError}
-      >
-        <source src={src} type={mimeType} />
-      </video>
+      <div aria-hidden="true" className="hero-fallback" />
+      <iframe
+        src={embedSrc}
+        title={title}
+        className="hero-video hero-video--visible"
+        style={{ border: 0 }}
+        allow="autoplay"
+      />
     </div>
   );
 }
@@ -107,7 +78,7 @@ export function HeroVideoPlayer({
   }
 
   return (
-    <HeroVideoPlayerAutoplay
+    <HeroVideoPlayerFrame
       key={src}
       src={src}
       mimeType={mimeType}

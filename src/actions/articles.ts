@@ -21,7 +21,7 @@ import {
   buildUniqueArticleSlug,
 } from "@/lib/articles/slug";
 import type { ArticleActionResult, ArticleBlock } from "@/lib/articles/types";
-import { verifyArticleCategory, verifyArticleTags } from "@/lib/taxonomy/queries";
+import { verifyArticleTags } from "@/lib/taxonomy/queries";
 import { normalizeStoredSeoForSave } from "@/lib/seo/resolve";
 import {
   archiveArticleSchema,
@@ -143,19 +143,8 @@ async function validateSlugAvailability(
 }
 
 async function validateTaxonomy(
-  categoryId: string,
   tagIds: string[]
 ): Promise<ArticleActionResult> {
-  const categoryValid = await verifyArticleCategory(categoryId);
-
-  if (!categoryValid) {
-    return {
-      success: false,
-      error: ARTICLE_ERRORS.categoryInvalid,
-      fieldErrors: { category_id: ARTICLE_ERRORS.categoryInvalid },
-    };
-  }
-
   const tagsValid = await verifyArticleTags(tagIds);
 
   if (!tagsValid) {
@@ -184,7 +173,6 @@ function toArticleInsertRow(input: ArticleDraftInput | ArticlePublishInput) {
     body,
     cover_media_id: input.cover_media_id,
     seo_og_media_id: input.seo_og_media_id,
-    category_id: input.category_id,
     reading_time_minutes: readingTimeMinutes,
     content,
     seo: normalizeStoredSeoForSave(input.seo),
@@ -217,7 +205,6 @@ function toArticleUpdateRow(
     body,
     cover_media_id: input.cover_media_id,
     seo_og_media_id: input.seo_og_media_id,
-    category_id: input.category_id,
     reading_time_minutes: readingTimeMinutes,
     content,
     seo: normalizeStoredSeoForSave(input.seo),
@@ -307,10 +294,7 @@ export async function createArticleAction(
     return mediaValidation;
   }
 
-  const taxonomyValidation = await validateTaxonomy(
-    data.category_id,
-    data.tag_ids
-  );
+  const taxonomyValidation = await validateTaxonomy(data.tag_ids);
 
   if (!taxonomyValidation.success) {
     return taxonomyValidation;
@@ -408,10 +392,7 @@ export async function updateArticleAction(
     return mediaValidation;
   }
 
-  const taxonomyValidation = await validateTaxonomy(
-    data.category_id,
-    data.tag_ids
-  );
+  const taxonomyValidation = await validateTaxonomy(data.tag_ids);
 
   if (!taxonomyValidation.success) {
     return taxonomyValidation;
@@ -486,10 +467,7 @@ export async function publishArticleAction(
     return mediaValidation;
   }
 
-  const taxonomyValidation = await validateTaxonomy(
-    data.category_id,
-    data.tag_ids
-  );
+  const taxonomyValidation = await validateTaxonomy(data.tag_ids);
 
   if (!taxonomyValidation.success) {
     return taxonomyValidation;

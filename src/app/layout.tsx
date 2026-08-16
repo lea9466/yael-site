@@ -38,6 +38,17 @@ export const viewport: Viewport = {
 // whole app. This makes those two DOM calls no-ops instead of throwing when
 // the node isn't actually where React thinks it is.
 //
+// NetFree specifically (confirmed by reading their injected script) also
+// unconditionally appends a UI panel (id="netfree-popup-window...") as a
+// direct child of <body> on page load, regardless of any video/image on the
+// page. Next.js hydrates the whole document, so <body>'s children are
+// React's own reconciliation scope — an extra untracked sibling there is
+// what actually destabilizes it. Their panel is position:fixed, so it
+// renders identically regardless of where in the DOM tree it lives; a
+// MutationObserver relocates it to <html> (a sibling of body, outside
+// React's tree) the instant it appears, before React can be confronted
+// with it, without affecting how NetFree's own UI looks or functions.
+//
 // This same script also reports the first uncaught error/rejection on the
 // page to /api/client-error-log, since whatever is crashing the page for
 // filtered visitors happens entirely in their browser — our server never
@@ -62,6 +73,39 @@ const DOM_MUTATION_GUARD_SCRIPT = `(function () {
     }
     return originalInsertBefore.apply(this, arguments);
   };
+
+  function isForeignInjectedNode(node) {
+    if (node.nodeType !== 1) return false;
+    if (node.id && node.id.indexOf("netfree-") === 0) return true;
+    return !!(node.querySelector && node.querySelector('[id^="netfree-"]'));
+  }
+
+  function relocateForeignBodyChildren() {
+    var body = document.body;
+    if (!body) return;
+    var children = Array.prototype.slice.call(body.children);
+    for (var i = 0; i < children.length; i++) {
+      var child = children[i];
+      if (child.id === "portal-root") continue;
+      if (isForeignInjectedNode(child)) {
+        document.documentElement.appendChild(child);
+      }
+    }
+  }
+
+  function startForeignBodyChildWatcher() {
+    if (!document.body || typeof MutationObserver !== "function") return;
+    relocateForeignBodyChildren();
+    new MutationObserver(relocateForeignBodyChildren).observe(document.body, {
+      childList: true,
+    });
+  }
+
+  if (document.body) {
+    startForeignBodyChildWatcher();
+  } else {
+    document.addEventListener("DOMContentLoaded", startForeignBodyChildWatcher);
+  }
 
   var reported = false;
 

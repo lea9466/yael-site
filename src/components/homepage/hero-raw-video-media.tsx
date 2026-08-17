@@ -17,8 +17,7 @@ export function HeroRawVideoMedia({ url, title }: { url: string; title: string }
       src={embedSrc}
       title={title}
       className="hero-video border-0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowFullScreen
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture"
       sandbox="allow-scripts allow-popups allow-presentation"
     />
   );

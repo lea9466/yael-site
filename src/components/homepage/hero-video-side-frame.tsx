@@ -1,45 +1,93 @@
 "use client";
 
 import { Maximize2, Minimize2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useRef, useSyncExternalStore, type ReactNode } from "react";
+
+type FullscreenableElement = HTMLDivElement & {
+  webkitRequestFullscreen?: () => Promise<void> | void;
+};
+
+type FullscreenDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+  webkitExitFullscreen?: () => Promise<void> | void;
+  webkitFullscreenEnabled?: boolean;
+};
+
+function isFullscreenSupported(): boolean {
+  const doc = document as FullscreenDocument;
+  return Boolean(doc.fullscreenEnabled ?? doc.webkitFullscreenEnabled);
+}
+
+function getFullscreenElement(): Element | null {
+  const doc = document as FullscreenDocument;
+  return doc.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
+}
+
+function subscribeToFullscreenChange(callback: () => void) {
+  document.addEventListener("fullscreenchange", callback);
+  document.addEventListener("webkitfullscreenchange", callback);
+  return () => {
+    document.removeEventListener("fullscreenchange", callback);
+    document.removeEventListener("webkitfullscreenchange", callback);
+  };
+}
+
+function getServerSnapshotFalse() {
+  return false;
+}
 
 export function HeroVideoSideFrame({ children }: { children: ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
 
-  useEffect(() => {
-    const handleChange = () => {
-      setIsFullscreen(document.fullscreenElement === containerRef.current);
-    };
+  const supportsFullscreen = useSyncExternalStore(
+    () => () => {},
+    isFullscreenSupported,
+    getServerSnapshotFalse
+  );
 
-    document.addEventListener("fullscreenchange", handleChange);
-    return () => document.removeEventListener("fullscreenchange", handleChange);
-  }, []);
+  const isFullscreen = useSyncExternalStore(
+    subscribeToFullscreenChange,
+    () => getFullscreenElement() === containerRef.current,
+    getServerSnapshotFalse
+  );
 
   const toggleFullscreen = useCallback(() => {
-    const container = containerRef.current;
+    const container = containerRef.current as FullscreenableElement | null;
     if (!container) {
       return;
     }
 
-    if (document.fullscreenElement) {
-      void document.exitFullscreen();
-    } else {
-      void container.requestFullscreen();
+    const doc = document as FullscreenDocument;
+
+    if (getFullscreenElement()) {
+      const exit = doc.exitFullscreen?.bind(doc) ?? doc.webkitExitFullscreen?.bind(doc);
+      Promise.resolve(exit?.()).catch((error: unknown) => {
+        console.error("Failed to exit fullscreen", error);
+      });
+      return;
     }
+
+    const request =
+      container.requestFullscreen?.bind(container) ??
+      container.webkitRequestFullscreen?.bind(container);
+    Promise.resolve(request?.()).catch((error: unknown) => {
+      console.error("Failed to enter fullscreen", error);
+    });
   }, []);
 
   return (
     <div ref={containerRef} className="hero-video-side">
       {children}
-      <button
-        type="button"
-        onClick={toggleFullscreen}
-        className="hero-video-side__expand"
-        aria-label={isFullscreen ? "צמצום למסך רגיל" : "הגדלה למסך מלא"}
-      >
-        {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-      </button>
+      {supportsFullscreen && (
+        <button
+          type="button"
+          onClick={toggleFullscreen}
+          className="hero-video-side__expand"
+          aria-label={isFullscreen ? "צמצום למסך רגיל" : "הגדלה למסך מלא"}
+        >
+          {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+        </button>
+      )}
     </div>
   );
 }

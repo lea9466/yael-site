@@ -58,7 +58,7 @@ function HeroVideoPlayerFrame({
         title={title}
         className="hero-video hero-video--visible"
         style={{ border: 0 }}
-        allow="autoplay"
+        allow="autoplay; fullscreen"
         sandbox="allow-scripts allow-popups allow-presentation"
       />
     </div>

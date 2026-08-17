@@ -3510,7 +3510,10 @@
 
   .recipes-page {
     flex: 1;
-    background-color: var(--color-background);
+    background: linear-gradient(145deg,
+        var(--color-light-sage-soft) 0%,
+        var(--color-cream) 42%,
+        var(--color-coral-soft) 100%);
   }
 
   .recipes-page__empty {

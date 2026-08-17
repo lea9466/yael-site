@@ -5,6 +5,7 @@ import { HeroMediaErrorBoundary } from "@/components/homepage/hero-media-error-b
 import { HeroRawVideoMedia } from "@/components/homepage/hero-raw-video-media";
 import { HeroResponsiveMedia } from "@/components/homepage/hero-responsive-media";
 import { HeroVideoPlayer } from "@/components/homepage/hero-video-player";
+import { HeroVideoSideFrame } from "@/components/homepage/hero-video-side-frame";
 import type { HomepageHeroMediaPreview } from "@/lib/homepage/queries";
 import type { HomepageHeroData } from "@/lib/validations/homepage-hero";
 import { cn } from "@/lib/utils/cn";
@@ -226,7 +227,20 @@ export function HomepageHeroSection({
         <div className="hero-stage__container">
           <div className="hero-editorial hero-editorial-enter">
             <div className="hero-content-row">
-              {hasSideMedia && (
+              {hasSideMedia && hero.side_media_type === "video_url" && (
+                <HeroVideoSideFrame>
+                  <HeroMediaErrorBoundary fallback={heroMediaFallback}>
+                    <SideHeroMedia
+                      hero={hero}
+                      desktopMediaPreview={sideMediaPreview}
+                      mobileMediaPreview={sideMediaPreview}
+                      title={hero.title}
+                    />
+                  </HeroMediaErrorBoundary>
+                </HeroVideoSideFrame>
+              )}
+
+              {hasSideMedia && hero.side_media_type !== "video_url" && (
                 <div className="hero-video-side">
                   <HeroMediaErrorBoundary fallback={heroMediaFallback}>
                     <SideHeroMedia

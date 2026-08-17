@@ -226,11 +226,6 @@ export function HomepageHeroSection({
         <div className="hero-stage__container">
           <div className="hero-editorial hero-editorial-enter">
             <div className="hero-content-row">
-              {/* Temporarily disabled: the side video was crashing the
-                  homepage for visitors behind NetFree. Media now proxies
-                  through the site's own domain (getPublicMediaUrl), which
-                  should have fixed this — re-enable once that's confirmed
-                  solid on the live site.
               {hasSideMedia && (
                 <div className="hero-video-side">
                   <HeroMediaErrorBoundary fallback={heroMediaFallback}>
@@ -243,7 +238,6 @@ export function HomepageHeroSection({
                   </HeroMediaErrorBoundary>
                 </div>
               )}
-              */}
 
               <div className="hero-content-main">
                 <h1 id="homepage-hero-title" className="hero-title">

@@ -3510,6 +3510,7 @@
 
   .recipes-page {
     flex: 1;
+    background-color: var(--color-background);
   }
 
   .recipes-page__empty {

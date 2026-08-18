@@ -15,6 +15,13 @@ const RESPONSE_HEADERS_TO_FORWARD = [
   "last-modified",
 ];
 
+// Every storage path is a fresh randomUUID() at upload time (see
+// buildOptimizedStoragePath in process-image.ts, and the equivalents in
+// process-video.ts/process-pdf.ts) and nothing ever overwrites an existing
+// path — a re-upload just creates a new path. So once a path resolves, its
+// content can never change, which makes it safe to cache forever.
+const IMMUTABLE_CACHE_CONTROL = "public, max-age=31536000, immutable";
+
 function isValidStorageSegment(segment: string): boolean {
   return segment.length > 0 && segment !== "." && segment !== "..";
 }
@@ -43,12 +50,23 @@ export async function GET(
     }
   }
 
+  // Range requests (video seeking) and conditional requests (a browser's own
+  // revalidation) are inherently request-specific — caching those risks
+  // serving the wrong byte range, or a stale 304, to a different client. A
+  // plain full-content GET (an <img>/<video poster> load, the overwhelming
+  // majority of hits on a media-heavy site) has no such risk and is exactly
+  // what was re-hitting this function and Supabase on every single page view.
+  const isRangeOrConditional =
+    upstreamHeaders.has("range") || upstreamHeaders.has("if-none-match") || upstreamHeaders.has("if-modified-since");
+
   let upstreamResponse: Response;
   try {
-    upstreamResponse = await fetch(upstreamUrl, {
-      headers: upstreamHeaders,
-      cache: "no-store",
-    });
+    upstreamResponse = await fetch(
+      upstreamUrl,
+      isRangeOrConditional
+        ? { headers: upstreamHeaders, cache: "no-store" }
+        : { headers: upstreamHeaders, next: { revalidate: 31536000 } }
+    );
   } catch (error) {
     console.error("[media-proxy] upstream fetch failed", { path: path.join("/"), error });
     return new Response("Not found", { status: 404 });
@@ -68,6 +86,13 @@ export async function GET(
     if (value) {
       responseHeaders.set(header, value);
     }
+  }
+
+  // Overrides whatever cache-control Supabase Storage happened to forward —
+  // this is what actually gets Vercel's Edge Network to serve repeat
+  // requests straight from cache without invoking this function again.
+  if (!isRangeOrConditional && upstreamResponse.status === 200) {
+    responseHeaders.set("cache-control", IMMUTABLE_CACHE_CONTROL);
   }
 
   return new Response(upstreamResponse.body, {

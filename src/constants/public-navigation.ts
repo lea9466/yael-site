@@ -14,6 +14,16 @@ export const PUBLIC_PRIMARY_NAV: PublicNavLink[] = [
 
 export const PUBLIC_PRESS_NAV_HREF = "/press";
 
+/**
+ * Direct link to the flagship "ליווי אישי" service. Appended to the header
+ * navigation only (not the footer or sitemap — the service already appears
+ * there via the services list).
+ */
+export const PUBLIC_LIVUY_NAV_LINK: PublicNavLink = {
+  label: "ליווי",
+  href: "/services/ליווי-אישי",
+};
+
 export function buildPublicPrimaryNav(
   options: { includePress: boolean } = { includePress: false }
 ): PublicNavLink[] {

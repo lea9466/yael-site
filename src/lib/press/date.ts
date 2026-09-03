@@ -1,3 +1,10 @@
+import { HDate } from "@hebcal/core";
+
+/**
+ * Public-facing press date, rendered on the Hebrew calendar
+ * (e.g. "כ״ז טבת תשפ״ו"). Falls back to a Hebrew Gregorian date if the
+ * Hebrew-calendar conversion fails for any reason.
+ */
 export function formatPressDate(isoDate: string | null): string {
   if (!isoDate) {
     return "—";
@@ -9,11 +16,15 @@ export function formatPressDate(isoDate: string | null): string {
     return "—";
   }
 
-  return new Intl.DateTimeFormat("he-IL", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(date);
+  try {
+    return new HDate(date).renderGematriya(true);
+  } catch {
+    return new Intl.DateTimeFormat("he-IL", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(date);
+  }
 }
 
 export function formatPressDateShort(isoDate: string | null): string {

@@ -3,7 +3,6 @@
 import { useCallback, useState } from "react";
 import { usePathname } from "next/navigation";
 
-import { AdminInactivityGuard } from "@/components/admin/admin-inactivity-guard";
 import { AdminShellProvider } from "@/components/admin/admin-shell-context";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { useSidebarCollapse } from "@/lib/hooks/use-sidebar-collapse";
@@ -31,8 +30,6 @@ export function AdminShell({ fullName, email, children }: AdminShellProps) {
   return (
     <AdminShellProvider openMobileMenu={handleOpen}>
       <div className="admin-layout-root flex min-h-dvh w-full max-w-full overflow-x-hidden bg-[var(--color-background)] lg:flex-row">
-        <AdminInactivityGuard />
-
         <button
           type="button"
           aria-label="סגור תפריט ניווט"

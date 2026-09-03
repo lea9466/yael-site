@@ -1,5 +1,3 @@
-export const ADMIN_INACTIVITY_MS = 15 * 60 * 1000;
-
 export const ADMIN_LAST_ACTIVITY_COOKIE = "admin_last_activity";
 
 export const adminActivityCookieOptions = {

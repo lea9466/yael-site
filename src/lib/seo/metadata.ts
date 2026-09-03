@@ -5,6 +5,28 @@ import { buildCanonicalUrl } from "@/lib/seo/resolve";
 import { finalizeDocumentTitle } from "@/lib/seo/title";
 import type { WebsiteSettingsPublic } from "@/lib/public/types";
 
+/**
+ * Topic keywords for the site, emitted as the <meta name="keywords"> tag on
+ * every page. Google ignores this tag for ranking, but it is still read by
+ * other engines and by some social / AI crawlers.
+ */
+const SITE_SEO_KEYWORDS = [
+  "יעל קנייבסקי",
+  "אכילה רגשית",
+  "הרזיה",
+  "משקל",
+  "מערכת יחסים עם אוכל",
+  "בריאות",
+  "מתכונים בריאים",
+  "אכילה קשובה",
+  "אכילה מחוברת",
+  "נון-דיאט",
+  "סדנאות בריאות",
+  "בישול בריא",
+  "אימון אישי",
+  "אימון לאורח חיים בריא",
+];
+
 export type PageMetadataInput = {
   title?: string;
   description?: string;
@@ -59,7 +81,7 @@ function resolveFaviconIcons(): Metadata["icons"] {
   // Served by src/app/icon.tsx and src/app/apple-icon.tsx from the CMS
   // favicon (with a brand fallback). Cache-bust so browsers drop the old
   // default Next/React favicon.ico they may have cached.
-  const version = "v2";
+  const version = "v3";
 
   return {
     icon: [{ url: `/icon?${version}`, type: "image/png", sizes: "32x32" }],
@@ -96,6 +118,7 @@ export function buildSiteMetadata(
       absolute: title,
     },
     description,
+    keywords: SITE_SEO_KEYWORDS,
     icons: resolveFaviconIcons(),
     alternates: {
       canonical: canonicalUrl,

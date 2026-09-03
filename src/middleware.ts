@@ -2,7 +2,6 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 import {
-  ADMIN_INACTIVITY_MS,
   ADMIN_LAST_ACTIVITY_COOKIE,
   adminActivityCookieOptions,
 } from "@/lib/auth/constants";
@@ -93,40 +92,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    const lastActivity = request.cookies.get(ADMIN_LAST_ACTIVITY_COOKIE)?.value;
-
-    if (lastActivity) {
-      const elapsed = Date.now() - Number(lastActivity);
-
-      if (!Number.isNaN(elapsed) && elapsed > ADMIN_INACTIVITY_MS) {
-        if (isServerAction) {
-          return response;
-        }
-
-        const redirectResponse = NextResponse.redirect(
-          new URL("/login?reason=inactivity", request.url)
-        );
-
-        const signOutClient = createServerClient(url, anonKey, {
-          cookies: {
-            getAll() {
-              return request.cookies.getAll();
-            },
-            setAll(cookiesToSet) {
-              cookiesToSet.forEach(({ name, value, options }) => {
-                redirectResponse.cookies.set(name, value, options);
-              });
-            },
-          },
-        });
-
-        await signOutClient.auth.signOut();
-        redirectResponse.cookies.delete(ADMIN_LAST_ACTIVITY_COOKIE);
-
-        return redirectResponse;
-      }
-    }
-
+    // Mark that an admin session is active in this browser (used to keep the
+    // "coming soon" gate open for the site owner). There is no inactivity
+    // timeout — the admin stays signed in until they log out explicitly.
     response.cookies.set(
       ADMIN_LAST_ACTIVITY_COOKIE,
       String(Date.now()),

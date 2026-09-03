@@ -8,6 +8,7 @@ import { SiteStructuredData } from "@/components/public/seo/organization-json-ld
 import {
   buildPublicFooterNav,
   buildPublicPrimaryNav,
+  PUBLIC_LIVUY_NAV_LINK,
 } from "@/constants/public-navigation";
 import { hasPublishedPressArticles } from "@/lib/press/queries";
 import { getWebsiteSettings } from "@/lib/public/queries";
@@ -29,7 +30,10 @@ export default async function PublicLayout({
     hasPublishedPressArticles(),
   ]);
 
-  const primaryNav = buildPublicPrimaryNav({ includePress });
+  const primaryNav = [
+    ...buildPublicPrimaryNav({ includePress }),
+    PUBLIC_LIVUY_NAV_LINK,
+  ];
   const footerNav = buildPublicFooterNav({ includePress });
 
   return (

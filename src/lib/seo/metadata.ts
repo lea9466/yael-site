@@ -78,9 +78,10 @@ function resolveOgImage(
 }
 
 function resolveFaviconIcons(): Metadata["icons"] {
-  // Served by src/app/icon.tsx and src/app/apple-icon.tsx. Cache-bust so
-  // browsers drop the old default Next/React favicon.ico they may have cached.
-  const version = "v2";
+  // Served by src/app/icon.tsx and src/app/apple-icon.tsx from the CMS
+  // favicon (with a brand fallback). Cache-bust so browsers / crawlers drop
+  // the old placeholder mark they cached.
+  const version = "v3";
 
   return {
     icon: [{ url: `/icon?${version}`, type: "image/png", sizes: "32x32" }],

@@ -26,6 +26,17 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "35mb",
     },
   },
+  // sharp ships a platform-specific native binary as an optional dependency
+  // (@img/sharp-linux-x64 etc.) loaded via a runtime require() the bundler's
+  // static trace misses. On Vercel that left the serverless functions without
+  // the binary, so every route that pulls sharp in (media upload / picker
+  // actions, the favicon image route) threw at module load and returned 500 —
+  // while `next start` locally worked because the host had sharp installed.
+  // Keep sharp external and force its native packages into every server trace.
+  serverExternalPackages: ["sharp"],
+  outputFileTracingIncludes: {
+    "/**": ["./node_modules/@img/**/*", "./node_modules/sharp/**/*"],
+  },
   images: {
     remotePatterns: [
       {

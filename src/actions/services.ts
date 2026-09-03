@@ -54,6 +54,14 @@ async function getAdminSupabase(): Promise<{
 function revalidateServicePaths(serviceId?: string) {
   revalidatePath("/admin/services");
 
+  // Public surfaces that list services and link to their (slug-based) detail
+  // pages. Without this a publish / unpublish / feature change — or a rename
+  // done before slugs were frozen — leaves the statically rendered listing
+  // pointing at a stale URL that 404s.
+  revalidatePath("/services");
+  revalidatePath("/services", "layout");
+  revalidatePath("/");
+
   if (serviceId) {
     revalidatePath(`/admin/services/${serviceId}`);
     revalidatePath(`/admin/services/${serviceId}/preview`);
@@ -286,7 +294,10 @@ export async function updateServiceAction(
     return { success: false, error: SERVICE_ERRORS.notFound };
   }
 
-  const data = parsed.data;
+  // The slug is the public URL and is frozen after the first save. Never let an
+  // edit change it — the form may post a freshly slugified value when the title
+  // changes, and persisting it would 404 every existing link to the page.
+  const data = { ...parsed.data, slug: existing.slug };
 
   const mediaValidation = await validateMediaIds(
     data.cover_media_id,
@@ -295,14 +306,6 @@ export async function updateServiceAction(
 
   if (!mediaValidation.success) {
     return mediaValidation;
-  }
-
-  // Validate slug availability if it changed
-  if (data.slug !== existing.slug) {
-    const slugValidation = await validateSlugAvailability(data.slug, existing.id);
-    if (!slugValidation.success) {
-      return slugValidation;
-    }
   }
 
   const rowInput = data;

@@ -168,7 +168,7 @@ export function ArticleForm({
         }
       : null
   );
-  const [slugTouched, setSlugTouched] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(mode === "edit");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
     open: boolean;
@@ -267,11 +267,16 @@ export function ArticleForm({
     setValues((current) => ({
       ...current,
       title,
-      slug: slugTouched ? current.slug : slugifyTitle(title),
+      slug:
+        mode === "edit" || slugTouched ? current.slug : slugifyTitle(title),
     }));
   };
 
   const handleSlugResetFromTitle = () => {
+    if (mode === "edit") {
+      return;
+    }
+
     setSlugTouched(false);
     setValues((current) => ({
       ...current,
@@ -637,7 +642,11 @@ export function ArticleForm({
               label: "כתובת פוסט (slug)",
               htmlFor: "article-slug",
               value: values.slug,
-              hint: "נוצרת אוטומטית מהכותרת. אופציונלית בטיוטה · נדרשת לפרסום",
+              locked: mode === "edit",
+              hint:
+                mode === "edit"
+                  ? undefined
+                  : "נוצרת אוטומטית מהכותרת. אופציונלית בטיוטה · נדרשת לפרסום",
               onChange: (slug) => setField("slug", slug),
               onManualEdit: () => setSlugTouched(true),
               onResetFromTitle: handleSlugResetFromTitle,

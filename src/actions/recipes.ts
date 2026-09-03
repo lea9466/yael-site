@@ -384,15 +384,10 @@ export async function updateRecipeAction(
     return { success: false, error: RECIPE_ERRORS.notFound };
   }
 
-  const data = parsed.data;
-
-  // Validate slug availability if it changed
-  if (data.slug !== existing.slug) {
-    const slugValidation = await validateSlugAvailability(data.slug, existing.id);
-    if (!slugValidation.success) {
-      return slugValidation;
-    }
-  }
+  // The slug is the public URL and is frozen after the first save. Never let an
+  // edit change it — the form may post a freshly slugified value when the title
+  // changes, and persisting it would 404 every existing link to the page.
+  const data = { ...parsed.data, slug: existing.slug };
 
   if (!data.cover_media_id) {
     return {

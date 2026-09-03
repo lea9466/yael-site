@@ -219,7 +219,7 @@ export function RecipeForm({
         }
       : null
   );
-  const [slugTouched, setSlugTouched] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(mode === "edit");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
     open: boolean;
@@ -311,11 +311,16 @@ export function RecipeForm({
     setValues((current) => ({
       ...current,
       title,
-      slug: slugTouched ? current.slug : slugifyTitle(title),
+      slug:
+        mode === "edit" || slugTouched ? current.slug : slugifyTitle(title),
     }));
   };
 
   const handleSlugResetFromTitle = () => {
+    if (mode === "edit") {
+      return;
+    }
+
     setSlugTouched(false);
     setValues((current) => ({
       ...current,
@@ -842,7 +847,11 @@ export function RecipeForm({
             label: "כתובת מתכון (slug)",
             htmlFor: "recipe-slug",
             value: values.slug,
-            hint: "נוצרת אוטומטית מהכותרת. אופציונלית בטיוטה · נדרשת לפרסום",
+            locked: mode === "edit",
+            hint:
+              mode === "edit"
+                ? undefined
+                : "נוצרת אוטומטית מהכותרת. אופציונלית בטיוטה · נדרשת לפרסום",
             onChange: (slug) => setField("slug", slug),
             onManualEdit: () => setSlugTouched(true),
             onResetFromTitle: handleSlugResetFromTitle,

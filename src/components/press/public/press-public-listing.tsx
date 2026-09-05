@@ -15,13 +15,10 @@ export function PressPublicListing({ articles }: PressPublicListingProps) {
     <div className="mx-auto w-full max-w-[90rem] px-5 py-12 md:px-20 md:py-16">
       <header className="mb-10 max-w-2xl space-y-3">
         <p className="text-caption font-medium tracking-wide text-[var(--color-secondary)]">
-          מהעיתונות
+          מן התקשורת
         </p>
-        <h1 className="text-page-title">כתבות וראיונות</h1>
-        <p className="text-lg text-[var(--color-text-muted)]">
-          כתבות, ראיונות וסיקור תקשורתי על אכילה מחוברת ועל הליווי התזונתי של
-          יעל.
-        </p>
+        <h1 className="text-page-title">מאחורי העיתון</h1>
+        <p className="text-lg text-[var(--color-text-muted)]">כתבות וראיונות</p>
       </header>
 
       {isEmpty ? (

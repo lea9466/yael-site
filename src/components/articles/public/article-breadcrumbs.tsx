@@ -31,7 +31,7 @@ export function ArticleBreadcrumbs({
             href={buildBlogPath()}
             className="post-article__breadcrumbs-link public-focus-ring"
           >
-            בלוג
+            תוכן טוב
           </Link>
         </li>
         <li aria-hidden="true" className="post-article__breadcrumbs-sep">

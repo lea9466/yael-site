@@ -34,7 +34,7 @@ export function PressPublicDetailView({ article }: PressPublicDetailViewProps) {
               href="/press"
               className="public-focus-ring hover:text-[var(--color-primary)]"
             >
-              כתבות
+              מאחורי העיתון
             </Link>
           </li>
           <li aria-hidden="true">/</li>

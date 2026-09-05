@@ -23,7 +23,7 @@ export function PressBreadcrumbJsonLd({
       {
         "@type": "ListItem",
         position: 2,
-        name: "כתבות",
+        name: "מאחורי העיתון",
         item: `${SITE_ORIGIN}/press`,
       },
       {

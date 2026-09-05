@@ -3574,6 +3574,14 @@
     margin-bottom: 1.5rem;
   }
 
+  .recipes-listing-hero__eyebrow {
+    margin: 0;
+    color: var(--color-secondary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
   .recipes-listing-hero__title {
     margin: 0;
     color: var(--color-primary);

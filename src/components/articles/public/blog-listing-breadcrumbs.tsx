@@ -29,7 +29,7 @@ export function BlogListingBreadcrumbs({
             aria-current="page"
             className="recipes-listing-breadcrumbs__current"
           >
-            בלוג
+            תוכן טוב
           </span>
         </li>
       </ol>
@@ -48,7 +48,7 @@ export function BlogListingBreadcrumbJsonLd() {
     {
       "@type": "ListItem",
       position: 2,
-      name: "בלוג",
+      name: "תוכן טוב",
       item: `${SITE_ORIGIN}/blog`,
     },
   ];

@@ -8,8 +8,8 @@ export const PUBLIC_PRIMARY_NAV: PublicNavLink[] = [
   { label: "הסיפור שלי", href: "/about" },
   { label: "שירותים", href: "/services" },
   { label: "מתכונים", href: "/recipes" },
-  { label: "פוסטים", href: "/blog" },
-  { label: "כתבות", href: "/press" },
+  { label: "תוכן טוב", href: "/blog" },
+  { label: "מאחורי העיתון", href: "/press" },
 ];
 
 export const PUBLIC_PRESS_NAV_HREF = "/press";

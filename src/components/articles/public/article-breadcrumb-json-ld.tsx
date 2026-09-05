@@ -20,7 +20,7 @@ export function ArticleBreadcrumbJsonLd({
     {
       "@type": "ListItem",
       position: 2,
-      name: "בלוג",
+      name: "תוכן טוב",
       item: `${SITE_ORIGIN}${buildBlogPath()}`,
     },
     {

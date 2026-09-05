@@ -81,10 +81,10 @@ function resolveFaviconIcons(): Metadata["icons"] {
   // Served by src/app/icon.tsx and src/app/apple-icon.tsx from the CMS
   // favicon (with a brand fallback). Cache-bust so browsers / crawlers drop
   // the old placeholder mark they cached.
-  const version = "v3";
+  const version = "v4";
 
   return {
-    icon: [{ url: `/icon?${version}`, type: "image/png", sizes: "32x32" }],
+    icon: [{ url: `/icon?${version}`, type: "image/png", sizes: "96x96" }],
     shortcut: [{ url: `/icon?${version}`, type: "image/png" }],
     apple: [
       { url: `/apple-icon?${version}`, type: "image/png", sizes: "180x180" },

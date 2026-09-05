@@ -33,11 +33,14 @@ export function ContactCtaSection({ content, settings }: ContactCtaSectionProps)
 
           <div className="contact-cta-section__layout">
             <div className="contact-cta-section__copy">
+              {/* Title + button label are fixed in code — the homepage
+                  contact CTA has no CMS editor. Only the body text is
+                  content-driven. */}
               <h2
                 id="homepage-contact-cta-title"
                 className="contact-cta-section__title"
               >
-                {content.title}
+                טוב להיות בקשר
               </h2>
               <p className="contact-cta-section__text">{content.text}</p>
             </div>
@@ -47,7 +50,7 @@ export function ContactCtaSection({ content, settings }: ContactCtaSectionProps)
                 href="/contact"
                 className="contact-cta-section__primary public-focus-ring"
               >
-                {content.button_label}
+                מכאן מתחברים
               </Link>
 
               {phoneHref ? (

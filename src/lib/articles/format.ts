@@ -1,4 +1,5 @@
 import { formatReadingTime } from "@/lib/articles/reading-time";
+import { formatHebrewCalendarDate } from "@/lib/date/hebrew-calendar";
 
 export function formatArticleDate(value: string): string {
   const date = new Date(value);
@@ -16,18 +17,9 @@ export function formatArticleDate(value: string): string {
   }).format(date);
 }
 
+/** Public-facing post date, on the Hebrew calendar (e.g. "כ״ז בטבת תשפ״ו"). */
 export function formatArticleDateShort(value: string): string {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "—";
-  }
-
-  return new Intl.DateTimeFormat("he-IL", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(date);
+  return formatHebrewCalendarDate(value);
 }
 
 export function formatArticleExcerpt(body: string, maxLength = 160): string {

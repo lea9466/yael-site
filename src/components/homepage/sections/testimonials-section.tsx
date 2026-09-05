@@ -22,8 +22,8 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
           <PublicSectionHeader
             className="testimonials-section__header"
             titleId="homepage-testimonials-title"
-            eyebrow="המלצות"
-            title="מה אומרים על הליווי"
+            title="דיבורים טובים"
+            description="פידבקים טובים מלקוחות"
           />
         </HomepageReveal>
 

@@ -1,7 +1,7 @@
-import { ApproachSection } from "@/components/homepage/sections/approach-section";
 // Temporary: certificates section hidden on homepage
 // import { CertificatesSection } from "@/components/homepage/sections/certificates-section";
 import { ContactCtaSection } from "@/components/homepage/sections/contact-cta-section";
+import { FeelGoodBanner } from "@/components/homepage/sections/feel-good-banner";
 import { HomepageHeroSection } from "@/components/homepage/sections/hero-section";
 import { RecentPostsSection } from "@/components/homepage/sections/recent-posts-section";
 import { RecentRecipesSection } from "@/components/homepage/sections/recent-recipes-section";
@@ -59,8 +59,8 @@ export function HomepageView({
         content={homepage.short_about}
         coverPreview={aboutCoverPreview}
       />
+      <FeelGoodBanner href="/services" />
       <ServicesSection services={services} />
-      <ApproachSection content={homepage.approach} />
       <TestimonialsSection testimonials={testimonials} />
       {/* Temporary: certificates section hidden on homepage
       <CertificatesSection certificates={certificates} />

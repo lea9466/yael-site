@@ -26,9 +26,9 @@ export function ServicesSection({ services }: ServicesSectionProps) {
           <PublicSectionHeader
             className="services-section__header"
             titleId="homepage-services-title"
-            title="איך אפשר ללוות אתכם"
-            description="ליווי תזונתי ואכילה מקושרת — בגישה אישית, חמה ומקצועית."
-            actionLabel="לכל השירותים"
+            title="כל טוב"
+            description="מוצרים שיעשו לכם טוב"
+            actionLabel="לעוד דברים טובים"
             actionHref="/services"
           />
         </HomepageReveal>

@@ -23,9 +23,9 @@ export function RecentRecipesSection({ recipes }: RecentRecipesSectionProps) {
           <PublicSectionHeader
             className="recipes-section__header"
             titleId="homepage-recipes-title"
-            title="מהמתכונים האחרונים"
-            description="טעימים, בריאים וקלים להכנה"
-            actionLabel="לכל המתכונים"
+            title="משהו טוב מתבשל פה"
+            description="מתכונים מהלב לצלחת"
+            actionLabel="לעוד מתכונים טובים"
             actionHref="/recipes"
           />
         </HomepageReveal>

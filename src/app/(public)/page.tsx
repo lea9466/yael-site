@@ -15,13 +15,14 @@ import {
   getWebsiteSettings,
 } from "@/lib/public/queries";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { PUBLIC_PAGE_SEO } from "@/lib/seo/public-page-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getWebsiteSettings();
 
   return buildSiteMetadata(settings, {
     path: "/",
-    title: settings.siteSettings.default_seo.title,
+    title: PUBLIC_PAGE_SEO.home.title,
     description: settings.siteSettings.default_seo.description,
     ogImage: settings.ogImage?.url ?? null,
     ogImageAlt: settings.ogImage?.alt ?? settings.businessProfile.business_name,

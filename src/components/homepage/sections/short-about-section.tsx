@@ -140,8 +140,6 @@ export function ShortAboutSection({
         <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16 xl:gap-20">
           <div className="order-2 space-y-8 text-start lg:order-1 lg:col-span-7 lg:pe-8">
             <div className="short-about-copy-enter space-y-8">
-              <span className="short-about-eyebrow">אודות</span>
-
               <h2
                 id="homepage-short-about-title"
                 className="short-about-title"
@@ -157,7 +155,7 @@ export function ShortAboutSection({
                 href="/about"
                 className="public-focus-ring short-about-link group inline-flex items-center gap-2 pb-1"
               >
-                <span>קראי עוד</span>
+                <span>עוד קצת עליי</span>
                 <ArrowLeft
                   aria-hidden="true"
                   className="size-4 transition-transform duration-[var(--transition-base)] motion-safe:group-hover:-translate-x-2"

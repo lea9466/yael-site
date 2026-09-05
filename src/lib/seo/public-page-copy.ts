@@ -4,8 +4,9 @@
  */
 export const PUBLIC_PAGE_SEO = {
   home: {
-    // Fallback only — live homepage prefers CMS default_seo
-    title: "יעל קנייבסקי | מאמנת לאכילה מחוברת וליווי תזונתי",
+    // Browser-tab / Google title for the homepage. finalizeDocumentTitle
+    // appends "| יעל קנייבסקי".
+    title: "תרגישו בבית",
     description:
       "מאמנת לאכילה מחוברת — ליווי אישי, סדנאות תזונה בריאה, מתכונים בריאים ומאמרים על תזונה עם יעל קנייבסקי.",
   },

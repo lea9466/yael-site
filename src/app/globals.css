@@ -4496,6 +4496,62 @@
     }
   }
 
+  .feel-good-banner {
+    padding-block: var(--spacing-3xl);
+    background: linear-gradient(115deg, #6f8e6e 0%, #4a6b52 55%, #3f5f47 100%);
+    color: var(--color-text-on-primary);
+  }
+
+  .feel-good-banner__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 52rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+    text-align: center;
+  }
+
+  .feel-good-banner__title {
+    margin: 0;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  .feel-good-banner__text {
+    margin: 0;
+    max-width: 40rem;
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .feel-good-banner__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.75rem 1.75rem;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-text-on-primary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition:
+      background-color var(--transition-base),
+      transform var(--transition-base);
+  }
+
+  .feel-good-banner__cta:hover {
+    background: rgba(255, 255, 255, 0.16);
+    transform: translateY(-1px);
+  }
+
   .contact-cta-section {
     padding-block: var(--spacing-3xl);
   }

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown, ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowDown, ArrowLeft } from "lucide-react";
 
 import { AboutCertificatesSection } from "@/components/about/about-certificates-section";
 import { AboutEditorialStory } from "@/components/about/about-editorial-story";
@@ -50,13 +50,6 @@ export function AboutPublicView({
 
         <div className="about-page__hero-inner">
           <HomepageReveal className="about-page__hero-copy">
-            <p className="about-page__eyebrow">
-              <Sparkles
-                aria-hidden="true"
-                className="about-page__eyebrow-icon"
-              />
-              להכיר קצת יותר
-            </p>
             <h1 className="about-page__title">{escapeHtml(data.title)}</h1>
             {data.intro_text ? (
               <p className="about-page__intro">

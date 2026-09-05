@@ -5,7 +5,7 @@ export type PublicNavLink = {
 
 export const PUBLIC_PRIMARY_NAV: PublicNavLink[] = [
   { label: "בית", href: "/" },
-  { label: "אודות", href: "/about" },
+  { label: "הסיפור שלי", href: "/about" },
   { label: "שירותים", href: "/services" },
   { label: "מתכונים", href: "/recipes" },
   { label: "פוסטים", href: "/blog" },

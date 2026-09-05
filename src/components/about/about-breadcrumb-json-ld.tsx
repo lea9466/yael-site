@@ -15,7 +15,7 @@ export function AboutBreadcrumbJsonLd() {
       {
         "@type": "ListItem",
         position: 2,
-        name: "אודות",
+        name: "הסיפור שלי",
         item: `${SITE_ORIGIN}/about`,
       },
     ],

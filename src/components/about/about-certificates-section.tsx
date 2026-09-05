@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { GraduationCap } from "lucide-react";
 
 import { CertificatePublicLightbox } from "@/components/certificates/public/certificate-public-lightbox";
 import { sortCertificatesForDisplay } from "@/components/certificates/public/sort-certificates-for-display";
@@ -48,22 +47,14 @@ export function AboutCertificatesSection({
       <div className="about-page__container">
         <HomepageReveal>
           <header className="about-page__certificates-head">
-            <p className="about-page__eyebrow">
-              <GraduationCap
-                aria-hidden="true"
-                className="about-page__eyebrow-icon"
-              />
-              הכשרה וניסיון מקצועי
-            </p>
             <h2
               id="about-certificates-heading"
               className="about-page__certificates-title"
             >
-              תעודות והסמכות
+              לא רק על הקיר
             </h2>
             <p className="about-page__certificates-text">
-              הכשרות, לימודים והסמכות מקצועיות — תשתית הידע שמלווה את הליווי
-              התזונתי ואת הגישה לאכילה מחוברת.
+              התעודות שמאחורי הידע, הכלים והלב
             </p>
           </header>
         </HomepageReveal>

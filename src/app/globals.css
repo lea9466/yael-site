@@ -1552,11 +1552,11 @@
   }
 
   .short-about-visual-enter {
-    animation: short-about-rise 760ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+    animation: short-about-rise 680ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
   }
 
   .short-about-pill-enter {
-    animation: short-about-pill-pop 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: short-about-pill-pop 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   @media (min-width: 1024px) {

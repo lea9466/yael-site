@@ -26,7 +26,7 @@ export function RecentPostsSection({ posts }: RecentPostsSectionProps) {
           <PublicSectionHeader
             className="posts-section__header"
             titleId="homepage-posts-title"
-            title="משהו טוב קורה פה"
+            title="משהו טוב קורא פה"
             description="פוסטים מחוברים ומחברים."
             actionLabel="עוד תוכן טוב"
             actionHref="/blog"

@@ -4,10 +4,10 @@ export type PublicNavLink = {
 };
 
 export const PUBLIC_PRIMARY_NAV: PublicNavLink[] = [
-  { label: "בית", href: "/" },
+  { label: "תרגישו בבית", href: "/" },
   { label: "הסיפור שלי", href: "/about" },
-  { label: "שירותים", href: "/services" },
-  { label: "מתכונים", href: "/recipes" },
+  { label: "דברים טובים", href: "/services" },
+  { label: "מהלב לצלחת", href: "/recipes" },
   { label: "תוכן טוב", href: "/blog" },
   { label: "מאחורי העיתון", href: "/press" },
 ];
@@ -20,7 +20,7 @@ export const PUBLIC_PRESS_NAV_HREF = "/press";
  * there via the services list).
  */
 export const PUBLIC_LIVUY_NAV_LINK: PublicNavLink = {
-  label: "ליווי",
+  label: "הדרך שלך",
   href: "/services/ליווי-אישי",
 };
 
@@ -39,7 +39,7 @@ export function buildPublicFooterNav(
 ): PublicNavLink[] {
   return [
     ...buildPublicPrimaryNav(options),
-    { label: "יצירת קשר", href: "/contact" },
+    { label: "טוב להיות בקשר", href: "/contact" },
     { label: "מדיניות פרטיות", href: "/privacy-policy" },
     { label: "תנאי שימוש", href: "/terms" },
   ];
@@ -51,7 +51,7 @@ export const PUBLIC_FOOTER_NAV: PublicNavLink[] = buildPublicFooterNav({
 });
 
 export const PUBLIC_CTA = {
-  label: "יצירת קשר",
+  label: "טוב להיות בקשר",
   href: "/contact",
 } as const;
 

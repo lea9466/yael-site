@@ -59,7 +59,7 @@ export function HomepageView({
         content={homepage.short_about}
         coverPreview={aboutCoverPreview}
       />
-      <FeelGoodBanner href="/services" />
+      <FeelGoodBanner href="/services/ליווי-אישי" />
       <ServicesSection services={services} />
       <TestimonialsSection testimonials={testimonials} />
       {/* Temporary: certificates section hidden on homepage

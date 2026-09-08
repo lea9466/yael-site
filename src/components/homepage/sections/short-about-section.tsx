@@ -2,27 +2,13 @@ import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-import { PublicHighlightPill } from "@/components/homepage/public-highlight-pill";
 import { OrganicDecoration } from "@/components/homepage/organic-decoration";
 import type { AboutMediaPreview } from "@/lib/about/queries";
-import {
-  HOMEPAGE_SHORT_ABOUT_HIGHLIGHTS,
-  type ShortAboutHighlightPosition,
-} from "@/lib/homepage/short-about-highlights";
 import type { HomepageData } from "@/lib/validations/homepage-hero";
-import { cn } from "@/lib/utils/cn";
 
 type ShortAboutSectionProps = {
   content: HomepageData["short_about"];
   coverPreview: AboutMediaPreview | null;
-};
-
-const highlightPositionClasses: Record<ShortAboutHighlightPosition, string> = {
-  "top-start": "top-4 start-0 motion-safe:-translate-x-4",
-  "top-end": "top-8 end-0 motion-safe:translate-x-4",
-  "center-start": "top-1/2 start-0 -translate-y-1/2 motion-safe:-translate-x-8",
-  "bottom-start": "-bottom-4 start-1/4",
-  "bottom-end": "bottom-24 end-0 motion-safe:translate-x-4",
 };
 
 function AboutEditorialFallback() {
@@ -78,24 +64,6 @@ function AboutVisualComposition({
         ) : (
           <AboutEditorialFallback />
         )}
-
-        {HOMEPAGE_SHORT_ABOUT_HIGHLIGHTS.map((highlight, index) => (
-          <PublicHighlightPill
-            key={highlight.id}
-            label={highlight.label}
-            icon={highlight.icon}
-            variant={highlight.variant}
-            animationDuration={highlight.animationDuration}
-            className={cn(
-              "absolute z-[2]",
-              highlightPositionClasses[highlight.position],
-              "short-about-pill-enter"
-            )}
-            style={{
-              animationDelay: `${180 + index * 120}ms`,
-            }}
-          />
-        ))}
       </div>
     </div>
   );

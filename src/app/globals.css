@@ -6360,18 +6360,6 @@
   text-align: center;
 }
 
-.service-page__quote-mark {
-  display: block;
-  margin-bottom: 0.25rem;
-  color: var(--service-beige);
-  font-family: var(--font-primary), sans-serif;
-  font-size: clamp(4rem, 10vw, 6.5rem);
-  font-weight: 600;
-  line-height: 0.7;
-  opacity: 0.9;
-  text-align: center;
-}
-
 .service-page__intro-copy {
   display: flex;
   flex-direction: column;

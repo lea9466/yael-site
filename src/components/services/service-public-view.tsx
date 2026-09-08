@@ -148,19 +148,20 @@ export function ServicePublicView({
             <h2 id="service-intro-heading" className="sr-only">
               על השירות
             </h2>
-            <span className="service-page__quote-mark" aria-hidden="true">
-              ”
-            </span>
             <div className="service-page__intro-copy">
               {leadParagraph ? (
-                <p className="service-page__intro-lead">
+                <MultilineText as="p" className="service-page__intro-lead">
                   {escapeHtml(leadParagraph)}
-                </p>
+                </MultilineText>
               ) : null}
               {restParagraphs.map((paragraph) => (
-                <p key={paragraph} className="service-page__body">
+                <MultilineText
+                  key={paragraph}
+                  as="p"
+                  className="service-page__body"
+                >
                   {escapeHtml(paragraph)}
-                </p>
+                </MultilineText>
               ))}
             </div>
           </HomepageReveal>

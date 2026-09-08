@@ -629,13 +629,13 @@ export function ServiceForm({
             <FormField
               label="תיאור קצר"
               htmlFor="service-short-description"
-              hint={`${values.short_description.length}/300 · אופציונלי`}
+              hint={`${values.short_description.length}/2000 · אופציונלי`}
               error={fieldErrors.short_description}
             >
               <Textarea
                 id="service-short-description"
                 value={values.short_description}
-                maxLength={300}
+                maxLength={2000}
                 error={Boolean(fieldErrors.short_description)}
                 onChange={(event) =>
                   setField("short_description", event.target.value)

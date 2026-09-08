@@ -240,7 +240,7 @@ const serviceSharedFieldsSchema = z.object({
     .transform((value) => value ?? ""),
   short_description: z
     .string()
-    .max(300, "התיאור הקצר ארוך מדי")
+    .max(2000, "התיאור הקצר ארוך מדי")
     .transform(normalizeMultilineText),
   // Derived plain-text mirror of `content.intro_blocks` (not edited directly).
   full_introduction: z.string().trim().max(60000, "ההקדמה ארוכה מדי"),

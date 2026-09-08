@@ -1,5 +1,8 @@
 import { JsonLd } from "@/lib/seo/json-ld";
-import { buildServiceCanonicalUrl } from "@/lib/seo/resolve";
+import {
+  buildServiceCanonicalUrl,
+  shortenForSeoDescription,
+} from "@/lib/seo/resolve";
 import { SITE_ORIGIN } from "@/lib/site/constants";
 import { normalizeMultilineTextForSeo } from "@/lib/text/multiline-text";
 import { sanitizePlainText } from "@/lib/services/sanitize";
@@ -14,7 +17,8 @@ export function ServiceJsonLd({ service, providerName }: ServiceJsonLdProps) {
   const url = buildServiceCanonicalUrl(service.slug);
   const description = normalizeMultilineTextForSeo(
     sanitizePlainText(
-      service.seo.description.trim() || service.short_description
+      service.seo.description.trim() ||
+        shortenForSeoDescription(service.short_description)
     )
   );
 

@@ -24,8 +24,8 @@ export function ServiceTestimonialsPublicSection({
           <PublicSectionHeader
             className="testimonials-section__header"
             titleId="service-testimonials-heading"
-            eyebrow="המלצות"
-            title="ממי שכבר חוותה את זה"
+            title="דיבורים טובים"
+            description="פידבקים טובים מלקוחות"
           />
         </HomepageReveal>
 

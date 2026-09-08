@@ -6219,28 +6219,6 @@
   text-align: center;
 }
 
-.service-page__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin: 0;
-  padding: 0.45rem 0.9rem;
-  border: 1px solid rgba(111, 142, 110, 0.28);
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.55);
-  color: var(--service-deep);
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  backdrop-filter: blur(6px);
-}
-
-.service-page__eyebrow-icon {
-  width: 0.95rem;
-  height: 0.95rem;
-  color: var(--service-coral);
-}
-
 .service-page__title {
   margin: 0;
   color: var(--service-ink);

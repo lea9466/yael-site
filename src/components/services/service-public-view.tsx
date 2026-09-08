@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { ServiceAudienceIcon } from "@/components/services/service-audience-icon";
@@ -96,10 +96,6 @@ export function ServicePublicView({
 
         <div className="service-page__hero-inner">
           <HomepageReveal className="service-page__hero-copy">
-            <p className="service-page__eyebrow">
-              <Sparkles aria-hidden="true" className="service-page__eyebrow-icon" />
-              שירות אישי
-            </p>
             {displayTitle ? (
               <h1 className="service-page__title">{escapeHtml(displayTitle)}</h1>
             ) : null}

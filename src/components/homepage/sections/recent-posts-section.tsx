@@ -41,7 +41,7 @@ export function RecentPostsSection({ posts }: RecentPostsSectionProps) {
         >
           {orderedPosts.map((post, index) => (
             <li key={post.id} className="posts-section__item">
-              <HomepageReveal delayMs={80 + index * 80} className="h-full">
+              <HomepageReveal delayMs={index * 250} className="h-full">
                 <PostCard post={post} />
               </HomepageReveal>
             </li>

@@ -27,7 +27,7 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
           />
         </HomepageReveal>
 
-        <HomepageReveal delayMs={120}>
+        <HomepageReveal delayMs={250}>
           <TestimonialCarousel testimonials={testimonials} />
         </HomepageReveal>
       </div>

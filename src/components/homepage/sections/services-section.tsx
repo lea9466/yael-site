@@ -36,7 +36,7 @@ export function ServicesSection({ services }: ServicesSectionProps) {
         <ul className="services-section__grid">
           {services.map((service, index) => (
             <li key={service.id} className="services-section__item">
-              <HomepageReveal delayMs={index * 90} className="h-full">
+              <HomepageReveal delayMs={index * 250} className="h-full">
                 <ServiceCard
                   service={service}
                   variant="pathway"

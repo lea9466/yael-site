@@ -38,7 +38,7 @@ export function RecentRecipesSection({ recipes }: RecentRecipesSectionProps) {
         >
           {recipes.map((recipe, index) => (
             <li key={recipe.id} className="recipes-section__item">
-              <HomepageReveal delayMs={80 + index * 90}>
+              <HomepageReveal delayMs={index * 250}>
                 <RecipeCard recipe={recipe} />
               </HomepageReveal>
             </li>

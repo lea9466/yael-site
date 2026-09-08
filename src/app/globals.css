@@ -1130,7 +1130,7 @@
   }
 
   .hero-editorial-enter {
-    animation: hero-editorial-enter 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: hero-editorial-enter 1400ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .hero-content-row {
@@ -1548,15 +1548,15 @@
   }
 
   .short-about-copy-enter {
-    animation: short-about-rise 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: short-about-rise 1400ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .short-about-visual-enter {
-    animation: short-about-rise 680ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+    animation: short-about-rise 1400ms cubic-bezier(0.22, 1, 0.36, 1) 250ms both;
   }
 
   .short-about-pill-enter {
-    animation: short-about-pill-pop 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: short-about-pill-pop 1400ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   @media (min-width: 1024px) {
@@ -1602,8 +1602,8 @@
     opacity: 0;
     transform: translateY(28px);
     transition:
-      opacity 680ms cubic-bezier(0.22, 1, 0.36, 1),
-      transform 680ms cubic-bezier(0.22, 1, 0.36, 1);
+      opacity 1400ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 1400ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .homepage-reveal--visible {

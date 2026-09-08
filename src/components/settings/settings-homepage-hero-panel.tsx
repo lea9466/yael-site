@@ -447,7 +447,7 @@ export function SettingsHomepageHeroPanel({
               <FormField
                 label="כתובת וידאו חיצונית"
                 htmlFor="field-hero-side-video-url"
-                hint="הזינו קישור https לווידאו חיצוני (YouTube, Vimeo)"
+                hint='הזינו קישור https לווידאו חיצוני (YouTube, Vimeo או Google Drive). בסרטון מ־Google Drive יש להגדיר שיתוף "כל מי שיש לו הקישור".'
                 error={fieldErrors["hero.side_video_url"] ?? fieldErrors.heroSideVideoUrl}
               >
                 <Input

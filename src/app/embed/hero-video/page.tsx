@@ -1,7 +1,7 @@
 import { EmbedIframePlayer } from "@/components/embed/embed-iframe-player";
 import { EmbedVideoPlayer } from "@/components/embed/embed-video-player";
 import {
-  getYouTubeOrVimeoEmbedUrl,
+  getExternalVideoEmbedUrl,
   isAllowedHeroVideoSrc,
 } from "@/lib/homepage/hero-video-embed";
 
@@ -29,7 +29,7 @@ export default async function HeroVideoEmbedPage({
   }
 
   const title = params.title || "";
-  const providerEmbedUrl = getYouTubeOrVimeoEmbedUrl(src);
+  const providerEmbedUrl = getExternalVideoEmbedUrl(src);
 
   if (providerEmbedUrl) {
     return <EmbedIframePlayer src={providerEmbedUrl} title={title} />;

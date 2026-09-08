@@ -70,6 +70,33 @@ export function getYouTubeOrVimeoEmbedUrl(url: string): string | null {
   return null;
 }
 
+// Turns a Google Drive share link into the embeddable /preview player URL.
+// Accepts the common shapes: /file/d/<id>/view, /file/d/<id>/preview,
+// open?id=<id> and uc?id=<id>. The Drive file must be shared so that
+// "anyone with the link" can view it, otherwise the embed shows a login wall.
+export function getGoogleDriveEmbedUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+
+    if (parsed.hostname !== "drive.google.com") {
+      return null;
+    }
+
+    const filePathMatch = parsed.pathname.match(/\/file\/d\/([^/]+)/);
+    const id = filePathMatch?.[1] ?? parsed.searchParams.get("id");
+
+    return id ? `https://drive.google.com/file/d/${id}/preview` : null;
+  } catch {
+    return null;
+  }
+}
+
+// Resolves any supported external video host (YouTube, Vimeo, Google Drive)
+// to an iframe-embeddable URL, or null for a direct file URL / unknown host.
+export function getExternalVideoEmbedUrl(url: string): string | null {
+  return getYouTubeOrVimeoEmbedUrl(url) ?? getGoogleDriveEmbedUrl(url);
+}
+
 // The embed page is a public route, so this only needs to stop it being
 // abused as an open redirect / arbitrary-content frame (non-https schemes
 // like javascript:/data:). The video URLs it receives already come from

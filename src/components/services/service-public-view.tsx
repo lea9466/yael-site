@@ -6,11 +6,12 @@ import { ArrowLeft } from "lucide-react";
 import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { ServiceAudienceIcon } from "@/components/services/service-audience-icon";
 import { ServiceFaqItem } from "@/components/services/service-faq-item";
+import { ServiceIntroBlocks } from "@/components/services/service-intro-blocks";
 import { ServiceProcessTimeline } from "@/components/services/service-process-timeline";
 import { ServiceTestimonialsPublicSection } from "@/components/services/service-testimonials-public-section";
 import { MultilineText } from "@/components/ui/multiline-text";
 import type { PublicTestimonialSummary } from "@/lib/public/types";
-import { escapeHtml, formatServiceParagraphs } from "@/lib/services/sanitize";
+import { escapeHtml } from "@/lib/services/sanitize";
 import type { ServiceDetail } from "@/lib/services/types";
 import { cn } from "@/lib/utils/cn";
 
@@ -60,9 +61,7 @@ export function ServicePublicView({
 }: ServicePublicViewProps) {
   const isPreview = mode === "preview";
   const ogImageUrl = service.ogUrl ?? service.coverUrl;
-  const paragraphs = formatServiceParagraphs(service.full_introduction);
-  const leadParagraph = paragraphs[0] ?? null;
-  const restParagraphs = paragraphs.slice(1);
+  const introBlocks = service.content.intro_blocks;
   const shortDescription = service.short_description.trim();
   const displayTitle = service.title.trim();
   const ctaTitle = service.content.cta_title.trim();
@@ -136,7 +135,7 @@ export function ServicePublicView({
         </div>
       </header>
 
-      {paragraphs.length > 0 ? (
+      {introBlocks.length > 0 ? (
         <section
           className="service-page__section service-page__intro"
           aria-labelledby="service-intro-heading"
@@ -148,22 +147,7 @@ export function ServicePublicView({
             <h2 id="service-intro-heading" className="sr-only">
               על השירות
             </h2>
-            <div className="service-page__intro-copy">
-              {leadParagraph ? (
-                <MultilineText as="p" className="service-page__intro-lead">
-                  {escapeHtml(leadParagraph)}
-                </MultilineText>
-              ) : null}
-              {restParagraphs.map((paragraph) => (
-                <MultilineText
-                  key={paragraph}
-                  as="p"
-                  className="service-page__body"
-                >
-                  {escapeHtml(paragraph)}
-                </MultilineText>
-              ))}
-            </div>
+            <ServiceIntroBlocks blocks={introBlocks} />
           </HomepageReveal>
         </section>
       ) : null}

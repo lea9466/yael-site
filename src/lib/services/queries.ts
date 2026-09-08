@@ -179,7 +179,7 @@ export async function fetchServiceById(
 
     return {
       ...record,
-      content: normalizeServiceContent(record.content),
+      content: normalizeServiceContent(record.content, record.full_introduction),
       coverUrl: cover ? getPublicMediaUrl(cover.storage_path) : null,
       coverAlt: cover?.alt_text ?? null,
       ogUrl: og ? getPublicMediaUrl(og.storage_path) : null,

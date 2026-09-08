@@ -6079,17 +6079,6 @@
   text-align: center;
 }
 
-.service-page__body {
-  margin: 0;
-  color: var(--service-muted);
-  font-size: 1.0625rem;
-  line-height: 1.85;
-  text-align: center;
-}
-
-.service-page__body+.service-page__body {
-  margin-top: 1.1rem;
-}
 
 .service-page__blob {
   position: absolute;
@@ -6368,15 +6357,82 @@
   text-align: center;
 }
 
-.service-page__intro-lead {
+.service-page__intro-paragraph {
+  margin: 0;
+  color: var(--service-ink);
+  font-size: clamp(1.05rem, 1.7vw, 1.2rem);
+  line-height: 1.85;
+  text-align: center;
+  text-wrap: pretty;
+  white-space: pre-line;
+}
+
+.service-page__intro-heading {
   margin: 0;
   color: var(--service-ink);
   font-family: var(--font-primary), sans-serif;
-  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
-  font-weight: 500;
-  line-height: 1.55;
-  letter-spacing: -0.015em;
+  font-size: clamp(1.6rem, 3vw, 2.15rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   text-align: center;
+  text-wrap: balance;
+}
+
+.service-page__intro-subheading {
+  margin: 0;
+  color: var(--service-deep);
+  font-family: var(--font-primary), sans-serif;
+  font-size: clamp(1.2rem, 2vw, 1.4rem);
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.service-page__intro-heading:not(:first-child),
+.service-page__intro-subheading:not(:first-child) {
+  margin-top: 0.6rem;
+}
+
+.service-page__intro-list {
+  margin: 0;
+  padding: 0;
+  list-style-position: inside;
+  color: var(--service-ink);
+  font-size: clamp(1.05rem, 1.7vw, 1.2rem);
+  line-height: 1.8;
+  text-align: center;
+}
+
+.service-page__intro-list--ordered {
+  list-style-type: decimal;
+}
+
+.service-page__intro-list--bullet {
+  list-style-type: disc;
+}
+
+.service-page__intro-list li {
+  margin-block: 0.4rem;
+}
+
+.service-page__intro-list li::marker {
+  color: var(--service-coral);
+}
+
+.service-page__intro-quote {
+  margin: 0.4rem auto;
+  max-width: 46ch;
+  padding-block: 1rem;
+  border-block: 1px solid rgba(217, 138, 128, 0.35);
+  color: var(--service-muted);
+  font-family: var(--font-primary), sans-serif;
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  font-style: italic;
+  line-height: 1.6;
+  text-align: center;
+  text-wrap: balance;
 }
 
 /* —— Audience —— pastel squares —— */

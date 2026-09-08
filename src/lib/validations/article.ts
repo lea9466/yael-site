@@ -9,9 +9,11 @@ import {
   isReservedArticleSlug,
   isValidArticleSlug,
 } from "@/lib/articles/slug";
+import { blockSchema, textMarkSchema } from "@/lib/validations/blocks";
 import { mapZodErrors } from "@/lib/validations/service";
 
 export { mapZodErrors };
+export { blockSchema, textMarkSchema };
 
 export const ARTICLES_PAGE_SIZE = 20;
 
@@ -36,70 +38,6 @@ export type ArticleStatusFilter = (typeof ARTICLE_STATUS_FILTERS)[number];
 export type ArticleFeaturedFilter = (typeof ARTICLE_FEATURED_FILTERS)[number];
 
 const uuidSchema = z.string().uuid("מזהה אינו תקין");
-
-const textMarkSchema = z.object({
-  type: z.enum(["bold", "italic", "link"]),
-  start: z.number().int().min(0),
-  end: z.number().int().min(1),
-  href: z.string().trim().max(2048).optional(),
-});
-
-const listItemSchema = z.object({
-  text: z
-    .string()
-    .trim()
-    .min(1, "יש להזין טקסט לפריט")
-    .max(4000, "טקסט הפריט ארוך מדי"),
-  marks: z.array(textMarkSchema).optional(),
-});
-
-const blockSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("paragraph"),
-    text: z
-      .string()
-      .trim()
-      .max(12000, "הפסקה ארוכה מדי"),
-    marks: z.array(textMarkSchema).optional(),
-  }),
-  z.object({
-    type: z.literal("heading"),
-    level: z.union([z.literal(2), z.literal(3)]),
-    text: z
-      .string()
-      .trim()
-      .max(240, "כותרת ארוכה מדי"),
-    marks: z.array(textMarkSchema).optional(),
-  }),
-  z.object({
-    type: z.literal("quote"),
-    text: z
-      .string()
-      .trim()
-      .max(4000, "ציטוט ארוך מדי"),
-    marks: z.array(textMarkSchema).optional(),
-  }),
-  z.object({
-    type: z.literal("list"),
-    list_type: z.enum(["bullet", "ordered"]),
-    items: z
-      .array(listItemSchema)
-      .max(
-        ARTICLE_REPEATER_LIMITS.listItems.max,
-        `ניתן להוסיף עד ${ARTICLE_REPEATER_LIMITS.listItems.max} פריטים לרשימה`
-      ),
-  }),
-  z.object({
-    type: z.literal("image"),
-    media_id: uuidSchema,
-    caption: z
-      .string()
-      .trim()
-      .max(500, "כיתוב ארוך מדי")
-      .nullable()
-      .transform((value) => (value && value.length > 0 ? value : null)),
-  }),
-]);
 
 const galleryItemSchema = z.object({
   media_id: uuidSchema,

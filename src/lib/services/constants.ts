@@ -29,6 +29,9 @@ export const SERVICE_REPEATER_LIMITS = {
   faq: { min: 0, max: 20 },
 } as const;
 
+/** Max rich-text blocks in a service's full introduction. */
+export const SERVICE_INTRO_BLOCKS_MAX = 100;
+
 export const SERVICE_UNTITLED_LABEL = "שירות ללא כותרת";
 
 export const STATUS_LABELS: Record<ContentStatus, string> = {

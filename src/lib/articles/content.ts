@@ -60,7 +60,7 @@ function normalizeMarks(value: unknown): ArticleTextMark[] {
     }));
 }
 
-function normalizeBlock(value: unknown): ArticleBlock | null {
+export function normalizeBlock(value: unknown): ArticleBlock | null {
   if (typeof value !== "object" || value === null || !("type" in value)) {
     return null;
   }

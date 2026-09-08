@@ -1,11 +1,16 @@
 import { z } from "zod";
 
 import { CONTENT_STATUSES } from "@/types/content";
+import { blockSchema } from "@/lib/validations/blocks";
 import { normalizeServiceAudienceIcon } from "@/lib/services/audience-icons";
-import { SERVICE_REPEATER_LIMITS } from "@/lib/services/constants";
+import {
+  SERVICE_INTRO_BLOCKS_MAX,
+  SERVICE_REPEATER_LIMITS,
+} from "@/lib/services/constants";
 import type {
   ServiceAudienceItem,
   ServiceFaqItem,
+  ServiceIntroBlock,
   ServiceProcessStep,
   ServiceTextItem,
 } from "@/lib/services/types";
@@ -139,7 +144,29 @@ const requiredSlugSchema = z
     message: "כתובת זו שמורה למערכת",
   });
 
+/** Drop image entries before validation — the service intro editor is text only. */
+function stripImageBlocks(value: unknown): unknown {
+  if (!Array.isArray(value)) {
+    return value;
+  }
+
+  return value.filter(
+    (block) =>
+      typeof block !== "object" ||
+      block === null ||
+      (block as { type?: unknown }).type !== "image"
+  );
+}
+
 const serviceContentSchema = z.object({
+  intro_blocks: z.preprocess(
+    stripImageBlocks,
+    z
+      .array(blockSchema)
+      .max(SERVICE_INTRO_BLOCKS_MAX, "יותר מדי בלוקים בהקדמה")
+      .default([])
+      .transform((blocks) => blocks as ServiceIntroBlock[])
+  ),
   target_audience: z
     .array(audienceItemSchema)
     .max(SERVICE_REPEATER_LIMITS.target_audience.max)
@@ -215,7 +242,8 @@ const serviceSharedFieldsSchema = z.object({
     .string()
     .max(300, "התיאור הקצר ארוך מדי")
     .transform(normalizeMultilineText),
-  full_introduction: z.string().trim().max(10000, "ההקדמה ארוכה מדי"),
+  // Derived plain-text mirror of `content.intro_blocks` (not edited directly).
+  full_introduction: z.string().trim().max(60000, "ההקדמה ארוכה מדי"),
   cover_media_id: optionalUuidSchema,
   seo_og_media_id: optionalUuidSchema,
   featured: z.boolean(),

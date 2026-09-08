@@ -1,14 +1,50 @@
+import {
+  extractPlainTextFromBlocks,
+  normalizeBlock,
+} from "@/lib/articles/content";
 import { normalizeServiceAudienceIcon } from "@/lib/services/audience-icons";
 import { createEmptyStoredSeo } from "@/lib/seo/resolve";
 import type {
   ServiceAudienceItem,
   ServiceContent,
+  ServiceIntroBlock,
   ServiceSeo,
   ServiceTextItem,
 } from "@/lib/services/types";
 
+/** Split a legacy plain-text introduction into paragraph blocks (blank line = new paragraph). */
+export function textToIntroBlocks(value: string): ServiceIntroBlock[] {
+  if (typeof value !== "string") {
+    return [];
+  }
+
+  return value
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter((paragraph) => paragraph.length > 0)
+    .map((paragraph) => ({ type: "paragraph", text: paragraph, marks: [] }));
+}
+
+/** Flatten intro blocks to plain text for the derived `full_introduction` mirror. */
+export function introBlocksToText(blocks: ServiceIntroBlock[]): string {
+  return extractPlainTextFromBlocks(blocks);
+}
+
+function normalizeIntroBlocks(value: unknown): ServiceIntroBlock[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((block) => {
+    const normalized = normalizeBlock(block);
+
+    return normalized && normalized.type !== "image" ? [normalized] : [];
+  });
+}
+
 export function createDefaultServiceContent(): ServiceContent {
   return {
+    intro_blocks: [],
     target_audience: [],
     benefits: [],
     process_steps: [],
@@ -69,13 +105,32 @@ function normalizeTextItems(value: unknown): ServiceTextItem[] {
   });
 }
 
-/** Ensures content arrays/fields are safe for public rendering. */
-export function normalizeServiceContent(value: unknown): ServiceContent {
+/**
+ * Ensures content arrays/fields are safe for public rendering.
+ *
+ * `fallbackIntroText` is the row's legacy `full_introduction`; it seeds
+ * `intro_blocks` for services saved before the block editor existed. Once such a
+ * service is re-saved, `content.intro_blocks` is persisted and the fallback is
+ * no longer consulted.
+ */
+export function normalizeServiceContent(
+  value: unknown,
+  fallbackIntroText?: string | null
+): ServiceContent {
   const defaults = createDefaultServiceContent();
 
   if (!isRecord(value)) {
-    return defaults;
+    return {
+      ...defaults,
+      intro_blocks: textToIntroBlocks(fallbackIntroText ?? ""),
+    };
   }
+
+  const introBlocks = normalizeIntroBlocks(value.intro_blocks);
+  const resolvedIntroBlocks =
+    introBlocks.length > 0
+      ? introBlocks
+      : textToIntroBlocks(fallbackIntroText ?? "");
 
   const processSteps = Array.isArray(value.process_steps)
     ? value.process_steps.flatMap((item) => {
@@ -112,6 +167,7 @@ export function normalizeServiceContent(value: unknown): ServiceContent {
       : defaults.cta_link_type;
 
   return {
+    intro_blocks: resolvedIntroBlocks,
     target_audience: normalizeAudienceItems(value.target_audience),
     benefits: normalizeTextItems(value.benefits),
     process_steps: processSteps,

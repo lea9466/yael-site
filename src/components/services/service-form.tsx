@@ -22,6 +22,12 @@ import { AdminFormBody } from "@/components/admin/admin-form-section";
 import { AdminFormHeader } from "@/components/admin/admin-form-header";
 import { AdminFormShell } from "@/components/admin/admin-form-shell";
 import { AdminSeoSection } from "@/components/admin/admin-seo-section";
+import {
+  ArticleEditor,
+  articleBlocksToEditorBlocks,
+  editorBlocksToArticleBlocks,
+  type EditorBlockUnion,
+} from "@/components/articles/article-editor";
 import { ServiceArchiveDialog } from "@/components/services/service-archive-dialog";
 import { ServiceAudienceIconPicker } from "@/components/services/service-audience-icon-picker";
 import { ServiceDeleteDialog } from "@/components/services/service-delete-dialog";
@@ -47,10 +53,12 @@ import {
   getSectionsWithErrors,
   getFieldErrorMessage,
 } from "@/lib/forms/validation-feedback";
+import { normalizeBlocksForSave } from "@/lib/articles/content";
 import { normalizeServiceAudienceIcon } from "@/lib/services/audience-icons";
 import { SERVICE_REPEATER_LIMITS } from "@/lib/services/constants";
+import { introBlocksToText } from "@/lib/services/content";
 import { slugifyTitle } from "@/lib/services/slug";
-import type { ServiceDetail } from "@/lib/services/types";
+import type { ServiceDetail, ServiceIntroBlock } from "@/lib/services/types";
 import type { ServiceTestimonialItem } from "@/lib/testimonials/types";
 import { useUnsavedChangesWarning } from "@/lib/hooks/use-unsaved-changes-warning";
 import { ADMIN_LIST_PATHS } from "@/lib/forms/admin-list-paths";
@@ -76,6 +84,7 @@ type ServiceFormProps = {
 };
 
 type FormContentState = {
+  intro_blocks: EditorBlockUnion[];
   target_audience: AudienceRepeaterItem[];
   benefits: TextRepeaterItem[];
   process_steps: ProcessRepeaterItem[];
@@ -89,6 +98,7 @@ type FormContentState = {
 
 function toRepeaterContent(content: ServiceDraftInput["content"]): FormContentState {
   return {
+    intro_blocks: articleBlocksToEditorBlocks(content.intro_blocks),
     target_audience: content.target_audience.map((item) => ({
       id: createRepeaterItemId(),
       text: item.text,
@@ -118,6 +128,11 @@ function toRepeaterContent(content: ServiceDraftInput["content"]): FormContentSt
 
 function toSubmitContent(content: FormContentState): ServiceDraftInput["content"] {
   return {
+    intro_blocks: normalizeBlocksForSave(
+      editorBlocksToArticleBlocks(content.intro_blocks)
+    ).filter(
+      (block): block is ServiceIntroBlock => block.type !== "image"
+    ),
     target_audience: content.target_audience
       .filter((item) => item.text.trim().length > 0)
       .map(({ text, icon }) => {
@@ -160,9 +175,12 @@ function buildSnapshot(input: {
   values: ServiceDraftInput;
   content: FormContentState;
 }) {
+  const content = toSubmitContent(input.content);
+
   return JSON.stringify({
     ...input.values,
-    content: toSubmitContent(input.content),
+    full_introduction: introBlocksToText(content.intro_blocks),
+    content,
   });
 }
 
@@ -302,11 +320,18 @@ export function ServiceForm({
     }));
   };
 
-  const buildPayload = (status: ServiceDraftInput["status"]): ServiceDraftInput => ({
-    ...values,
-    status,
-    content: toSubmitContent(content),
-  });
+  const buildPayload = (
+    status: ServiceDraftInput["status"]
+  ): ServiceDraftInput => {
+    const submitContent = toSubmitContent(content);
+
+    return {
+      ...values,
+      status,
+      full_introduction: introBlocksToText(submitContent.intro_blocks),
+      content: submitContent,
+    };
+  };
 
   const handleSave = () => {
     if (isPending) {
@@ -650,17 +675,15 @@ export function ServiceForm({
             <h2 className="text-section-title">תוכן השירות</h2>
             <FormField
               label="הקדמה מלאה"
-              htmlFor="service-full-introduction"
-              hint="אופציונלי · טקסט רציף. יוצג בפסקאות נפרדות באתר."
-              error={fieldErrors.full_introduction}
+              hint="אופציונלי · בחרי לכל בלוק סוג טקסט — פסקה, כותרת, רשימה או ציטוט."
+              error={getFieldErrorMessage(fieldErrors, "content.intro_blocks")}
             >
-              <Textarea
-                id="service-full-introduction"
-                value={values.full_introduction}
-                className="min-h-48"
-                error={Boolean(fieldErrors.full_introduction)}
-                onChange={(event) =>
-                  setField("full_introduction", event.target.value)
+              <ArticleEditor
+                blocks={content.intro_blocks}
+                allowedBlockTypes={["paragraph", "heading", "list", "quote"]}
+                hideHeader
+                onChange={(intro_blocks) =>
+                  setContent((current) => ({ ...current, intro_blocks }))
                 }
               />
             </FormField>

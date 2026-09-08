@@ -102,10 +102,28 @@ export type EditorBlockUnion =
   | EditorListBlock
   | EditorImageBlock;
 
+export type EditorBlockType = EditorBlockUnion["type"];
+
+const ALL_EDITOR_BLOCK_TYPES: readonly EditorBlockType[] = [
+  "paragraph",
+  "heading",
+  "list",
+  "quote",
+  "image",
+];
+
 type ArticleEditorProps = {
   blocks: EditorBlockUnion[];
   error?: string;
-  readingTimeLabel: string;
+  /** Shown in the editor header; omit together with `hideHeader`. */
+  readingTimeLabel?: string;
+  /**
+   * Which block types the "add block" toolbar offers. Defaults to all of them.
+   * Excluded types are also stripped from pasted content.
+   */
+  allowedBlockTypes?: readonly EditorBlockType[];
+  /** Hide the built-in "תוכן הפוסט" header (when the host form supplies its own). */
+  hideHeader?: boolean;
   onChange: (blocks: EditorBlockUnion[]) => void;
 };
 
@@ -378,8 +396,12 @@ export function ArticleEditor({
   blocks,
   error,
   readingTimeLabel,
+  allowedBlockTypes = ALL_EDITOR_BLOCK_TYPES,
+  hideHeader = false,
   onChange,
 }: ArticleEditorProps) {
+  const canUseBlockType = (type: EditorBlockType) =>
+    allowedBlockTypes.includes(type);
   const [pendingFocusBlockId, setPendingFocusBlockId] = useState<string | null>(
     null
   );
@@ -891,6 +913,20 @@ export function ArticleEditor({
     onUpdate(nextText, nextMarks);
   };
 
+  const coerceDraftToAllowed = (draft: PastedBlockDraft): PastedBlockDraft => {
+    if (canUseBlockType(draft.kind)) {
+      return draft;
+    }
+
+    const text =
+      draft.kind === "list"
+        ? draft.items.map((item) => item.text).join("\n")
+        : draft.text;
+    const marks = draft.kind === "list" ? [] : draft.marks;
+
+    return { kind: "paragraph", text, marks };
+  };
+
   const parseClipboardDrafts = (
     clipboardData: DataTransfer
   ): PastedBlockDraft[] => {
@@ -900,11 +936,13 @@ export function ArticleEditor({
       const htmlDrafts = parsePastedHtml(html);
 
       if (htmlDrafts.length > 0) {
-        return htmlDrafts;
+        return htmlDrafts.map(coerceDraftToAllowed);
       }
     }
 
-    return parsePastedPlainText(clipboardData.getData("text/plain"));
+    return parsePastedPlainText(clipboardData.getData("text/plain")).map(
+      coerceDraftToAllowed
+    );
   };
 
   /**
@@ -1077,16 +1115,18 @@ export function ArticleEditor({
         error && "ring-1 ring-[var(--color-error)]/40"
       )}
     >
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-1.5">
-          <h3 className="text-lg font-semibold text-[var(--color-text)]">
-            תוכן הפוסט
-          </h3>
-          <p className="text-caption text-[var(--color-text-muted)]">
-            כתבי, עצבי וסדרי את הפוסט — {readingTimeLabel}
-          </p>
+      {hideHeader ? null : (
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-1.5">
+            <h3 className="text-lg font-semibold text-[var(--color-text)]">
+              תוכן הפוסט
+            </h3>
+            <p className="text-caption text-[var(--color-text-muted)]">
+              כתבי, עצבי וסדרי את הפוסט{readingTimeLabel ? ` — ${readingTimeLabel}` : ""}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       <div
         role="toolbar"
@@ -1098,33 +1138,47 @@ export function ArticleEditor({
           aria-label="הוספת בלוקים"
           className="flex flex-wrap items-center gap-0.5"
         >
-          <EditorToolbarButton
-            label="פסקה"
-            onClick={() => addBlock("paragraph")}
-          >
-            <Type aria-hidden="true" className="size-4" strokeWidth={2} />
-          </EditorToolbarButton>
-          <EditorToolbarButton
-            label="כותרת"
-            onClick={() => addBlock("heading")}
-          >
-            <Heading2 aria-hidden="true" className="size-4" strokeWidth={2} />
-          </EditorToolbarButton>
-          <EditorToolbarButton
-            label="רשימת תבליטים"
-            onClick={() => addBlock("list", "bullet")}
-          >
-            <List aria-hidden="true" className="size-4" strokeWidth={2} />
-          </EditorToolbarButton>
-          <EditorToolbarButton
-            label="רשימה ממוספרת"
-            onClick={() => addBlock("list", "ordered")}
-          >
-            <ListOrdered aria-hidden="true" className="size-4" strokeWidth={2} />
-          </EditorToolbarButton>
-          <EditorToolbarButton label="ציטוט" onClick={() => addBlock("quote")}>
-            <Quote aria-hidden="true" className="size-4" strokeWidth={2} />
-          </EditorToolbarButton>
+          {canUseBlockType("paragraph") ? (
+            <EditorToolbarButton
+              label="פסקה"
+              onClick={() => addBlock("paragraph")}
+            >
+              <Type aria-hidden="true" className="size-4" strokeWidth={2} />
+            </EditorToolbarButton>
+          ) : null}
+          {canUseBlockType("heading") ? (
+            <EditorToolbarButton
+              label="כותרת"
+              onClick={() => addBlock("heading")}
+            >
+              <Heading2 aria-hidden="true" className="size-4" strokeWidth={2} />
+            </EditorToolbarButton>
+          ) : null}
+          {canUseBlockType("list") ? (
+            <>
+              <EditorToolbarButton
+                label="רשימת תבליטים"
+                onClick={() => addBlock("list", "bullet")}
+              >
+                <List aria-hidden="true" className="size-4" strokeWidth={2} />
+              </EditorToolbarButton>
+              <EditorToolbarButton
+                label="רשימה ממוספרת"
+                onClick={() => addBlock("list", "ordered")}
+              >
+                <ListOrdered
+                  aria-hidden="true"
+                  className="size-4"
+                  strokeWidth={2}
+                />
+              </EditorToolbarButton>
+            </>
+          ) : null}
+          {canUseBlockType("quote") ? (
+            <EditorToolbarButton label="ציטוט" onClick={() => addBlock("quote")}>
+              <Quote aria-hidden="true" className="size-4" strokeWidth={2} />
+            </EditorToolbarButton>
+          ) : null}
         </div>
 
         <EditorToolbarDivider />
@@ -1494,15 +1548,22 @@ export function ArticleEditor({
         </ul>
       )}
 
-      <div className="flex flex-wrap items-center gap-2 border-t border-[var(--color-border)]/60 pt-4">
-        <span className="text-caption text-[var(--color-text-muted)]">
-          הוספת מדיה
-        </span>
-        <Button type="button" variant="outline" size="sm" onClick={() => addBlock("image")}>
-          <ImageIcon aria-hidden="true" className="size-4" />
-          תמונה
-        </Button>
-      </div>
+      {canUseBlockType("image") ? (
+        <div className="flex flex-wrap items-center gap-2 border-t border-[var(--color-border)]/60 pt-4">
+          <span className="text-caption text-[var(--color-text-muted)]">
+            הוספת מדיה
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => addBlock("image")}
+          >
+            <ImageIcon aria-hidden="true" className="size-4" />
+            תמונה
+          </Button>
+        </div>
+      ) : null}
 
       {error ? (
         <p role="alert" className="text-sm text-[var(--color-error)]">

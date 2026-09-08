@@ -338,7 +338,7 @@ export async function getPublishedServiceBySlug(
 
     return {
       ...record,
-      content: normalizeServiceContent(record.content),
+      content: normalizeServiceContent(record.content, record.full_introduction),
       seo: record.seo ?? createDefaultServiceSeo(),
       coverUrl: cover?.url ?? null,
       coverAlt: cover?.alt ?? null,

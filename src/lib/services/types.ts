@@ -1,11 +1,19 @@
 import type { ContentStatus } from "@/types/content";
 
+import type { ArticleBlock } from "@/lib/articles/types";
 import type { ServiceAudienceIconName } from "@/lib/services/audience-icons";
 import type { StoredSeo } from "@/lib/seo/types";
 
 export type ServiceTextItem = {
   text: string;
 };
+
+/**
+ * Rich-text blocks for a service's full introduction. Reuses the posts block
+ * model (paragraph / heading / list / quote with bold-italic-link marks), minus
+ * the image block — the service intro editor is text only.
+ */
+export type ServiceIntroBlock = Exclude<ArticleBlock, { type: "image" }>;
 
 /** Audience item may include an optional Lucide icon name (CMS allowlist). */
 export type ServiceAudienceItem = {
@@ -26,6 +34,7 @@ export type ServiceFaqItem = {
 export type ServiceCtaLinkType = "internal" | "external";
 
 export type ServiceContent = {
+  intro_blocks: ServiceIntroBlock[];
   target_audience: ServiceAudienceItem[];
   benefits: ServiceTextItem[];
   process_steps: ServiceProcessStep[];

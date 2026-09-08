@@ -245,12 +245,6 @@ export function ServicePublicView({
                         `service-page__benefit-card--tone-${index % PASTEL_TONES}`
                       )}
                     >
-                      <span
-                        className="service-page__benefit-index"
-                        aria-hidden="true"
-                      >
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
                       <p className="service-page__benefit-text">
                         {escapeHtml(item.text)}
                       </p>

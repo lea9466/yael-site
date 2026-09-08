@@ -231,17 +231,9 @@ export function ServicePublicView({
           </div>
 
           <div className="service-page__container">
-            <HomepageReveal>
-              <div className="service-page__section-head service-page__section-head--benefits">
-                <p className="service-page__section-kicker">מה יוצא מזה</p>
-                <h2
-                  id="service-benefits-heading"
-                  className="service-page__heading"
-                >
-                  יתרונות
-                </h2>
-              </div>
-            </HomepageReveal>
+            <h2 id="service-benefits-heading" className="sr-only">
+              יתרונות
+            </h2>
 
             <ul className="service-page__benefits-row">
               {service.content.benefits.map((item, index) => (

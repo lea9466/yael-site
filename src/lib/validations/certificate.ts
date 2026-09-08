@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import {
+  CERTIFICATE_CARD_TITLE_MAX,
   CERTIFICATE_DESCRIPTION_MAX,
   CERTIFICATE_ORGANIZATION_MAX,
   CERTIFICATE_TITLE_MAX,
@@ -33,6 +34,14 @@ export const certificateItemSchema = z
       .trim()
       .min(1, "יש להזין כותרת")
       .max(CERTIFICATE_TITLE_MAX, "הכותרת ארוכה מדי"),
+    card_title: z
+      .union([
+        z
+          .string()
+          .max(CERTIFICATE_CARD_TITLE_MAX, "השם לכרטיס ארוך מדי"),
+        z.null(),
+      ])
+      .optional(),
     organization: z
       .string()
       .trim()
@@ -83,6 +92,12 @@ export const certificateFormInputSchema = z.object({
     .trim()
     .min(1, "יש להזין כותרת")
     .max(CERTIFICATE_TITLE_MAX, "הכותרת ארוכה מדי"),
+  card_title: z
+    .string()
+    .trim()
+    .max(CERTIFICATE_CARD_TITLE_MAX, "השם לכרטיס ארוך מדי")
+    .optional()
+    .default(""),
   organization: z
     .string()
     .trim()
@@ -128,14 +143,16 @@ export function formInputToCertificateFields(
   input: CertificateFormInput
 ): Pick<
   CertificateItem,
-  "title" | "organization" | "year" | "media_id" | "description"
+  "title" | "card_title" | "organization" | "year" | "media_id" | "description"
 > {
   const trimmedYear = input.year.trim();
+  const trimmedCardTitle = (input.card_title ?? "").trim();
 
   const normalizedDescription = normalizeMultilineText(input.description);
 
   return {
     title: input.title.trim(),
+    card_title: trimmedCardTitle.length > 0 ? trimmedCardTitle : null,
     organization: input.organization.trim(),
     year: trimmedYear.length > 0 ? Number.parseInt(trimmedYear, 10) : null,
     media_id: input.media_id,

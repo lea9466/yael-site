@@ -40,6 +40,7 @@ export type RecipeSeo = StoredSeo;
 export type RecipeRecord = {
   id: string;
   title: string;
+  card_title: string | null;
   slug: string;
   description: string;
   cover_media_id: string;

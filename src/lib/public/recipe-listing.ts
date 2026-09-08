@@ -8,7 +8,7 @@ import {
 import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 
 const RECIPE_PUBLIC_COLUMNS =
-  "id, title, slug, description, cover_media_id, category_id, prep_duration, servings, featured, published_at, updated_at";
+  "id, title, card_title, slug, description, cover_media_id, category_id, prep_duration, servings, featured, published_at, updated_at";
 
 export type PublicRecipeCategory = {
   id: string;
@@ -376,6 +376,7 @@ export async function getPublicRecipeListing(options: {
       return {
         id: row.id as string,
         title: row.title as string,
+        card_title: (row.card_title as string | null) ?? null,
         slug: row.slug as string,
         description: row.description as string,
         coverUrl: cover?.url ?? null,

@@ -42,6 +42,7 @@ export type ServiceSeo = StoredSeo;
 export type ServiceRecord = {
   id: string;
   title: string;
+  card_title: string | null;
   slug: string;
   short_description: string;
   full_introduction: string;

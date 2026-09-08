@@ -194,6 +194,7 @@ function toRecipeInsertRow(input: RecipeDraftInput | RecipePublishInput) {
 
   return {
     title: input.title,
+    card_title: input.card_title.trim() || null,
     slug: input.slug,
     description: input.description,
     cover_media_id: input.cover_media_id,
@@ -225,6 +226,7 @@ function toRecipeUpdateRow(
 
   return {
     title: input.title,
+    card_title: input.card_title.trim() || null,
     slug: input.slug,
     description: input.description,
     cover_media_id: input.cover_media_id,
@@ -547,6 +549,7 @@ export async function duplicateRecipeAction(
     .from("recipes")
     .insert({
       title: newTitle,
+      card_title: source.card_title ?? null,
       slug: newSlug,
       description: source.description,
       cover_media_id: source.cover_media_id,

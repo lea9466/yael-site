@@ -71,6 +71,7 @@ export type ArticleSeo = StoredSeo;
 export type ArticleRecord = {
   id: string;
   title: string;
+  card_title: string | null;
   slug: string;
   body: string;
   cover_media_id: string;

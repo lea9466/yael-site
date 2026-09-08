@@ -157,6 +157,7 @@ function toServiceInsertRow(
 ) {
   return {
     title: input.title,
+    card_title: input.card_title.trim() || null,
     slug: input.slug,
     short_description: input.short_description,
     full_introduction: input.full_introduction,
@@ -182,6 +183,7 @@ function toServiceUpdateRow(
 
   return {
     title: input.title,
+    card_title: input.card_title.trim() || null,
     slug: input.slug,
     short_description: input.short_description,
     full_introduction: input.full_introduction,
@@ -409,6 +411,7 @@ export async function duplicateServiceAction(
     .from("services")
     .insert({
       title: newTitle,
+      card_title: source.card_title ?? null,
       slug: newSlug,
       short_description: source.short_description,
       full_introduction: source.full_introduction,

@@ -12,10 +12,10 @@ import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 import type { ContentStatus } from "@/types/content";
 
 const RECIPE_DETAIL_COLUMNS =
-  "id, title, slug, description, cover_media_id, seo_og_media_id, category_id, prep_duration, servings, content, seo, featured, status, published_at, created_at, updated_at";
+  "id, title, card_title, slug, description, cover_media_id, seo_og_media_id, category_id, prep_duration, servings, content, seo, featured, status, published_at, created_at, updated_at";
 
 const RECIPE_RELATED_COLUMNS =
-  "id, title, slug, description, cover_media_id, category_id, prep_duration, servings, featured, published_at, updated_at, created_at";
+  "id, title, card_title, slug, description, cover_media_id, category_id, prep_duration, servings, featured, published_at, updated_at, created_at";
 
 type MediaRow = {
   id: string;
@@ -121,6 +121,7 @@ function mapRelatedRow(
   return {
     id: row.id as string,
     title: row.title as string,
+    card_title: (row.card_title as string | null) ?? null,
     slug: row.slug as string,
     description: row.description as string,
     coverUrl: cover ? getPublicMediaUrl(cover.storage_path) : null,
@@ -224,6 +225,7 @@ async function fetchRecipeDetailBySlug(
     return {
       id: data.id as string,
       title: data.title as string,
+      card_title: (data.card_title as string | null) ?? null,
       slug: data.slug as string,
       description: data.description as string,
       cover_media_id: data.cover_media_id as string,

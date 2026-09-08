@@ -21,6 +21,7 @@ export function PostCard({ post, className }: PostCardProps) {
   const href = buildPostPath(post.slug);
   const statusPills = getPostStatusPills(post);
   const { readingTime } = getPostCardMeta(post);
+  const cardTitle = post.card_title?.trim() || post.title;
 
   return (
     <article className={cn("post-card group", className)}>
@@ -28,7 +29,7 @@ export function PostCard({ post, className }: PostCardProps) {
         <Link
           href={href}
           className="post-card__media public-focus-ring"
-          aria-label={post.title}
+          aria-label={cardTitle}
         >
           {post.coverUrl ? (
             <Image
@@ -39,7 +40,7 @@ export function PostCard({ post, className }: PostCardProps) {
               className="post-card__image"
             />
           ) : (
-            <div className="post-card__media-fallback">{post.title}</div>
+            <div className="post-card__media-fallback">{cardTitle}</div>
           )}
         </Link>
 
@@ -70,7 +71,7 @@ export function PostCard({ post, className }: PostCardProps) {
 
         <h3 className="post-card__title">
           <Link href={href} className="public-focus-ring rounded-[var(--radius-sm)]">
-            {post.title}
+            {cardTitle}
           </Link>
         </h3>
 

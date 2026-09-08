@@ -11,7 +11,7 @@ import type {
 import type { ListServicesQuery, ServiceSortValue } from "@/lib/validations/service";
 
 const SERVICE_SELECT_COLUMNS =
-  "id, title, slug, short_description, full_introduction, cover_media_id, seo_og_media_id, content, seo, featured, status, published_at, created_at, updated_at";
+  "id, title, card_title, slug, short_description, full_introduction, cover_media_id, seo_og_media_id, content, seo, featured, status, published_at, created_at, updated_at";
 
 type SortConfig = {
   column: "created_at" | "updated_at" | "title";

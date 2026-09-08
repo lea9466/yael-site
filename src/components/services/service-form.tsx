@@ -587,6 +587,21 @@ export function ServiceForm({
             </FormField>
 
             <FormField
+              label="שם תצוגה בכרטיס"
+              htmlFor="service-card-title"
+              hint="אופציונלי — אם ריק, בכרטיסים באתר תוצג הכותרת המלאה"
+              error={fieldErrors.card_title}
+            >
+              <Input
+                id="service-card-title"
+                value={values.card_title ?? ""}
+                maxLength={120}
+                error={Boolean(fieldErrors.card_title)}
+                onChange={(event) => setField("card_title", event.target.value)}
+              />
+            </FormField>
+
+            <FormField
               label="תיאור קצר"
               htmlFor="service-short-description"
               hint={`${values.short_description.length}/300 · אופציונלי`}

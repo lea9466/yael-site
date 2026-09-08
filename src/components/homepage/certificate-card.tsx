@@ -29,6 +29,7 @@ export function CertificateCard({
 }: CertificateCardProps) {
   const yearLabel = formatCertificateYear(certificate.year);
   const badge = getCertificateCardBadge(certificate);
+  const cardTitle = certificate.card_title?.trim() || certificate.title;
   const alt = certificate.mediaPreview?.alt || certificate.title;
 
   return (
@@ -44,7 +45,7 @@ export function CertificateCard({
         type="button"
         className="certificate-card__trigger public-focus-ring"
         onClick={() => onOpen(certificate)}
-        aria-label={`הצגת תעודה: ${certificate.title}`}
+        aria-label={`הצגת תעודה: ${cardTitle}`}
       >
         <div className="certificate-card__media">
           <div className="certificate-card__frame">
@@ -84,7 +85,7 @@ export function CertificateCard({
             </span>
           ) : null}
 
-          <h3 className="certificate-card__title">{certificate.title}</h3>
+          <h3 className="certificate-card__title">{cardTitle}</h3>
           <p className="certificate-card__organization">
             {certificate.organization}
           </p>

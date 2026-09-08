@@ -10,6 +10,7 @@ export function articleDetailToFormInput(
 ): ArticleDraftInput {
   return {
     title: article.title,
+    card_title: article.card_title ?? "",
     slug: article.slug,
     cover_media_id: article.cover_media_id,
     seo_og_media_id: article.seo_og_media_id,
@@ -24,6 +25,7 @@ export function articleDetailToFormInput(
 export function createEmptyArticleFormInput(): ArticleDraftInput {
   return {
     title: "",
+    card_title: "",
     slug: "",
     cover_media_id: null,
     seo_og_media_id: null,

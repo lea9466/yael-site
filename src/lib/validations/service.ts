@@ -205,6 +205,12 @@ const serviceSeoSchema = z.object({
 });
 
 const serviceSharedFieldsSchema = z.object({
+  card_title: z
+    .string()
+    .trim()
+    .max(120, "שם התצוגה בכרטיס ארוך מדי")
+    .nullish()
+    .transform((value) => value ?? ""),
   short_description: z
     .string()
     .max(300, "התיאור הקצר ארוך מדי")
@@ -309,6 +315,7 @@ export function mapZodErrors(
 /** Build a publish-shaped payload from a stored service for quick-publish checks. */
 export function serviceRecordToPublishInput(service: {
   title: string;
+  card_title: string | null;
   slug: string;
   short_description: string;
   full_introduction: string;
@@ -320,6 +327,7 @@ export function serviceRecordToPublishInput(service: {
 }): ServicePublishInput {
   return {
     title: service.title,
+    card_title: service.card_title ?? "",
     slug: service.slug,
     short_description: service.short_description,
     full_introduction: service.full_introduction,

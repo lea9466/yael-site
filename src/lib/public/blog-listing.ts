@@ -8,7 +8,7 @@ import {
 } from "@/lib/validations/public-blog-listing";
 
 const ARTICLE_PUBLIC_COLUMNS =
-  "id, title, slug, body, cover_media_id, reading_time_minutes, featured, published_at, updated_at";
+  "id, title, card_title, slug, body, cover_media_id, reading_time_minutes, featured, published_at, updated_at";
 
 export type PublicBlogTag = {
   id: string;
@@ -231,6 +231,7 @@ export async function getPublicBlogListing(options: {
       return {
         id: row.id as string,
         title: row.title as string,
+        card_title: (row.card_title as string | null) ?? null,
         slug: row.slug as string,
         excerpt: shortenForSeoDescription(row.body as string, 180),
         coverUrl: cover?.url ?? null,

@@ -10,6 +10,7 @@ export function serviceDetailToFormInput(
 ): ServiceDraftInput {
   return {
     title: service.title,
+    card_title: service.card_title ?? "",
     slug: service.slug,
     short_description: service.short_description,
     full_introduction: service.full_introduction,
@@ -25,6 +26,7 @@ export function serviceDetailToFormInput(
 export function createEmptyServiceFormInput(): ServiceDraftInput {
   return {
     title: "",
+    card_title: "",
     slug: "",
     short_description: "",
     full_introduction: "",

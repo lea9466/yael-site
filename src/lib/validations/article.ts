@@ -155,6 +155,12 @@ const articleBaseFieldsSchema = z.object({
     .trim()
     .min(2, "יש להזין לפחות 2 תווים בכותרת")
     .max(120, "הכותרת ארוכה מדי"),
+  card_title: z
+    .string()
+    .trim()
+    .max(120, "שם התצוגה בכרטיס ארוך מדי")
+    .nullish()
+    .transform((value) => value ?? ""),
   slug: slugSchema,
   cover_media_id: uuidSchema.nullable(),
   seo_og_media_id: uuidSchema.nullable(),

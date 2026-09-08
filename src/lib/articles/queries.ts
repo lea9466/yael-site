@@ -15,7 +15,7 @@ import { fetchArticleTags } from "@/lib/taxonomy/queries";
 import type { ListArticlesQuery, ArticleSortValue } from "@/lib/validations/article";
 
 const ARTICLE_SELECT_COLUMNS =
-  "id, title, slug, body, cover_media_id, seo_og_media_id, reading_time_minutes, content, seo, featured, status, published_at, created_at, updated_at";
+  "id, title, card_title, slug, body, cover_media_id, seo_og_media_id, reading_time_minutes, content, seo, featured, status, published_at, created_at, updated_at";
 
 type SortConfig = {
   column: "created_at" | "updated_at" | "title";

@@ -1,5 +1,6 @@
 const FIELD_ELEMENT_MAP: Record<string, string> = {
   title: "article-title",
+  card_title: "article-card-title",
   slug: "article-slug",
   cover_media_id: "field-cover-media",
   category_id: "article-category",
@@ -26,6 +27,7 @@ const FIELD_PRIORITY = [
 
 const FIELD_LABELS: Record<string, string> = {
   title: "כותרת",
+  card_title: "שם תצוגה בכרטיס",
   slug: "כתובת",
   cover_media_id: "תמונת כיסוי",
   category_id: "קטגוריה",

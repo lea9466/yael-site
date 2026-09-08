@@ -43,6 +43,7 @@ export function ServiceCard({
   const badge = getServiceCardBadge(service, isPrimaryFeatured);
   const href = `/services/${service.slug}`;
   const isPathway = variant === "pathway";
+  const cardTitle = service.card_title?.trim() || service.title;
 
   return (
     <article
@@ -72,7 +73,7 @@ export function ServiceCard({
         <Link
           href={href}
           className="service-card__media public-focus-ring"
-          aria-label={service.title}
+          aria-label={cardTitle}
         >
           {service.coverUrl ? (
             <Image
@@ -87,7 +88,7 @@ export function ServiceCard({
               className="service-card__image"
             />
           ) : (
-            <div className="service-card__media-fallback">{service.title}</div>
+            <div className="service-card__media-fallback">{cardTitle}</div>
           )}
         </Link>
       </div>
@@ -99,7 +100,7 @@ export function ServiceCard({
               href={href}
               className="public-focus-ring rounded-[var(--radius-sm)]"
             >
-              {service.title}
+              {cardTitle}
             </Link>
           </h3>
           <MultilineText as="p" className="service-card__description">

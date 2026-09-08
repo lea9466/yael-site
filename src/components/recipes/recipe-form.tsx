@@ -644,6 +644,21 @@ export function RecipeForm({
           </FormField>
 
           <FormField
+            label="שם תצוגה בכרטיס"
+            htmlFor="recipe-card-title"
+            hint="אופציונלי — אם ריק, בכרטיסים באתר תוצג הכותרת המלאה"
+            error={fieldErrors.card_title}
+          >
+            <Input
+              id="recipe-card-title"
+              value={values.card_title ?? ""}
+              maxLength={120}
+              error={Boolean(fieldErrors.card_title)}
+              onChange={(event) => setField("card_title", event.target.value)}
+            />
+          </FormField>
+
+          <FormField
             label="תיאור"
             htmlFor="recipe-description"
             hint={`${values.description.length}/${RECIPE_DESCRIPTION_MAX} · ניתן להוסיף שורות חדשות`}

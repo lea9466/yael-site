@@ -20,6 +20,7 @@ import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  CERTIFICATE_CARD_TITLE_MAX,
   CERTIFICATE_DESCRIPTION_MAX,
   CERTIFICATE_ORGANIZATION_MAX,
   CERTIFICATE_TITLE_MAX,
@@ -46,6 +47,7 @@ type CertificateFormDialogProps = {
 
 const EMPTY_VALUES: CertificateFormValues = {
   title: "",
+  card_title: "",
   organization: "",
   year: "",
   media_id: null,
@@ -61,6 +63,7 @@ function buildInitialValues(
 
   return {
     title: certificate.title,
+    card_title: certificate.card_title ?? "",
     organization: certificate.organization,
     year: formatCertificateYear(certificate.year),
     media_id: certificate.media_id,
@@ -134,6 +137,7 @@ function CertificateFormBody({
 
     const payload = {
       title: values.title,
+      card_title: values.card_title,
       organization: values.organization,
       year: values.year,
       media_id: values.media_id,
@@ -243,6 +247,22 @@ function CertificateFormBody({
             />
           </FormField>
         </div>
+
+        <FormField
+          htmlFor={`${formId}-card-title`}
+          label="שם תצוגה בכרטיס"
+          hint="אופציונלי — אם ריק, בכרטיס תוצג הכותרת המלאה"
+          error={fieldErrors.card_title}
+        >
+          <Input
+            id={`${formId}-card-title`}
+            value={values.card_title}
+            maxLength={CERTIFICATE_CARD_TITLE_MAX}
+            placeholder="לדוגמה: תזונה קלינית"
+            error={Boolean(fieldErrors.card_title)}
+            onChange={(event) => setField("card_title", event.target.value)}
+          />
+        </FormField>
 
         <FormField
           htmlFor={`${formId}-year`}

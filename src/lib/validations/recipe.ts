@@ -176,6 +176,12 @@ const recipeBaseFieldsSchema = z.object({
     .trim()
     .min(2, "יש להזין לפחות 2 תווים בכותרת")
     .max(120, "הכותרת ארוכה מדי"),
+  card_title: z
+    .string()
+    .trim()
+    .max(120, "שם התצוגה בכרטיס ארוך מדי")
+    .nullish()
+    .transform((value) => value ?? ""),
   slug: slugSchema,
   description: z
     .string()

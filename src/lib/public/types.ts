@@ -19,6 +19,8 @@ export type WebsiteSettingsPublic = {
 export type PublicServiceSummary = {
   id: string;
   title: string;
+  /** Optional override shown instead of `title` on cards. */
+  card_title: string | null;
   slug: string;
   short_description: string;
   coverUrl: string | null;
@@ -30,6 +32,8 @@ export type PublicServiceSummary = {
 export type PublicRecipeSummary = {
   id: string;
   title: string;
+  /** Optional override shown instead of `title` on cards. */
+  card_title: string | null;
   slug: string;
   description: string;
   coverUrl: string | null;
@@ -45,6 +49,8 @@ export type PublicRecipeSummary = {
 export type PublicPostSummary = {
   id: string;
   title: string;
+  /** Optional override shown instead of `title` on cards. */
+  card_title: string | null;
   slug: string;
   excerpt: string;
   coverUrl: string | null;

@@ -9,6 +9,7 @@ import type { RecipeDraftInput } from "@/lib/validations/recipe";
 export function recipeDetailToFormInput(recipe: RecipeDetail): RecipeDraftInput {
   return {
     title: recipe.title,
+    card_title: recipe.card_title ?? "",
     slug: recipe.slug,
     description: recipe.description,
     cover_media_id: recipe.cover_media_id,
@@ -35,6 +36,7 @@ export function createEmptyRecipeFormInput(
 ): RecipeDraftInput {
   return {
     title: "",
+    card_title: "",
     slug: "",
     description: "",
     cover_media_id: null,

@@ -30,6 +30,7 @@ export function CertificatePublicCard({
   const hasDescription = description.length > 0;
   const mediaUrl = certificate.mediaPreview?.url?.trim() ?? "";
   const hasMedia = mediaUrl.length > 0;
+  const cardTitle = certificate.card_title?.trim() || certificate.title;
   const alt = buildCertificateAlt(certificate.title, certificate.organization);
 
   return (
@@ -40,7 +41,7 @@ export function CertificatePublicCard({
         type="button"
         className="certificate-card__trigger public-focus-ring"
         onClick={onOpen}
-        aria-label={`פתיחת תעודה: ${certificate.title}`}
+        aria-label={`פתיחת תעודה: ${cardTitle}`}
       >
         <div className="certificate-card__media">
           <div className="certificate-card__frame">
@@ -69,7 +70,7 @@ export function CertificatePublicCard({
           {yearLabel ? (
             <p className="certificate-card__year">{yearLabel}</p>
           ) : null}
-          <h3 className="certificate-card__title">{certificate.title}</h3>
+          <h3 className="certificate-card__title">{cardTitle}</h3>
           <p className="certificate-card__organization">
             {certificate.organization}
           </p>

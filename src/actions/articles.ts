@@ -169,6 +169,7 @@ function toArticleInsertRow(input: ArticleDraftInput | ArticlePublishInput) {
 
   return {
     title: input.title,
+    card_title: input.card_title.trim() || null,
     slug: input.slug,
     body,
     cover_media_id: input.cover_media_id,
@@ -201,6 +202,7 @@ function toArticleUpdateRow(
 
   return {
     title: input.title,
+    card_title: input.card_title.trim() || null,
     slug: input.slug,
     body,
     cover_media_id: input.cover_media_id,
@@ -524,6 +526,7 @@ export async function duplicateArticleAction(
     .from("articles")
     .insert({
       title: newTitle,
+      card_title: source.card_title ?? null,
       slug: newSlug,
       body: source.body,
       cover_media_id: source.cover_media_id,

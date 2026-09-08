@@ -562,6 +562,21 @@ export function ArticleForm({
               />
             </FormField>
 
+            <FormField
+              label="שם תצוגה בכרטיס"
+              htmlFor="article-card-title"
+              hint="אופציונלי — אם ריק, בכרטיסים באתר תוצג הכותרת המלאה"
+              error={fieldErrors.card_title}
+            >
+              <Input
+                id="article-card-title"
+                value={values.card_title ?? ""}
+                maxLength={120}
+                error={Boolean(fieldErrors.card_title)}
+                onChange={(event) => setField("card_title", event.target.value)}
+              />
+            </FormField>
+
             <ServiceMediaPicker
               fieldId="field-cover-media"
               label="תמונת כיסוי"

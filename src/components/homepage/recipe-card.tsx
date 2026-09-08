@@ -21,6 +21,7 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
   const href = buildRecipePath(recipe.categorySlug, recipe.slug);
   const tags = getRecipeCardTags(recipe);
   const { servings } = getRecipeCardMeta(recipe);
+  const cardTitle = recipe.card_title?.trim() || recipe.title;
 
   return (
     <article className={cn("recipe-card group", className)}>
@@ -37,7 +38,7 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
 
         <h3 className="recipe-card__title">
           <Link href={href} className="public-focus-ring rounded-[var(--radius-sm)]">
-            {recipe.title}
+            {cardTitle}
           </Link>
         </h3>
 
@@ -64,7 +65,7 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
       <Link
         href={href}
         className="recipe-card__media public-focus-ring"
-        aria-label={recipe.title}
+        aria-label={cardTitle}
       >
         {recipe.coverUrl ? (
           <Image
@@ -75,7 +76,7 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
             className="recipe-card__image"
           />
         ) : (
-          <div className="recipe-card__media-fallback">{recipe.title}</div>
+          <div className="recipe-card__media-fallback">{cardTitle}</div>
         )}
 
         {recipe.featured ? (

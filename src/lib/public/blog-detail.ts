@@ -8,10 +8,10 @@ import type { StoredSeo } from "@/lib/seo/types";
 import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 
 const ARTICLE_DETAIL_COLUMNS =
-  "id, title, slug, body, cover_media_id, seo_og_media_id, reading_time_minutes, content, seo, featured, status, published_at, created_at, updated_at";
+  "id, title, card_title, slug, body, cover_media_id, seo_og_media_id, reading_time_minutes, content, seo, featured, status, published_at, created_at, updated_at";
 
 const ARTICLE_RELATED_COLUMNS =
-  "id, title, slug, body, cover_media_id, reading_time_minutes, featured, published_at, updated_at, created_at";
+  "id, title, card_title, slug, body, cover_media_id, reading_time_minutes, featured, published_at, updated_at, created_at";
 
 type MediaRow = {
   id: string;
@@ -84,6 +84,7 @@ function mapRelatedRow(
   return {
     id: row.id as string,
     title: row.title as string,
+    card_title: (row.card_title as string | null) ?? null,
     slug: row.slug as string,
     excerpt: shortenForSeoDescription(row.body as string, 180),
     coverUrl: cover ? getPublicMediaUrl(cover.storage_path) : null,
@@ -189,6 +190,7 @@ export async function getPublishedPostBySlug(
     return {
       id: data.id as string,
       title: data.title as string,
+      card_title: (data.card_title as string | null) ?? null,
       slug: data.slug as string,
       body: data.body as string,
       cover_media_id: data.cover_media_id as string,

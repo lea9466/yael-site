@@ -17,6 +17,7 @@ export type CertificatesPageData = {
 
 export type CertificateFormValues = {
   title: string;
+  card_title: string;
   organization: string;
   year: string;
   media_id: string | null;

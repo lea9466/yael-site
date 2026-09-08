@@ -41,16 +41,16 @@ const MEDIA_SELECT_COLUMNS =
   "id, storage_path, file_name, original_file_name, alt_text";
 
 const SERVICE_PUBLIC_COLUMNS =
-  "id, title, slug, short_description, cover_media_id, featured, published_at, updated_at";
+  "id, title, card_title, slug, short_description, cover_media_id, featured, published_at, updated_at";
 
 const SERVICE_DETAIL_COLUMNS =
-  "id, title, slug, short_description, full_introduction, cover_media_id, seo_og_media_id, content, seo, featured, status, published_at, created_at, updated_at";
+  "id, title, card_title, slug, short_description, full_introduction, cover_media_id, seo_og_media_id, content, seo, featured, status, published_at, created_at, updated_at";
 
 const RECIPE_PUBLIC_COLUMNS =
-  "id, title, slug, description, cover_media_id, category_id, prep_duration, servings, featured, published_at, updated_at";
+  "id, title, card_title, slug, description, cover_media_id, category_id, prep_duration, servings, featured, published_at, updated_at";
 
 const ARTICLE_PUBLIC_COLUMNS =
-  "id, title, slug, body, cover_media_id, reading_time_minutes, featured, published_at, updated_at";
+  "id, title, card_title, slug, body, cover_media_id, reading_time_minutes, featured, published_at, updated_at";
 
 const TESTIMONIAL_PUBLIC_COLUMNS =
   "id, name, city, content, service_id, featured, is_published, updated_at";
@@ -283,6 +283,7 @@ export async function getPublishedServices(): Promise<PublicServiceSummary[]> {
       return {
         id: row.id,
         title: row.title,
+        card_title: (row.card_title as string | null) ?? null,
         slug: row.slug,
         short_description: row.short_description,
         coverUrl: cover?.url ?? null,
@@ -407,6 +408,7 @@ export async function getPublishedRecipes(options?: {
       return {
         id: row.id,
         title: row.title,
+        card_title: (row.card_title as string | null) ?? null,
         slug: row.slug,
         description: row.description,
         coverUrl: cover?.url ?? null,
@@ -483,6 +485,7 @@ export async function getPublishedPosts(): Promise<PublicPostSummary[]> {
       return {
         id: row.id,
         title: row.title,
+        card_title: (row.card_title as string | null) ?? null,
         slug: row.slug,
         excerpt: shortenForSeoDescription(row.body as string, 180),
         coverUrl: cover?.url ?? null,

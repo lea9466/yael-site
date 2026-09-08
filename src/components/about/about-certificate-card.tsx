@@ -27,6 +27,7 @@ export function AboutCertificateCard({
   const hasDescription = description.length > 0;
   const mediaUrl = certificate.mediaPreview?.url?.trim() ?? "";
   const hasMedia = mediaUrl.length > 0;
+  const cardTitle = certificate.card_title?.trim() || certificate.title;
   const alt = buildCertificateAlt(certificate.title, certificate.organization);
 
   return (
@@ -39,7 +40,7 @@ export function AboutCertificateCard({
         type="button"
         className="flex h-full flex-col items-stretch"
         onClick={onOpen}
-        aria-label={`פתיחת תעודה: ${certificate.title}`}
+        aria-label={`פתיחת תעודה: ${cardTitle}`}
       >
         <div className="relative aspect-[4/3] bg-[var(--color-surface-soft)]">
           {hasMedia ? (
@@ -61,8 +62,8 @@ export function AboutCertificateCard({
 
         <div className="flex flex-1 flex-col gap-3 p-5">
           <div className="min-w-0 space-y-1">
-            <h3 className="line-clamp-2 text-card-title" title={certificate.title}>
-              {certificate.title}
+            <h3 className="line-clamp-2 text-card-title" title={cardTitle}>
+              {cardTitle}
             </h3>
             <p
               className="truncate text-sm text-[var(--color-text-muted)]"

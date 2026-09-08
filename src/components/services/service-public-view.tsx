@@ -160,12 +160,11 @@ export function ServicePublicView({
           <div className="service-page__container">
             <HomepageReveal>
               <div className="service-page__section-head">
-                <p className="service-page__section-kicker">קהל יעד</p>
                 <h2
                   id="service-audience-heading"
                   className="service-page__heading"
                 >
-                  למי השירות מתאים
+                  זה בשבילך אם…
                 </h2>
               </div>
             </HomepageReveal>
@@ -248,7 +247,6 @@ export function ServicePublicView({
           <div className="service-page__container service-page__container--faq">
             <HomepageReveal>
               <div className="service-page__section-head">
-                <p className="service-page__section-kicker">שאלות ותשובות</p>
                 <h2 id="service-faq-heading" className="service-page__heading">
                   שאלות נפוצות
                 </h2>

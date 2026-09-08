@@ -6023,14 +6023,6 @@
   text-align: center;
 }
 
-.service-page__section-kicker {
-  margin: 0 0 0.65rem;
-  color: var(--service-olive);
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
 .service-page__heading {
   margin: 0;
   color: var(--service-ink);

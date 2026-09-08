@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
+import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { OrganicDecoration } from "@/components/homepage/organic-decoration";
 import type { AboutMediaPreview } from "@/lib/about/queries";
 import type { HomepageData } from "@/lib/validations/homepage-hero";
@@ -40,7 +41,7 @@ function AboutVisualComposition({
   coverPreview: AboutMediaPreview | null;
 }) {
   return (
-    <div className="short-about-visual short-about-visual-enter relative mx-auto flex min-h-[28rem] w-full max-w-md items-center justify-center md:min-h-[37.5rem]">
+    <div className="short-about-visual relative mx-auto flex min-h-[28rem] w-full max-w-md items-center justify-center md:min-h-[37.5rem]">
       <OrganicDecoration
         variant="mint"
         className="absolute size-[22rem] motion-safe:translate-x-10 motion-safe:translate-y-10 opacity-60"
@@ -107,7 +108,7 @@ export function ShortAboutSection({
       <div className="relative z-[1] mx-auto w-full max-w-[90rem] px-5 md:px-20">
         <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16 xl:gap-20">
           <div className="order-2 space-y-8 text-start lg:order-1 lg:col-span-7 lg:pe-8">
-            <div className="short-about-copy-enter space-y-8">
+            <HomepageReveal className="space-y-8">
               <h2
                 id="homepage-short-about-title"
                 className="short-about-title"
@@ -129,11 +130,13 @@ export function ShortAboutSection({
                   className="size-4 transition-transform duration-[var(--transition-base)] motion-safe:group-hover:-translate-x-2"
                 />
               </Link>
-            </div>
+            </HomepageReveal>
           </div>
 
           <div className="order-1 lg:order-2 lg:col-span-5">
-            <AboutVisualComposition coverPreview={coverPreview} />
+            <HomepageReveal delayMs={250}>
+              <AboutVisualComposition coverPreview={coverPreview} />
+            </HomepageReveal>
           </div>
         </div>
       </div>

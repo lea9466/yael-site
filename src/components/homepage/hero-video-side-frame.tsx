@@ -3,6 +3,8 @@
 import { Maximize2, Minimize2 } from "lucide-react";
 import { useCallback, useRef, useSyncExternalStore, type ReactNode } from "react";
 
+import { cn } from "@/lib/utils/cn";
+
 type FullscreenableElement = HTMLDivElement & {
   webkitRequestFullscreen?: () => Promise<void> | void;
 };
@@ -36,7 +38,13 @@ function getServerSnapshotFalse() {
   return false;
 }
 
-export function HeroVideoSideFrame({ children }: { children: ReactNode }) {
+export function HeroVideoSideFrame({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const supportsFullscreen = useSyncExternalStore(
@@ -76,7 +84,7 @@ export function HeroVideoSideFrame({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div ref={containerRef} className="hero-video-side">
+    <div ref={containerRef} className={cn("hero-video-side", className)}>
       {children}
       {supportsFullscreen && (
         <button

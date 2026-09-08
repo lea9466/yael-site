@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+import { HomepageReveal } from "@/components/homepage/homepage-reveal";
+
 type FeelGoodBannerProps = {
   /** Where "נשמע טוב" points. */
   href: string;
@@ -12,7 +14,7 @@ export function FeelGoodBanner({ href }: FeelGoodBannerProps) {
       aria-labelledby="homepage-feel-good-title"
       className="feel-good-banner"
     >
-      <div className="feel-good-banner__inner">
+      <HomepageReveal className="feel-good-banner__inner">
         <p id="homepage-feel-good-title" className="feel-good-banner__title">
           מרגישה טוב
         </p>
@@ -23,7 +25,7 @@ export function FeelGoodBanner({ href }: FeelGoodBannerProps) {
           <span>נשמע טוב</span>
           <ArrowLeft aria-hidden="true" className="size-4" />
         </Link>
-      </div>
+      </HomepageReveal>
     </section>
   );
 }

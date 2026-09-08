@@ -225,10 +225,10 @@ export function HomepageHeroSection({
 
       <div className="hero-stage">
         <div className="hero-stage__container">
-          <div className="hero-editorial hero-editorial-enter">
+          <div className="hero-editorial">
             <div className="hero-content-row">
               {hasSideMedia && hero.side_media_type === "video_url" && (
-                <HeroVideoSideFrame>
+                <HeroVideoSideFrame className="hero-rise hero-rise--d2">
                   <HeroMediaErrorBoundary fallback={heroMediaFallback}>
                     <SideHeroMedia
                       hero={hero}
@@ -241,7 +241,7 @@ export function HomepageHeroSection({
               )}
 
               {hasSideMedia && hero.side_media_type !== "video_url" && (
-                <div className="hero-video-side">
+                <div className="hero-video-side hero-rise hero-rise--d2">
                   <HeroMediaErrorBoundary fallback={heroMediaFallback}>
                     <SideHeroMedia
                       hero={hero}
@@ -254,13 +254,18 @@ export function HomepageHeroSection({
               )}
 
               <div className="hero-content-main">
-                <h1 id="homepage-hero-title" className="hero-title">
+                <h1
+                  id="homepage-hero-title"
+                  className="hero-title hero-rise"
+                >
                   <HeroTitle title={hero.title} />
                 </h1>
 
-                <p className="hero-lead">{hero.subtitle}</p>
+                <p className="hero-lead hero-rise hero-rise--d2">
+                  {hero.subtitle}
+                </p>
 
-                <div className="hero-actions">
+                <div className="hero-actions hero-rise hero-rise--d3">
                   <HeroButton
                     label={hero.primary_button.label}
                     href={hero.primary_button.url}

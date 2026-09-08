@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 
+import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { PostCard } from "@/components/homepage/post-card";
 import { PublicEmptyState } from "@/components/public/states/public-empty-state";
 import {
@@ -64,9 +65,11 @@ export function BlogListing({ data }: BlogListingProps) {
                   `recipes-section__grid--count-${Math.min(posts.length, 3)}`
                 )}
               >
-                {posts.map((post) => (
+                {posts.map((post, index) => (
                   <li key={post.id} className="recipes-section__item">
-                    <PostCard post={post} />
+                    <HomepageReveal delayMs={(index % 3) * 250}>
+                      <PostCard post={post} />
+                    </HomepageReveal>
                   </li>
                 ))}
               </ul>

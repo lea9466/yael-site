@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChefHat } from "lucide-react";
 
+import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { RecipeCard } from "@/components/homepage/recipe-card";
 import { PublicEmptyState } from "@/components/public/states/public-empty-state";
 import { RecipesCategoryPills } from "@/components/recipes/public/recipes-category-pills";
@@ -80,9 +81,11 @@ export function RecipesListing({ data }: RecipesListingProps) {
           {recipes.length > 0 ? (
             <>
               <ul className="recipes-section__grid recipes-listing__grid recipes-section__grid--count-2">
-                {recipes.map((recipe) => (
+                {recipes.map((recipe, index) => (
                   <li key={recipe.id} className="recipes-section__item">
-                    <RecipeCard recipe={recipe} />
+                    <HomepageReveal delayMs={(index % 3) * 250}>
+                      <RecipeCard recipe={recipe} />
+                    </HomepageReveal>
                   </li>
                 ))}
               </ul>

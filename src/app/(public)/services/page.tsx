@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { ServiceCard } from "@/components/homepage/service-card";
 import { ServicesListingBreadcrumbJsonLd } from "@/components/services/public/services-listing-breadcrumb-json-ld";
 import { SERVICES_LISTING_HIDDEN_SLUGS } from "@/constants/public-navigation";
@@ -46,13 +47,15 @@ export default async function PublicServicesPage() {
         <ul className="services-listing-grid grid list-none gap-8 p-0 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service, index) => (
             <li key={service.id} className="services-section__item">
-              <ServiceCard
-                service={service}
-                variant="pathway"
-                ordinal={index + 1}
-                surface={getServiceCardSurface(index)}
-                isPrimaryFeatured={service.id === primaryFeaturedId}
-              />
+              <HomepageReveal delayMs={(index % 3) * 250}>
+                <ServiceCard
+                  service={service}
+                  variant="pathway"
+                  ordinal={index + 1}
+                  surface={getServiceCardSurface(index)}
+                  isPrimaryFeatured={service.id === primaryFeaturedId}
+                />
+              </HomepageReveal>
             </li>
           ))}
         </ul>

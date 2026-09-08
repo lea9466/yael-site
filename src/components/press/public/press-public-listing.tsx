@@ -1,5 +1,6 @@
 import { Newspaper } from "lucide-react";
 
+import { HomepageReveal } from "@/components/homepage/homepage-reveal";
 import { PressPublicCard } from "@/components/press/public/press-public-card";
 import { PublicEmptyState } from "@/components/public/states/public-empty-state";
 import type { PressArticlePublicCard as PressCard } from "@/lib/press/types";
@@ -34,7 +35,9 @@ export function PressPublicListing({ articles }: PressPublicListingProps) {
               key={article.id}
               className="flex w-full justify-center sm:block"
             >
-              <PressPublicCard article={article} accentIndex={index} />
+              <HomepageReveal delayMs={(index % 3) * 250}>
+                <PressPublicCard article={article} accentIndex={index} />
+              </HomepageReveal>
             </li>
           ))}
         </ul>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MultilineText } from "@/components/ui/multiline-text";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Feather, Mail, MapPin, Phone } from "lucide-react";
 
 import { PublicLogo } from "@/components/public/header/public-logo";
 import { Container } from "@/components/public/layout/container";
@@ -36,6 +36,56 @@ function FooterNavColumn({
         ))}
       </ul>
     </nav>
+  );
+}
+
+type FooterCredit = {
+  role: string;
+  name: string;
+  contacts: { label: string; href: string }[];
+};
+
+const FOOTER_CREDITS: FooterCredit[] = [
+  {
+    role: "קופי ומיקרו קופי",
+    name: "לאה יעקבי",
+    contacts: [
+      { label: "052-717-1680", href: "tel:0527171680" },
+      { label: "leahcopywriting@gmail.com", href: "mailto:leahcopywriting@gmail.com" },
+    ],
+  },
+  {
+    role: "אפיון, עיצוב ופיתוח",
+    name: "לאה",
+    contacts: [
+      { label: "lea0556769466@gmail.com", href: "mailto:lea0556769466@gmail.com" },
+    ],
+  },
+];
+
+function FooterCreditLine({ role, name, contacts }: FooterCredit) {
+  return (
+    <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+      <Feather
+        aria-hidden="true"
+        className="size-4 shrink-0 text-[var(--color-secondary)]"
+      />
+      <span>{role}:</span>
+      <span className="font-medium text-[var(--color-text)]">{name}</span>
+      {contacts.map((contact) => (
+        <span key={contact.href} className="inline-flex items-center gap-x-2">
+          <span aria-hidden="true" className="text-[var(--color-border-strong)]">
+            ·
+          </span>
+          <a
+            href={contact.href}
+            className="public-focus-ring rounded-[var(--radius-sm)] hover:text-[var(--color-primary)]"
+          >
+            {contact.label}
+          </a>
+        </span>
+      ))}
+    </p>
   );
 }
 
@@ -182,6 +232,11 @@ export function PublicFooter({
           <p>
             © {currentYear} {businessProfile.business_name}. כל הזכויות שמורות.
           </p>
+          <div className="mt-4 flex flex-col items-center gap-1.5">
+            {FOOTER_CREDITS.map((credit) => (
+              <FooterCreditLine key={credit.role} {...credit} />
+            ))}
+          </div>
         </div>
       </Container>
     </footer>

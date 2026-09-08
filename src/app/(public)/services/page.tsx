@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { ServiceCard } from "@/components/homepage/service-card";
 import { ServicesListingBreadcrumbJsonLd } from "@/components/services/public/services-listing-breadcrumb-json-ld";
+import { SERVICES_LISTING_HIDDEN_SLUGS } from "@/constants/public-navigation";
 import { getServiceCardSurface } from "@/lib/homepage/service-card-display";
 import {
   getPublishedServices,
@@ -21,7 +22,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PublicServicesPage() {
-  const services = await getPublishedServices();
+  const services = (await getPublishedServices()).filter(
+    (service) => !SERVICES_LISTING_HIDDEN_SLUGS.includes(service.slug)
+  );
   const primaryFeaturedId =
     services.find((service) => service.featured)?.id ?? null;
 

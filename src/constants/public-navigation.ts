@@ -24,6 +24,14 @@ export const PUBLIC_LIVUY_NAV_LINK: PublicNavLink = {
   href: "/services/ליווי-אישי",
 };
 
+/**
+ * Service slugs hidden from the /services listing and the homepage services
+ * section. "ליווי אישי" has its own header nav link (PUBLIC_LIVUY_NAV_LINK), so
+ * listing it again as a regular service card is redundant. Its detail page,
+ * sitemap entry and the nav link all stay live.
+ */
+export const SERVICES_LISTING_HIDDEN_SLUGS: readonly string[] = ["ליווי-אישי"];
+
 export function buildPublicPrimaryNav(
   options: { includePress: boolean } = { includePress: false }
 ): PublicNavLink[] {

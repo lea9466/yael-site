@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { HomepageView } from "@/components/homepage/homepage-view";
+import { SERVICES_LISTING_HIDDEN_SLUGS } from "@/constants/public-navigation";
 import { fetchAboutPageDetail } from "@/lib/about/queries";
 import { fetchCertificatesPageData } from "@/lib/certificates/queries";
 import { getDefaultHomepageData } from "@/lib/homepage/defaults";
@@ -58,7 +59,12 @@ export default async function PublicHomePage() {
   const heroSideMediaPreview = heroPageData?.heroSideMediaPreview ?? null;
   const aboutCoverPreview = aboutDetail?.coverPreview ?? null;
 
-  const homepageServices = selectHomepageItems(services, "services");
+  const homepageServices = selectHomepageItems(
+    services.filter(
+      (service) => !SERVICES_LISTING_HIDDEN_SLUGS.includes(service.slug)
+    ),
+    "services"
+  );
   const homepageTestimonials = selectHomepageItems(testimonials, "testimonials");
   const homepagePosts = selectHomepageItems(posts, "recentPosts");
   const homepageRecipes = selectHomepageItems(recipes, "recentRecipes");

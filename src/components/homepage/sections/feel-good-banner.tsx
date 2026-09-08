@@ -17,7 +17,7 @@ export function FeelGoodBanner({ href }: FeelGoodBannerProps) {
           מרגישה טוב
         </p>
         <p className="feel-good-banner__text">
-          תוכנית הדגל &ldquo;אוכלת בשפת הגוף&rdquo;, אימון אישי לאכילה מחוברת
+          &ldquo;אוכלת בשפת הגוף&rdquo;, אימון אישי לאכילה מחוברת
         </p>
         <Link href={href} className="feel-good-banner__cta public-focus-ring">
           <span>נשמע טוב</span>

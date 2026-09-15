@@ -14,7 +14,7 @@ export type ServiceCardBadge = {
   variant: ShortAboutHighlightVariant;
 };
 
-const NEW_SERVICE_WINDOW_MS = 1000 * 60 * 60 * 24 * 45;
+const NEW_SERVICE_WINDOW_MS = 1000 * 60 * 60 * 24 * 7;
 
 function isRecentlyPublished(publishedAt: string | null): boolean {
   if (!publishedAt) {

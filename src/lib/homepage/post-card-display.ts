@@ -7,7 +7,7 @@ export type PostCardPill = {
   variant: ShortAboutHighlightVariant;
 };
 
-const NEW_POST_WINDOW_MS = 1000 * 60 * 60 * 24 * 45;
+const NEW_POST_WINDOW_MS = 1000 * 60 * 60 * 24 * 7;
 
 function sortByPublishedDesc(
   left: PublicPostSummary,

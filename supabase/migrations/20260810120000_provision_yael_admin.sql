@@ -7,10 +7,15 @@
 -- 4. Updates business profile email
 
 -- Configuration
+-- NOTE: the real email/password used when this was originally run have been
+-- redacted here for security (this file lives in a public repo). The
+-- provisioning already happened; these placeholders only document the shape
+-- of the script. Use scripts/provision-admin.ts with real --email/--password
+-- arguments to (re-)provision an admin going forward.
 DO $$
 DECLARE
-  yael_email TEXT := 'berkovich.yael@gmail.com';
-  yael_password TEXT := '1234';
+  yael_email TEXT := '<redacted>';
+  yael_password TEXT := '<redacted>';
   yael_full_name TEXT := 'יעל קנייבסקי';
   yael_auth_id UUID;
   old_admin_id UUID;

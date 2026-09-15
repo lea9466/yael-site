@@ -3,12 +3,6 @@ import { resolve } from "node:path";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-const DEFAULT_ADMIN = {
-  email: "berkovich.yael@gmail.com",
-  password: "1234",
-  fullName: "יעל קנייבסקי",
-} as const;
-
 type AdminRow = {
   id: string;
   email: string | null;
@@ -76,9 +70,9 @@ function parseArgs(): {
   fullName: string;
 } {
   const args = process.argv.slice(2);
-  let email: string = DEFAULT_ADMIN.email;
-  let password: string = DEFAULT_ADMIN.password;
-  let fullName: string = DEFAULT_ADMIN.fullName;
+  let email = "";
+  let password = "";
+  let fullName = "";
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -100,6 +94,12 @@ function parseArgs(): {
       fullName = next.trim();
       index += 1;
     }
+  }
+
+  if (!email || !password || !fullName) {
+    throw new Error(
+      "Usage: npx tsx scripts/provision-admin.ts --email <email> --password <password> --name <full name>"
+    );
   }
 
   return { email, password, fullName };

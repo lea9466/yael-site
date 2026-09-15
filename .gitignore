@@ -49,3 +49,4 @@ next-env.d.ts
 # local tooling / scratch files
 .claude/
 curl-output.txt
+.cursor/

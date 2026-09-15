@@ -27,7 +27,7 @@ export function getDefaultHomepageData(): HomepageData {
     },
     contact_cta: {
       title: "רוצים לדבר?",
-      text: "אשמח לשמוע מכם וללוות אתכם בדרך לאכילה מודעת ומאוזנת.",
+      text: "אשמח ללוות אותך בדרך לאכילה מודעת ומאוזנת.",
       button_label: "יצירת קשר",
     },
   };

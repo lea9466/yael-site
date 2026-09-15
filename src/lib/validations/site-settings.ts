@@ -17,6 +17,7 @@ import {
   WEEKDAYS,
 } from "@/lib/settings/constants";
 import {
+  contactCtaTextSchema,
   formStateToHomepageHero,
   formStateToHomepageShortAbout,
   homepageHeroSchema,
@@ -203,6 +204,7 @@ export const saveSiteSettingsInputSchema = z.object({
   siteSettings: siteSettingsDataSchema,
   homepageHero: homepageHeroSchema,
   homepageShortAbout: shortAboutSchema,
+  homepageContactCtaText: contactCtaTextSchema,
   businessProfileUpdatedAt: z.string().datetime({ offset: true }),
   siteSettingsUpdatedAt: z.string().datetime({ offset: true }),
   homepageUpdatedAt: z.string().datetime({ offset: true }),
@@ -367,6 +369,7 @@ export type SettingsPageData = {
   siteSettings: SiteSettingsData;
   homepageHero: HomepageHeroData;
   homepageShortAbout: HomepageShortAbout;
+  homepageContactCtaText: string;
   businessProfileUpdatedAt: string;
   siteSettingsUpdatedAt: string;
   homepageUpdatedAt: string;
@@ -421,6 +424,7 @@ export type SettingsFormState = {
   heroSideAnimationUrl: string;
   shortAboutTitle: string;
   shortAboutText: string;
+  contactCtaText: string;
 };
 
 export function pageDataToFormState(data: SettingsPageData): SettingsFormState {
@@ -457,6 +461,7 @@ export function pageDataToFormState(data: SettingsPageData): SettingsFormState {
     googleSiteVerification: siteSettings.google_site_verification ?? "",
     ...heroState,
     ...shortAboutState,
+    contactCtaText: data.homepageContactCtaText,
   };
 }
 
@@ -473,6 +478,7 @@ export function formStateToSavePayload(
     siteSettings: formStateToSiteSettings(state),
     homepageHero: formStateToHomepageHero(state),
     homepageShortAbout: formStateToHomepageShortAbout(state),
+    homepageContactCtaText: state.contactCtaText,
     businessProfileUpdatedAt: timestamps.businessProfileUpdatedAt,
     siteSettingsUpdatedAt: timestamps.siteSettingsUpdatedAt,
     homepageUpdatedAt: timestamps.homepageUpdatedAt,

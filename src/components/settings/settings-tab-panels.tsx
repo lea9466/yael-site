@@ -1,5 +1,6 @@
 "use client";
 
+import { SettingsHomepageContactCtaPanel } from "@/components/settings/settings-homepage-contact-cta-panel";
 import { SettingsHomepageHeroPanel } from "@/components/settings/settings-homepage-hero-panel";
 import { SettingsHomepageShortAboutPanel } from "@/components/settings/settings-homepage-short-about-panel";
 import { ServiceMediaPicker } from "@/components/services/service-media-picker";
@@ -191,7 +192,7 @@ export function SettingsTabPanels({
         activeTab={activeTab}
         tabId="homepage"
         title="דף הבית"
-        description="עריכת אזור ה-Hero וסקציית האודות הקצרה בדף הבית."
+        description="עריכת אזור ה-Hero, סקציית האודות הקצרה וטקסט הפנייה ליצירת קשר בדף הבית."
       >
         <div className="space-y-8">
           <SettingsHomepageHeroPanel
@@ -206,6 +207,11 @@ export function SettingsTabPanels({
             onHeroSideImageChange={onHeroSideImageChange}
           />
           <SettingsHomepageShortAboutPanel
+            formState={formState}
+            fieldErrors={fieldErrors}
+            onChange={onChange}
+          />
+          <SettingsHomepageContactCtaPanel
             formState={formState}
             fieldErrors={fieldErrors}
             onChange={onChange}

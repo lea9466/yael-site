@@ -32,6 +32,8 @@ export const HOMEPAGE_HERO_EXTERNAL_URL_MAX = 2048;
 export const HOMEPAGE_SHORT_ABOUT_TITLE_MAX = 120;
 export const HOMEPAGE_SHORT_ABOUT_TEXT_MAX = 1200;
 
+export const HOMEPAGE_CONTACT_CTA_TEXT_MAX = 300;
+
 export const HOMEPAGE_HERO_MEDIA_TYPES = [
   "image",
   "video_url",

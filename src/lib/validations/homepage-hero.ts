@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { isValidArticleLinkUrl } from "@/lib/articles/link-validation";
 import {
+  HOMEPAGE_CONTACT_CTA_TEXT_MAX,
   HOMEPAGE_HERO_BUTTON_LABEL_MAX,
   HOMEPAGE_HERO_BUTTON_URL_MAX,
   HOMEPAGE_HERO_EXTERNAL_URL_MAX,
@@ -182,10 +183,21 @@ export const shortAboutSchema = z
 
 export type HomepageShortAbout = z.infer<typeof shortAboutSchema>;
 
+/**
+ * The homepage contact-CTA title and button label are fixed in code (see
+ * ContactCtaSection) — only the body text is editable via the settings
+ * panel, so it gets its own exported schema for reuse there.
+ */
+export const contactCtaTextSchema = z
+  .string()
+  .trim()
+  .min(1, "יש להזין טקסט")
+  .max(HOMEPAGE_CONTACT_CTA_TEXT_MAX, "הטקסט ארוך מדי");
+
 const contactCtaSchema = z
   .object({
     title: z.string().trim().min(1, "יש להזין כותרת"),
-    text: z.string().trim().min(1, "יש להזין טקסט"),
+    text: contactCtaTextSchema,
     button_label: z.string().trim().min(1, "יש להזין תווית לכפתור"),
   })
   .strict();
@@ -438,15 +450,20 @@ export function mergeHomepageHero(
   });
 }
 
-export function mergeHomepageHeroAndShortAbout(
+export function mergeHomepageHeroShortAboutAndContactCta(
   existing: HomepageData,
   hero: HomepageHeroData,
-  shortAbout: HomepageShortAbout
+  shortAbout: HomepageShortAbout,
+  contactCtaText: string
 ): HomepageData {
   return homepageDataSchema.parse({
     ...existing,
     hero,
     short_about: shortAbout,
+    contact_cta: {
+      ...existing.contact_cta,
+      text: contactCtaText,
+    },
   });
 }
 

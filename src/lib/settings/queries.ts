@@ -105,6 +105,7 @@ export async function fetchSettingsPageData(): Promise<SettingsPageData | null> 
       siteSettings,
       homepageHero: homepage.hero,
       homepageShortAbout: homepage.short_about,
+      homepageContactCtaText: homepage.contact_cta.text,
       businessProfileUpdatedAt: businessRow.updated_at,
       siteSettingsUpdatedAt: settingsRow.updated_at,
       homepageUpdatedAt: homepageRow.updated_at,

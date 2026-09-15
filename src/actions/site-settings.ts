@@ -13,7 +13,7 @@ import { HOMEPAGE_SITE_CONTENT_KEY } from "@/lib/homepage/constants";
 import { HOMEPAGE_ERRORS } from "@/lib/homepage/errors";
 import { fetchHomepageSiteContent } from "@/lib/homepage/queries";
 import {
-  mergeHomepageHeroAndShortAbout,
+  mergeHomepageHeroShortAboutAndContactCta,
   homepageDataSchema,
   type HomepageData,
 } from "@/lib/validations/homepage-hero";
@@ -175,10 +175,11 @@ export async function saveSiteSettingsAction(
     return { success: false, error: HOMEPAGE_ERRORS.generic };
   }
 
-  const mergedHomepage = mergeHomepageHeroAndShortAbout(
+  const mergedHomepage = mergeHomepageHeroShortAboutAndContactCta(
     existingHomepage.data,
     parsed.data.homepageHero,
-    parsed.data.homepageShortAbout
+    parsed.data.homepageShortAbout,
+    parsed.data.homepageContactCtaText
   );
   const homepageValidation = homepageDataSchema.safeParse(mergedHomepage);
 

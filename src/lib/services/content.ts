@@ -46,6 +46,7 @@ export function createDefaultServiceContent(): ServiceContent {
   return {
     intro_blocks: [],
     target_audience: [],
+    audience_note_blocks: [],
     benefits: [],
     process_steps: [],
     faq: [],
@@ -169,6 +170,7 @@ export function normalizeServiceContent(
   return {
     intro_blocks: resolvedIntroBlocks,
     target_audience: normalizeAudienceItems(value.target_audience),
+    audience_note_blocks: normalizeIntroBlocks(value.audience_note_blocks),
     benefits: normalizeTextItems(value.benefits),
     process_steps: processSteps,
     faq,

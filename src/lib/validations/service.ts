@@ -171,6 +171,14 @@ const serviceContentSchema = z.object({
     .array(audienceItemSchema)
     .max(SERVICE_REPEATER_LIMITS.target_audience.max)
     .transform(filterAudienceItems),
+  audience_note_blocks: z.preprocess(
+    stripImageBlocks,
+    z
+      .array(blockSchema)
+      .max(SERVICE_INTRO_BLOCKS_MAX, "יותר מדי בלוקים בפסקה")
+      .default([])
+      .transform((blocks) => blocks as ServiceIntroBlock[])
+  ),
   benefits: z
     .array(textItemSchema)
     .max(SERVICE_REPEATER_LIMITS.benefits.max)

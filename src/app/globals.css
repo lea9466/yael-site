@@ -6284,6 +6284,10 @@
     linear-gradient(180deg, transparent 0%, rgba(245, 248, 244, 0.7) 40%, transparent 100%);
 }
 
+.service-page__audience-note {
+  padding-block: clamp(2rem, 4vw, 3rem);
+}
+
 .service-page__intro-atmosphere {
   position: absolute;
   inset: 0;

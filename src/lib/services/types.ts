@@ -36,6 +36,8 @@ export type ServiceCtaLinkType = "internal" | "external";
 export type ServiceContent = {
   intro_blocks: ServiceIntroBlock[];
   target_audience: ServiceAudienceItem[];
+  /** Optional short rich-text paragraph shown between "target audience" and "benefits". */
+  audience_note_blocks: ServiceIntroBlock[];
   benefits: ServiceTextItem[];
   process_steps: ServiceProcessStep[];
   faq: ServiceFaqItem[];

@@ -197,6 +197,20 @@ export function ServicePublicView({
         </section>
       ) : null}
 
+      {service.content.audience_note_blocks.length > 0 ? (
+        <section
+          className="service-page__section service-page__intro service-page__audience-note"
+          aria-labelledby="service-audience-note-heading"
+        >
+          <HomepageReveal className="service-page__intro-panel">
+            <h2 id="service-audience-note-heading" className="sr-only">
+              עוד על השירות
+            </h2>
+            <ServiceIntroBlocks blocks={service.content.audience_note_blocks} />
+          </HomepageReveal>
+        </section>
+      ) : null}
+
       {service.content.benefits.length > 0 ? (
         <section
           className="service-page__section service-page__benefits"

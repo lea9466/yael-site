@@ -86,6 +86,7 @@ type ServiceFormProps = {
 type FormContentState = {
   intro_blocks: EditorBlockUnion[];
   target_audience: AudienceRepeaterItem[];
+  audience_note_blocks: EditorBlockUnion[];
   benefits: TextRepeaterItem[];
   process_steps: ProcessRepeaterItem[];
   faq: FaqRepeaterItem[];
@@ -104,6 +105,9 @@ function toRepeaterContent(content: ServiceDraftInput["content"]): FormContentSt
       text: item.text,
       icon: item.icon?.trim() ?? "",
     })),
+    audience_note_blocks: articleBlocksToEditorBlocks(
+      content.audience_note_blocks
+    ),
     benefits: content.benefits.map((item) => ({
       id: createRepeaterItemId(),
       text: item.text,
@@ -142,6 +146,9 @@ function toSubmitContent(content: FormContentState): ServiceDraftInput["content"
           ? { text: text.trim(), icon: normalizedIcon }
           : { text: text.trim() };
       }),
+    audience_note_blocks: normalizeBlocksForSave(
+      editorBlocksToArticleBlocks(content.audience_note_blocks)
+    ).filter((block): block is ServiceIntroBlock => block.type !== "image"),
     benefits: content.benefits
       .filter((item) => item.text.trim().length > 0)
       .map(({ text }) => ({ text: text.trim() })),
@@ -729,6 +736,27 @@ export function ServiceForm({
                 </div>
               )}
             />
+
+            <FormField
+              label="פסקה בין קהל היעד ליתרונות"
+              hint="אופציונלי · פסקת טקסט קצרה שמופיעה בעמוד השירות אחרי סקציית קהל היעד ולפני היתרונות."
+              error={getFieldErrorMessage(
+                fieldErrors,
+                "content.audience_note_blocks"
+              )}
+            >
+              <ArticleEditor
+                blocks={content.audience_note_blocks}
+                allowedBlockTypes={["paragraph", "heading", "list", "quote"]}
+                hideHeader
+                onChange={(audience_note_blocks) =>
+                  setContent((current) => ({
+                    ...current,
+                    audience_note_blocks,
+                  }))
+                }
+              />
+            </FormField>
           </section>
 
           <section

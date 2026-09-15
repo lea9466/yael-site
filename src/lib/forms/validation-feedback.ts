@@ -8,6 +8,7 @@ const FIELD_SECTION_MAP: Record<string, ServiceFormSectionId> = {
   featured: "basic",
   full_introduction: "content",
   "content.target_audience": "audience",
+  "content.audience_note_blocks": "audience",
   "content.benefits": "benefits",
   "content.process_steps": "process",
   "content.faq": "faq",
@@ -26,6 +27,7 @@ const FIELD_ELEMENT_MAP: Record<string, string> = {
   cover_media_id: "field-cover-media",
   full_introduction: "service-full-introduction",
   "content.target_audience": "section-audience",
+  "content.audience_note_blocks": "section-audience",
   "content.benefits": "section-benefits",
   "content.process_steps": "section-process",
   "content.faq": "section-faq",
@@ -61,7 +63,7 @@ function normalizeFieldPath(path: string): string {
     return path;
   }
 
-  const contentMatch = /^content\.(target_audience|benefits|process_steps|faq|cta_\w+)(?:\.\d+(?:\.\w+)?)?$/.exec(
+  const contentMatch = /^content\.(target_audience|audience_note_blocks|benefits|process_steps|faq|cta_\w+)(?:\.\d+(?:\.\w+)?)?$/.exec(
     path
   );
 

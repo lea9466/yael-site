@@ -68,6 +68,7 @@ export function formatHebrewCalendarDate(isoDate: string | null): string {
       day: "numeric",
       month: "long",
       year: "numeric",
+      timeZone: "Asia/Jerusalem",
     }).formatToParts(date);
 
     const partValue = (type: Intl.DateTimeFormatPartTypes) =>
@@ -88,5 +89,6 @@ export function formatHebrewCalendarDate(isoDate: string | null): string {
     day: "numeric",
     month: "long",
     year: "numeric",
+    timeZone: "Asia/Jerusalem",
   }).format(date);
 }

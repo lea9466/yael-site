@@ -20,6 +20,7 @@ export function formatMediaDate(isoDate: string): string {
   return new Intl.DateTimeFormat("he-IL", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "Asia/Jerusalem",
   }).format(date);
 }
 

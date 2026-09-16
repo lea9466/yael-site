@@ -23,6 +23,7 @@ export function formatPressDateShort(isoDate: string | null): string {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+    timeZone: "Asia/Jerusalem",
   }).format(date);
 }
 

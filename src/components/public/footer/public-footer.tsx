@@ -43,7 +43,12 @@ function FooterNavColumn({
 type FooterCredit = {
   role: string;
   name: string;
-  contacts: { label: string; href: string; email?: string }[];
+  contacts: {
+    label: string;
+    href: string;
+    email?: string;
+    external?: boolean;
+  }[];
 };
 
 const FOOTER_CREDITS: FooterCredit[] = [
@@ -63,11 +68,7 @@ const FOOTER_CREDITS: FooterCredit[] = [
     role: "אפיון, עיצוב ופיתוח",
     name: "לאה",
     contacts: [
-      {
-        label: "lea0556769466@gmail.com",
-        href: "mailto:lea0556769466@gmail.com",
-        email: "lea0556769466@gmail.com",
-      },
+      { label: "leatech.dev", href: "https://leatech.dev/", external: true },
     ],
   },
 ];
@@ -97,6 +98,9 @@ function FooterCreditLine({ role, name, contacts }: FooterCredit) {
             <a
               href={contact.href}
               className="public-focus-ring rounded-[var(--radius-sm)] hover:text-[var(--color-primary)]"
+              {...(contact.external
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
             >
               {contact.label}
             </a>

@@ -3,11 +3,8 @@
 import Link from "next/link";
 import { Mail, MessageCircle, Phone } from "lucide-react";
 
-import {
-  buildMailtoHref,
-  buildTelHref,
-  buildWhatsAppHref,
-} from "@/lib/contact-messages/format";
+import { EmailLink } from "@/components/ui/email-link";
+import { buildTelHref, buildWhatsAppHref } from "@/lib/contact-messages/format";
 import { cn } from "@/lib/utils/cn";
 
 type ContactMessageQuickActionsProps = {
@@ -24,16 +21,15 @@ export function ContactMessageQuickActions({
   phone,
   className,
 }: ContactMessageQuickActionsProps) {
-  const mailtoHref = buildMailtoHref(email);
   const telHref = phone ? buildTelHref(phone) : null;
   const whatsappHref = phone ? buildWhatsAppHref(phone) : null;
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
-      <Link href={mailtoHref} className={actionClassName}>
+      <EmailLink email={email} className={actionClassName}>
         <Mail aria-hidden="true" className="size-4" />
         שליחת אימייל
-      </Link>
+      </EmailLink>
 
       {telHref ? (
         <Link href={telHref} className={actionClassName}>

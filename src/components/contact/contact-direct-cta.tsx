@@ -1,5 +1,6 @@
 import { Mail, MessageCircle, Phone } from "lucide-react";
 
+import { EmailLink } from "@/components/ui/email-link";
 import type { PublicContactLinks } from "@/lib/contact/public-links";
 
 type ContactDirectCtaProps = {
@@ -58,6 +59,19 @@ export function ContactDirectCta({ links }: ContactDirectCtaProps) {
           <div className="contact-page__direct-actions">
             {actions.map((action) => {
               const Icon = action.icon;
+
+              if (action.key === "email" && links.email) {
+                return (
+                  <EmailLink
+                    key={action.key}
+                    email={links.email}
+                    className="contact-page__direct-button public-focus-ring"
+                  >
+                    <Icon aria-hidden="true" className="size-4" />
+                    {action.label}
+                  </EmailLink>
+                );
+              }
 
               return (
                 <a

@@ -115,3 +115,8 @@ export function buildBusinessWhatsAppHref(value: string): string | null {
 export function buildMailtoHref(email: string): string {
   return `mailto:${email.trim()}`;
 }
+
+/** Opens a ready-to-write Gmail compose window addressed to `email`. */
+export function buildGmailComposeHref(email: string): string {
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email.trim())}`;
+}

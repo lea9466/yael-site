@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EmailLink } from "@/components/ui/email-link";
 import { MultilineText } from "@/components/ui/multiline-text";
 import { Feather, Mail, MapPin, Phone } from "lucide-react";
 
@@ -42,7 +43,7 @@ function FooterNavColumn({
 type FooterCredit = {
   role: string;
   name: string;
-  contacts: { label: string; href: string }[];
+  contacts: { label: string; href: string; email?: string }[];
 };
 
 const FOOTER_CREDITS: FooterCredit[] = [
@@ -51,14 +52,22 @@ const FOOTER_CREDITS: FooterCredit[] = [
     name: "לאה יעקבי",
     contacts: [
       { label: "052-717-1680", href: "tel:0527171680" },
-      { label: "leahcopywriting@gmail.com", href: "mailto:leahcopywriting@gmail.com" },
+      {
+        label: "leahcopywriting@gmail.com",
+        href: "mailto:leahcopywriting@gmail.com",
+        email: "leahcopywriting@gmail.com",
+      },
     ],
   },
   {
     role: "אפיון, עיצוב ופיתוח",
     name: "לאה",
     contacts: [
-      { label: "lea0556769466@gmail.com", href: "mailto:lea0556769466@gmail.com" },
+      {
+        label: "lea0556769466@gmail.com",
+        href: "mailto:lea0556769466@gmail.com",
+        email: "lea0556769466@gmail.com",
+      },
     ],
   },
 ];
@@ -77,12 +86,21 @@ function FooterCreditLine({ role, name, contacts }: FooterCredit) {
           <span aria-hidden="true" className="text-[var(--color-border-strong)]">
             ·
           </span>
-          <a
-            href={contact.href}
-            className="public-focus-ring rounded-[var(--radius-sm)] hover:text-[var(--color-primary)]"
-          >
-            {contact.label}
-          </a>
+          {contact.email ? (
+            <EmailLink
+              email={contact.email}
+              className="public-focus-ring rounded-[var(--radius-sm)] hover:text-[var(--color-primary)]"
+            >
+              {contact.label}
+            </EmailLink>
+          ) : (
+            <a
+              href={contact.href}
+              className="public-focus-ring rounded-[var(--radius-sm)] hover:text-[var(--color-primary)]"
+            >
+              {contact.label}
+            </a>
+          )}
         </span>
       ))}
     </p>
@@ -160,13 +178,13 @@ export function PublicFooter({
               ) : null}
               {businessProfile.email ? (
                 <li>
-                  <a
-                    href={`mailto:${businessProfile.email}`}
+                  <EmailLink
+                    email={businessProfile.email}
                     className="public-focus-ring inline-flex items-center gap-2 rounded-[var(--radius-sm)] hover:text-[var(--color-primary)]"
                   >
                     <Mail aria-hidden="true" className="size-4 shrink-0" />
                     <span>{businessProfile.email}</span>
-                  </a>
+                  </EmailLink>
                 </li>
               ) : null}
               {addressLine ? (

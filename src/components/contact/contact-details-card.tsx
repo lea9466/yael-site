@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 
+import { EmailLink } from "@/components/ui/email-link";
 import {
   CONTACT_DETAIL_ICONS,
   type PublicContactLinks,
@@ -55,7 +56,14 @@ export function ContactDetailsCard({
 
               return (
                 <li key={item.key} className="contact-page__details-item">
-                  {item.href ? (
+                  {item.icon === "email" && links.email ? (
+                    <EmailLink
+                      email={links.email}
+                      className="contact-page__details-link public-focus-ring"
+                    >
+                      {content}
+                    </EmailLink>
+                  ) : item.href ? (
                     <a
                       href={item.href}
                       className="contact-page__details-link public-focus-ring"

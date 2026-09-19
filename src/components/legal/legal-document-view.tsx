@@ -1,5 +1,6 @@
 import { Scale } from "lucide-react";
 
+import { EmailLink } from "@/components/ui/email-link";
 import type {
   LegalDocumentContent,
   LegalDocumentSection,
@@ -135,12 +136,12 @@ export function LegalDocumentView({ content, titleId }: LegalDocumentViewProps) 
                   <div className="legal-document-page__contact-item">
                     <dt>אימייל</dt>
                     <dd>
-                      <a
-                        href={`mailto:${email}`}
+                      <EmailLink
+                        email={email}
                         className="legal-document-page__link public-focus-ring"
                       >
                         {email}
-                      </a>
+                      </EmailLink>
                     </dd>
                   </div>
                 ) : null}

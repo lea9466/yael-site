@@ -5,6 +5,7 @@ import {
   FolderTree,
   HeartHandshake,
   Image,
+  KeyRound,
   LayoutDashboard,
   Mail,
   MessageCircleHeart,
@@ -124,6 +125,12 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
         icon: Settings,
         enabled: true,
       },
+      {
+        label: "החשבון שלי",
+        href: "/admin/account",
+        icon: KeyRound,
+        enabled: true,
+      },
     ],
   },
 ];
@@ -196,4 +203,5 @@ export const ADMIN_ROUTE_LABELS: Record<string, string> = {
   "/admin/contact-messages": "פניות",
   "/admin/certificates": "תעודות והסמכות",
   "/admin/settings": "הגדרות האתר",
+  "/admin/account": "החשבון שלי",
 };

@@ -8,6 +8,10 @@ export type LoginResult =
   | { success: true }
   | { success: false; error: string };
 
+export type ChangePasswordResult =
+  | { success: true }
+  | { success: false; error: string };
+
 export type LogoutResult =
   | { success: true }
   | { success: false; error: string };

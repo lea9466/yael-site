@@ -9386,6 +9386,14 @@
   color: var(--color-primary);
 }
 
+.newsletter-popup__title-icon {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  vertical-align: -0.08em;
+  color: #ec7aa6;
+}
+
 .newsletter-popup__text {
   margin: 0 0 0.9rem;
   font-size: 0.85rem;
@@ -9476,7 +9484,7 @@
 .newsletter-popup__success-icon {
   width: 32px;
   height: 32px;
-  color: var(--color-soft-accent);
+  color: #ec7aa6;
   margin-inline: auto;
   margin-bottom: 0.5rem;
 }

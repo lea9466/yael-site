@@ -299,7 +299,11 @@ export function NewsletterPopup() {
 
         {phase === "success" ? (
           <div className="newsletter-popup__success" role="status" aria-live="polite">
-            <Heart aria-hidden="true" className="newsletter-popup__success-icon" />
+            <Heart
+              aria-hidden="true"
+              fill="currentColor"
+              className="newsletter-popup__success-icon"
+            />
             <p className="newsletter-popup__success-title">נרשמת בהצלחה!</p>
             <p className="newsletter-popup__success-text">
               תודה שהצטרפת — התוכן הראשון בדרך אלייך.
@@ -313,7 +317,12 @@ export function NewsletterPopup() {
             aria-describedby={formError ? formErrorId : undefined}
           >
             <p id={`${formId}-title`} className="newsletter-popup__title">
-              משהו טוב מחכה לך ❤️
+              משהו טוב מחכה לך{" "}
+              <Heart
+                aria-hidden="true"
+                fill="currentColor"
+                className="newsletter-popup__title-icon"
+              />
             </p>
             <p className="newsletter-popup__text">
               תוכן קצר, מחשבות וכלים למערכת יחסים בריאה ונינוחה יותר עם אוכל.

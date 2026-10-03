@@ -9296,7 +9296,7 @@
   z-index: var(--z-dropdown);
   background: color-mix(in srgb, var(--color-background) 74%, transparent);
   backdrop-filter: blur(3px);
-  animation: newsletter-popup-veil-in 420ms ease both;
+  animation: newsletter-popup-veil-in 850ms ease-out both;
 }
 
 @keyframes newsletter-popup-veil-in {
@@ -9328,8 +9328,8 @@
   box-shadow: var(--shadow-lg);
   padding: var(--spacing-2xl);
   text-align: center;
-  --newsletter-popup-from: 0 10px;
-  animation: newsletter-popup-in-center 420ms cubic-bezier(0.2, 0.8, 0.2, 1) 80ms both;
+  --newsletter-popup-from: 0 5px;
+  animation: newsletter-popup-in-center 900ms ease-out 80ms both;
 }
 
 @keyframes newsletter-popup-in-center {

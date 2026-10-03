@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { NewsletterPopup } from "@/components/newsletter/newsletter-popup";
 import { PublicFooter } from "@/components/public/footer/public-footer";
 import { PublicHeader } from "@/components/public/header/public-header";
 import { SkipToContent } from "@/components/public/layout/skip-to-content";
@@ -50,6 +51,7 @@ export default async function PublicLayout({
       </main>
       <PublicFooter settings={settings} navLinks={footerNav} />
       <PublicScrollRestoration />
+      <NewsletterPopup />
     </div>
   );
 }

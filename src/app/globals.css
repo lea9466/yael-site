@@ -9288,3 +9288,208 @@
     gap: 0.55rem;
   }
 }
+
+/* Newsletter signup popup — soft centered card over a translucent veil */
+.newsletter-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dropdown);
+  background: color-mix(in srgb, var(--color-background) 74%, transparent);
+  backdrop-filter: blur(3px);
+  animation: newsletter-popup-veil-in 420ms ease both;
+}
+
+@keyframes newsletter-popup-veil-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.newsletter-popup {
+  position: fixed;
+  top: 50%;
+  /* physical `left` on purpose: it pairs with the translateX(-50%) below to
+     center regardless of direction — `inset-inline-start` would resolve to
+     `right` under RTL and the (physical-axis) transform would then push the
+     card a full width off-screen instead of centering it. */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: calc(var(--z-dropdown) + 1);
+  width: min(420px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-2xl);
+  text-align: center;
+  --newsletter-popup-from: 0 10px;
+  animation: newsletter-popup-in-center 420ms cubic-bezier(0.2, 0.8, 0.2, 1) 80ms both;
+}
+
+@keyframes newsletter-popup-in-center {
+  from {
+    opacity: 0;
+    translate: var(--newsletter-popup-from);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .newsletter-popup,
+  .newsletter-popup-backdrop {
+    animation: none;
+  }
+}
+
+.newsletter-popup__close {
+  position: absolute;
+  top: var(--spacing-sm);
+  inset-inline-end: var(--spacing-sm);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-surface-soft);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.newsletter-popup__close:hover {
+  background: var(--color-border);
+  color: var(--color-primary);
+}
+
+.newsletter-popup__close:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.newsletter-popup__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.newsletter-popup__text {
+  margin: 0 0 0.9rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.newsletter-popup__field {
+  width: 100%;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding-inline: 0.75rem;
+  font-size: 0.88rem;
+  color: var(--color-text);
+  margin-bottom: 0.6rem;
+  font-family: inherit;
+  text-align: start;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.newsletter-popup__field::placeholder {
+  color: var(--color-text-muted);
+}
+
+.newsletter-popup__field:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.newsletter-popup__consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin-bottom: 0.85rem;
+  text-align: start;
+}
+
+.newsletter-popup__link {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.newsletter-popup__field-error,
+.newsletter-popup__error {
+  margin: -0.35rem 0 0.6rem;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--color-error);
+  text-align: start;
+}
+
+.newsletter-popup__honeypot {
+  /* Visually-hidden (not off-canvas with a huge negative offset, unlike
+     .contact-page__honeypot): this card is its own scroll container
+     (overflow-y: auto above), so a -10000px offset here inflated its
+     scrollWidth to 10000px+ and produced a real horizontal scrollbar. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.newsletter-popup__submit {
+  width: 100%;
+  margin-top: 0.25rem;
+  box-shadow: 0 10px 20px -8px rgba(63, 95, 71, 0.35);
+}
+
+.newsletter-popup__success {
+  text-align: center;
+  padding-block: 0.5rem 0.25rem;
+}
+
+.newsletter-popup__success-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--color-soft-accent);
+  margin-inline: auto;
+  margin-bottom: 0.5rem;
+}
+
+.newsletter-popup__success-title {
+  margin: 0 0 0.3rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.newsletter-popup__success-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}

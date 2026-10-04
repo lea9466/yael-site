@@ -5690,13 +5690,51 @@
       gap: 0;
     }
 
-    .recipe-hero,
+    .recipe-detail img,
+    .recipe-detail picture {
+      display: none !important;
+    }
+
+    .recipe-hero__media img {
+      display: block !important;
+    }
+
+    .recipe-hero__media {
+      width: 10rem;
+      max-height: 12.5rem;
+      box-shadow: none;
+      border-radius: 0.75rem;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .recipe-detail,
+    .recipe-detail__body,
+    .recipe-detail__body--sections,
+    .recipe-section,
     .recipe-section--named,
+    .recipe-section__grid,
+    .recipe-ingredients,
+    .recipe-steps {
+      display: block !important;
+      width: 100% !important;
+      max-width: none !important;
+      height: auto !important;
+      overflow: visible !important;
+      position: static !important;
+    }
+
+    .recipe-section--named,
+    .recipe-hero,
     .recipe-ingredients__card,
     .recipe-steps__item,
     .recipe-tip {
-      break-inside: avoid;
       box-shadow: none;
+    }
+
+    .recipe-steps__item,
+    .recipe-tip {
+      break-inside: avoid;
     }
 
     .recipe-section--named {

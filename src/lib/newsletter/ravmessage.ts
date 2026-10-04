@@ -72,6 +72,72 @@ function buildAuthorizationHeader(config: RavMessageConfig): string {
     .join(",");
 }
 
+async function fetchRavMessage(
+  config: RavMessageConfig,
+  method: "POST" | "PUT",
+  body: string
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), RAVMESSAGE_API_TIMEOUT_MS);
+
+  try {
+    return await fetch(
+      `https://api.responder.co.il/main/lists/${encodeURIComponent(config.listId)}/subscribers`,
+      {
+        method,
+        headers: {
+          // Fresh nonce/timestamp per request — the auth header can't be reused.
+          Authorization: buildAuthorizationHeader(config),
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body,
+        signal: controller.signal,
+      }
+    );
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/**
+ * Reactivates a subscriber who previously unsubscribed/was removed.
+ * https://github.com/responder/restapi/tree/master/Subscribers/ByList
+ *
+ * RavMessage's own docs say re-registering through their hosted forms
+ * reactivates an inactive subscriber, while the API path "gives you the
+ * choice" — confirmed by testing that POST alone does NOT flip STATUS back
+ * to 1 for an existing-but-inactive email (it just reports it as already
+ * existing and leaves it untouched). A separate PUT with STATUS: 1 does.
+ * Called after every POST so a returning subscriber is reactivated the same
+ * way a brand-new one is active by default.
+ */
+async function reactivateRavMessageSubscriber(
+  config: RavMessageConfig,
+  email: string
+): Promise<void> {
+  const body = `subscribers=${encodeURIComponent(
+    JSON.stringify([{ IDENTIFIER: email, STATUS: 1 }])
+  )}`;
+
+  try {
+    const response = await fetchRavMessage(config, "PUT", body);
+
+    if (!response.ok) {
+      const bodyText = await response.text().catch(() => "");
+      console.error("[newsletter-signup] RavMessage reactivation rejected", {
+        at: new Date().toISOString(),
+        status: response.status,
+        body: bodyText.slice(0, 500),
+      });
+    }
+  } catch (error) {
+    console.error("[newsletter-signup] RavMessage reactivation request failed", {
+      at: new Date().toISOString(),
+      type: error instanceof Error ? error.name : "unknown",
+    });
+  }
+}
+
 /**
  * Adds a subscriber to the configured RavMesser list.
  * https://github.com/responder/restapi/tree/master/Subscribers/ByList
@@ -92,7 +158,6 @@ export async function addRavMessageSubscriber(
     return { ok: false, reason: "config" };
   }
 
-  const authorization = buildAuthorizationHeader(config);
   const subscribers = [
     {
       NAME: input.fullName,
@@ -101,21 +166,11 @@ export async function addRavMessageSubscriber(
     },
   ];
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), RAVMESSAGE_API_TIMEOUT_MS);
-
   try {
-    const response = await fetch(
-      `https://api.responder.co.il/main/lists/${encodeURIComponent(config.listId)}/subscribers`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: authorization,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: `subscribers=${encodeURIComponent(JSON.stringify(subscribers))}`,
-        signal: controller.signal,
-      }
+    const response = await fetchRavMessage(
+      config,
+      "POST",
+      `subscribers=${encodeURIComponent(JSON.stringify(subscribers))}`
     );
 
     if (!response.ok) {
@@ -128,6 +183,10 @@ export async function addRavMessageSubscriber(
       return { ok: false, reason: "rejected" };
     }
 
+    // Best-effort: don't fail the visitor's signup if only this step fails —
+    // they're already on the list either way, just possibly still inactive.
+    await reactivateRavMessageSubscriber(config, input.email);
+
     return { ok: true };
   } catch (error) {
     console.error("[newsletter-signup] RavMessage request failed", {
@@ -135,7 +194,5 @@ export async function addRavMessageSubscriber(
       type: error instanceof Error ? error.name : "unknown",
     });
     return { ok: false, reason: "network" };
-  } finally {
-    clearTimeout(timeout);
   }
 }

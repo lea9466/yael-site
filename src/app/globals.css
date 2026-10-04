@@ -5663,6 +5663,13 @@
 
   @media print {
 
+    html,
+    body {
+      overflow: visible !important;
+      height: auto !important;
+    }
+
+    .skip-to-content,
     .public-header,
     footer,
     .contact-cta-section,
@@ -5732,9 +5739,19 @@
       box-shadow: none;
     }
 
-    .recipe-steps__item,
-    .recipe-tip {
+    .recipe-steps__item {
       break-inside: avoid;
+    }
+
+    .recipe-tip {
+      display: block !important;
+      overflow: visible !important;
+      border-radius: 0.75rem;
+      page-break-inside: auto;
+    }
+
+    .recipe-tip__accent {
+      display: none;
     }
 
     .recipe-section--named {

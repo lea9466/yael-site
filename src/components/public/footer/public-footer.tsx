@@ -3,8 +3,8 @@ import { EmailLink } from "@/components/ui/email-link";
 import { MultilineText } from "@/components/ui/multiline-text";
 import { Feather, Mail, MapPin, Phone } from "lucide-react";
 
+import { FooterNewsletterForm } from "@/components/public/footer/footer-newsletter-form";
 import { PublicLogo } from "@/components/public/header/public-logo";
-import { Container } from "@/components/public/layout/container";
 import {
   PUBLIC_FOOTER_NAV,
   type PublicNavLink,
@@ -153,8 +153,8 @@ export function PublicFooter({
 
   return (
     <footer className="mt-auto border-t border-[var(--color-border)] bg-[var(--color-surface-soft)]/80">
-      <Container className="py-[var(--spacing-3xl)]">
-        <div className="grid gap-y-10 md:grid-cols-2 md:gap-x-12 lg:grid-cols-4">
+      <div className="mx-auto w-full max-w-7xl px-4 py-[var(--spacing-3xl)] sm:px-3 lg:px-2">
+        <div className="grid gap-y-10 gap-x-8 md:grid-cols-2 md:gap-x-10 xl:grid-cols-[1.1fr_1fr_0.8fr_0.9fr_minmax(300px,420px)] xl:items-start xl:gap-x-10">
           <div className="space-y-4">
             <PublicLogo settings={settings} />
             {businessProfile.short_description ? (
@@ -164,7 +164,7 @@ export function PublicFooter({
             ) : null}
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 text-right md:text-center">
             <h2 className="text-sm font-semibold text-[var(--color-primary)]">
               יצירת קשר
             </h2>
@@ -229,7 +229,7 @@ export function PublicFooter({
             ) : null}
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 text-right md:text-center">
             <h2 className="text-sm font-semibold text-[var(--color-primary)]">
               ניווט
             </h2>
@@ -239,7 +239,7 @@ export function PublicFooter({
             />
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 text-right md:text-center">
             <h2 className="text-sm font-semibold text-[var(--color-primary)]">
               מידע וקשר
             </h2>
@@ -247,6 +247,10 @@ export function PublicFooter({
               links={infoNavLinks}
               ariaLabel="מידע ויצירת קשר"
             />
+          </div>
+
+          <div className="mx-auto w-full max-w-[420px] xl:mx-0">
+            <FooterNewsletterForm />
           </div>
         </div>
 
@@ -260,7 +264,7 @@ export function PublicFooter({
             ))}
           </div>
         </div>
-      </Container>
+      </div>
     </footer>
   );
 }

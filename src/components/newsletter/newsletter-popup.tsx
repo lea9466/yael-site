@@ -14,6 +14,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useClientReady } from "@/lib/hooks/use-client-ready";
+import {
+  markNewsletterSubscribed,
+  readNewsletterStoredState,
+  shouldOfferNewsletterSignup,
+  writeNewsletterStoredState,
+} from "@/lib/newsletter/popup-storage";
 import { getPortalRoot } from "@/lib/portal/get-portal-root";
 import {
   NEWSLETTER_EMAIL_MAX,
@@ -22,8 +28,6 @@ import {
   type NewsletterSignupFormValues,
 } from "@/lib/validations/newsletter";
 
-const STORAGE_KEY = "yael-newsletter-popup-v1";
-const DISMISS_SNOOZE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const IDLE_DELAY_MS = 16000;
 const SCROLL_THRESHOLD_PX = 480;
 const SUCCESS_AUTO_HIDE_MS = 5000;
@@ -35,50 +39,6 @@ const EMPTY_VALUES: NewsletterSignupFormValues = {
   email: "",
   marketing_consent: false,
 };
-
-type StoredState = { dismissedAt?: number; subscribed?: boolean };
-
-function readStoredState(): StoredState {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-
-    if (!raw) {
-      return {};
-    }
-
-    const parsed: unknown = JSON.parse(raw);
-
-    if (!parsed || typeof parsed !== "object") {
-      return {};
-    }
-
-    return parsed as StoredState;
-  } catch {
-    return {};
-  }
-}
-
-function writeStoredState(state: StoredState) {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // Ignore quota / private-mode failures — popup just may reappear sooner.
-  }
-}
-
-function shouldOfferSignup(): boolean {
-  const stored = readStoredState();
-
-  if (stored.subscribed) {
-    return false;
-  }
-
-  if (stored.dismissedAt && Date.now() - stored.dismissedAt < DISMISS_SNOOZE_MS) {
-    return false;
-  }
-
-  return true;
-}
 
 export function NewsletterPopup() {
   const formId = useId();
@@ -107,7 +67,7 @@ export function NewsletterPopup() {
   const emailRegister = register("email");
 
   useEffect(() => {
-    if (!shouldOfferSignup()) {
+    if (!shouldOfferNewsletterSignup()) {
       return;
     }
 
@@ -203,7 +163,10 @@ export function NewsletterPopup() {
 
   function dismiss() {
     setPhase("hidden");
-    writeStoredState({ ...readStoredState(), dismissedAt: Date.now() });
+    writeNewsletterStoredState({
+      ...readNewsletterStoredState(),
+      dismissedAt: Date.now(),
+    });
   }
 
   function applyFieldErrors(fieldErrors: NewsletterSignupFieldErrors) {
@@ -261,7 +224,7 @@ export function NewsletterPopup() {
           return;
         }
 
-        writeStoredState({ subscribed: true });
+        markNewsletterSubscribed();
         setPhase("success");
       } finally {
         setIsSubmitting(false);

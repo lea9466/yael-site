@@ -171,11 +171,6 @@ export default function RootLayout({
         <Script id="dom-mutation-guard" strategy="beforeInteractive">
           {DOM_MUTATION_GUARD_SCRIPT}
         </Script>
-        <Script
-          id="enable-accessibility"
-          src="https://cdn.enable.co.il/licenses/enable-L56422aatiwwzrpt-1026-83956/init.js"
-          strategy="afterInteractive"
-        />
         {children}
         <div id="portal-root" />
       </body>

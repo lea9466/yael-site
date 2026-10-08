@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 
 import { NewsletterPopup } from "@/components/newsletter/newsletter-popup";
 import { PublicFooter } from "@/components/public/footer/public-footer";
@@ -52,6 +53,11 @@ export default async function PublicLayout({
       <PublicFooter settings={settings} navLinks={footerNav} />
       <PublicScrollRestoration />
       <NewsletterPopup />
+      <Script
+        id="enable-accessibility"
+        src="https://cdn.enable.co.il/licenses/enable-L56422aatiwwzrpt-1026-83956/init.js"
+        strategy="afterInteractive"
+      />
     </div>
   );
 }

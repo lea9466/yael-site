@@ -51,7 +51,7 @@ export function ContactDirectCta({ links }: ContactDirectCtaProps) {
         <div className="contact-page__direct-panel">
           <div aria-hidden="true" className="contact-page__direct-glow" />
           <h2 id="contact-direct-title" className="contact-page__direct-title">
-            מעדיפים לפנות ישירות?
+            מעדיפה לפנות ישירות?
           </h2>
           <p className="contact-page__direct-text">
             אפשר גם ליצור קשר בדרך שנוחה לך — בלי למלא טופס.

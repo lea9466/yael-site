@@ -30,7 +30,7 @@ export function ContactDetailsCard({
             אפשר גם לפנות ישירות
           </h2>
           <p className="contact-page__details-text">
-            אם נוח לכם יותר בטלפון או באימייל — הפרטים שלי כאן.
+            אם נוח לך יותר בטלפון או באימייל — הפרטים שלי כאן.
           </p>
 
           <ul className="contact-page__details-list">

@@ -288,9 +288,9 @@ export function ContactForm({ links }: ContactFormProps) {
       aria-describedby={formError ? formErrorId : undefined}
     >
       <div className="contact-page__form-header">
-        <h2 className="contact-page__form-title">השאירו פרטים</h2>
+        <h2 className="contact-page__form-title">השאירי פרטים</h2>
         <p className="contact-page__form-intro">
-          מלאו את הטופס ואחזור אליכם בהקדם. אין צורך לכתוב מידע רפואי או רגיש
+          מלאי את הטופס ואחזור אליך בהקדם. אין צורך לכתוב מידע רפואי או רגיש
           בטופס זה.
         </p>
       </div>
@@ -339,7 +339,7 @@ export function ContactForm({ links }: ContactFormProps) {
           id={`${formId}-full-name`}
           type="text"
           autoComplete="name"
-          placeholder="השם שלכם"
+          placeholder="נעים מאוד, מה שמך?"
           maxLength={PUBLIC_CONTACT_FULL_NAME_MAX}
           error={Boolean(errors.full_name)}
           aria-invalid={Boolean(errors.full_name) || undefined}

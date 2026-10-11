@@ -22,11 +22,11 @@ export function ContactPageView({ links }: ContactPageViewProps) {
             נדבר?
           </p>
           <h1 id="contact-hero-title" className="contact-page__title">
-            בואו נתחיל בשיחה
+            בואי נתחיל בשיחה
           </h1>
           <p className="contact-page__lead">
-            אפשר להשאיר כאן פרטים ואחזור אליכם בהקדם — ברוגע, בבהירות ובלי לחץ.
-            אם נוח לכם יותר בטלפון או באימייל, הפרטים זמינים גם כאן בעמוד.
+            אפשר להשאיר כאן פרטים ואחזור אליך בהקדם — ברוגע, בבהירות ובלי לחץ.
+            אם נוח לך יותר בטלפון או באימייל, הפרטים זמינים גם כאן בעמוד.
           </p>
         </div>
       </section>

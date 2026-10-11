@@ -54,7 +54,7 @@ export function ContactDirectCta({ links }: ContactDirectCtaProps) {
             מעדיפים לפנות ישירות?
           </h2>
           <p className="contact-page__direct-text">
-            אפשר גם ליצור קשר בדרך שנוחה לכם — בלי למלא טופס.
+            אפשר גם ליצור קשר בדרך שנוחה לך — בלי למלא טופס.
           </p>
           <div className="contact-page__direct-actions">
             {actions.map((action) => {

@@ -417,7 +417,7 @@ export function ContactForm({ links }: ContactFormProps) {
       >
         <AutoResizeTextarea
           id={`${formId}-message`}
-          placeholder="ספרו בקצרה במה אוכל לעזור"
+          placeholder="ספרי בקצרה במה אוכל לעזור"
           maxLength={PUBLIC_CONTACT_MESSAGE_MAX}
           minHeightPx={140}
           maxHeightPx={320}

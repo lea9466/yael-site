@@ -6,4 +6,5 @@ export const AUTH_ERRORS = {
   currentPasswordInvalid: "הסיסמה הנוכחית שגויה",
   passwordWeak: "הסיסמה החדשה חלשה מדי. נסו סיסמה ארוכה וייחודית יותר.",
   passwordSame: "הסיסמה החדשה חייבת להיות שונה מהנוכחית",
+  resetLinkInvalid: "קישור האיפוס פג תוקף או שכבר נעשה בו שימוש. אפשר לבקש קישור חדש.",
 } as const;

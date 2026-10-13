@@ -41,3 +41,35 @@ export const changePasswordSchema = z
   });
 
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, "יש להזין כתובת אימייל")
+    .email("כתובת האימייל אינה תקינה"),
+});
+
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z
+  .object({
+    tokenHash: z.string().min(1),
+    newPassword: z
+      .string()
+      .min(
+        PASSWORD_MIN_LENGTH,
+        `הסיסמה החדשה צריכה להכיל לפחות ${PASSWORD_MIN_LENGTH} תווים`
+      )
+      .max(
+        PASSWORD_MAX_LENGTH,
+        `הסיסמה החדשה יכולה להכיל עד ${PASSWORD_MAX_LENGTH} תווים`
+      ),
+    confirmPassword: z.string().min(1, "יש לאשר את הסיסמה החדשה"),
+  })
+  .refine((value) => value.newPassword === value.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "הסיסמאות אינן תואמות",
+  });
+
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

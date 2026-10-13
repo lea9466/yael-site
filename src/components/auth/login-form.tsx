@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -151,14 +152,22 @@ export function LoginForm({ initialMessage }: LoginFormProps) {
         ) : null}
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-        <input
-          type="checkbox"
-          className="size-4 rounded border-gray-300 text-green-600 focus:ring-green-500/30 focus:ring-offset-0"
-          {...register("rememberMe")}
-        />
-        זכור אותי
-      </label>
+      <div className="flex items-center justify-between gap-4">
+        <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <input
+            type="checkbox"
+            className="size-4 rounded border-gray-300 text-green-600 focus:ring-green-500/30 focus:ring-offset-0"
+            {...register("rememberMe")}
+          />
+          זכור אותי
+        </label>
+        <Link
+          href="/login/forgot-password"
+          className="text-sm font-medium text-green-700 hover:text-green-800 hover:underline"
+        >
+          שכחתי סיסמה
+        </Link>
+      </div>
 
       <button
         type="submit"

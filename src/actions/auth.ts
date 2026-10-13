@@ -2,8 +2,12 @@
 
 import { cookies } from "next/headers";
 
-import { ADMIN_LAST_ACTIVITY_COOKIE } from "@/lib/auth/constants";
+import {
+  ADMIN_LAST_ACTIVITY_COOKIE,
+  adminActivityCookieOptions,
+} from "@/lib/auth/constants";
 import { AUTH_ERRORS } from "@/lib/auth/errors";
+import { sendPasswordResetEmail } from "@/lib/auth/password-reset-email";
 import {
   createActionClient,
   createClient,
@@ -15,12 +19,19 @@ import type {
   ChangePasswordResult,
   LoginResult,
   LogoutResult,
+  RequestPasswordResetResult,
+  ResetPasswordResult,
 } from "@/lib/auth/types";
+import { createServiceRoleClient } from "@/lib/supabase/admin";
 import {
   changePasswordSchema,
+  forgotPasswordSchema,
   loginSchema,
+  resetPasswordSchema,
   type ChangePasswordInput,
+  type ForgotPasswordInput,
   type LoginInput,
+  type ResetPasswordInput,
 } from "@/lib/validations/auth";
 
 export async function loginAction(input: LoginInput): Promise<LoginResult> {
@@ -154,6 +165,171 @@ export async function changePasswordAction(
     return { success: true };
   } catch (err) {
     console.error("[auth] changePasswordAction threw", err);
+    return { success: false, error: AUTH_ERRORS.generic };
+  }
+}
+
+function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, (char) => `\\${char}`);
+}
+
+/**
+ * Emails a one-time reset link, but only to addresses that belong to an admin.
+ * Always reports success for unknown addresses so the form can't be used to
+ * discover which emails have admin access.
+ */
+export async function requestPasswordResetAction(
+  input: ForgotPasswordInput
+): Promise<RequestPasswordResetResult> {
+  const parsed = forgotPasswordSchema.safeParse(input);
+
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues[0];
+
+    return {
+      success: false,
+      error: firstIssue?.message ?? AUTH_ERRORS.generic,
+    };
+  }
+
+  try {
+    const serviceClient = createServiceRoleClient();
+
+    if (!serviceClient) {
+      console.error("[auth] requestPasswordResetAction: missing service role key");
+      return { success: false, error: AUTH_ERRORS.generic };
+    }
+
+    const { data: adminUser, error: lookupError } = await serviceClient
+      .from("admin_users")
+      .select("email")
+      .ilike("email", escapeLikePattern(parsed.data.email))
+      .maybeSingle();
+
+    if (lookupError) {
+      console.error("[auth] requestPasswordResetAction lookup failed", {
+        code: lookupError.code,
+      });
+      return { success: false, error: AUTH_ERRORS.generic };
+    }
+
+    if (!adminUser?.email) {
+      return { success: true };
+    }
+
+    // generateLink only creates the token; we send our own Hebrew email so the
+    // link works from any device and doesn't depend on Supabase's mailer.
+    const { data: linkData, error: linkError } =
+      await serviceClient.auth.admin.generateLink({
+        type: "recovery",
+        email: adminUser.email,
+      });
+
+    const tokenHash = linkData?.properties?.hashed_token;
+
+    if (linkError || !tokenHash) {
+      console.error("[auth] requestPasswordResetAction generateLink failed", {
+        code: linkError?.code,
+      });
+      return { success: false, error: AUTH_ERRORS.generic };
+    }
+
+    const sent = await sendPasswordResetEmail(adminUser.email, tokenHash);
+
+    if (!sent) {
+      return { success: false, error: AUTH_ERRORS.generic };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error("[auth] requestPasswordResetAction threw", err);
+    return { success: false, error: AUTH_ERRORS.generic };
+  }
+}
+
+/**
+ * The token is redeemed only here, on submit — never on page load — so email
+ * scanners that prefetch the link can't burn it.
+ */
+export async function resetPasswordAction(
+  input: ResetPasswordInput
+): Promise<ResetPasswordResult> {
+  const parsed = resetPasswordSchema.safeParse(input);
+
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues[0];
+
+    return {
+      success: false,
+      error: firstIssue?.message ?? AUTH_ERRORS.generic,
+    };
+  }
+
+  try {
+    const supabase = await createActionClient(false);
+    const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
+      type: "recovery",
+      token_hash: parsed.data.tokenHash,
+    });
+
+    const user = otpData?.user;
+
+    if (otpError || !user) {
+      return { success: false, error: AUTH_ERRORS.resetLinkInvalid };
+    }
+
+    const { data: adminUser } = await supabase
+      .from("admin_users")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!adminUser) {
+      await supabase.auth.signOut();
+      return { success: false, error: AUTH_ERRORS.unauthorized };
+    }
+
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: parsed.data.newPassword,
+    });
+
+    if (updateError) {
+      if (updateError.code === "same_password") {
+        return { success: false, error: AUTH_ERRORS.passwordSame };
+      }
+
+      if (updateError.code === "weak_password") {
+        return { success: false, error: AUTH_ERRORS.passwordWeak };
+      }
+
+      console.error("[auth] resetPasswordAction updateUser failed", {
+        code: updateError.code,
+        status: updateError.status,
+      });
+      return { success: false, error: AUTH_ERRORS.generic };
+    }
+
+    // Whoever knew the old password is signed out everywhere else.
+    const { error: signOutError } = await supabase.auth.signOut({
+      scope: "others",
+    });
+
+    if (signOutError) {
+      console.error("[auth] resetPasswordAction signOut(others) failed", {
+        code: signOutError.code,
+      });
+    }
+
+    const cookieStore = await cookies();
+    cookieStore.set(
+      ADMIN_LAST_ACTIVITY_COOKIE,
+      String(Date.now()),
+      adminActivityCookieOptions
+    );
+
+    return { success: true };
+  } catch (err) {
+    console.error("[auth] resetPasswordAction threw", err);
     return { success: false, error: AUTH_ERRORS.generic };
   }
 }

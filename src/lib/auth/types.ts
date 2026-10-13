@@ -15,3 +15,11 @@ export type ChangePasswordResult =
 export type LogoutResult =
   | { success: true }
   | { success: false; error: string };
+
+export type RequestPasswordResetResult =
+  | { success: true }
+  | { success: false; error: string };
+
+export type ResetPasswordResult =
+  | { success: true }
+  | { success: false; error: string };

@@ -5669,6 +5669,13 @@
       height: auto !important;
     }
 
+    /* Third-party widgets (Enable accessibility menu, filtering-software
+       panels) append themselves outside the page layout; keep them off paper. */
+    body:has(> .public-layout) > *:not(.public-layout),
+    html > *:not(head):not(body) {
+      display: none !important;
+    }
+
     .skip-to-content,
     .public-header,
     footer,

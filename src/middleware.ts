@@ -13,7 +13,31 @@ function isServerActionRequest(request: NextRequest): boolean {
   );
 }
 
+function isAuthRoute(pathname: string): boolean {
+  return (
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/api/admin") ||
+    pathname.startsWith("/login")
+  );
+}
+
+function hasSupabaseAuthCookie(request: NextRequest): boolean {
+  return request.cookies
+    .getAll()
+    .some(({ name }) => name.startsWith("sb-") && name.includes("-auth-token"));
+}
+
 export async function middleware(request: NextRequest) {
+  // Anonymous visitors on public pages (almost all traffic, incl. bots) have no
+  // session to refresh — bail out before doing any work. A signed-in admin
+  // browsing the public site still gets her session refreshed here: public
+  // pages read Supabase with her cookies, and an expired token refreshed inside
+  // a Server Component can't be saved, which would rotate the refresh token
+  // without persisting it and later log her out.
+  if (!isAuthRoute(request.nextUrl.pathname) && !hasSupabaseAuthCookie(request)) {
+    return NextResponse.next();
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -47,8 +71,8 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // The "coming soon" gate for public pages was removed (the site is public).
-  // If it is ever brought back, public routes must be re-added to the matcher
-  // below — and note that running this middleware on every public request was
+  // If it is ever brought back, the early return for anonymous visitors above
+  // must change — and note that doing auth work on every public request was
   // the single biggest source of Vercel CPU time.
 
   if (request.nextUrl.pathname.startsWith("/admin") || request.nextUrl.pathname.startsWith("/api/admin")) {
@@ -76,14 +100,10 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Only run where auth matters: the admin area, admin APIs and the login page.
-  // Public pages don't need it — running it there cost a Supabase auth call on
-  // every page view, prefetch and bot hit.
   matcher: [
-    "/admin/:path*",
     // Exclude media upload so large multipart bodies are not buffered/truncated
     // by the Next.js proxy layer (see proxyClientMaxBodySize in next.config).
-    "/api/admin/((?!media/upload).*)",
-    "/login",
+    // Public requests without an auth cookie return immediately (see above).
+    "/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|manifest.webmanifest|robots.txt|sitemap.xml|api/media|api/favicon|api/admin/media/upload|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

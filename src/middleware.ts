@@ -46,40 +46,10 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Check if user is an admin
-  let isAdmin = false;
-  if (user) {
-    const { data: adminUser } = await supabase
-      .from("admin_users")
-      .select("id")
-      .eq("id", user.id)
-      .maybeSingle();
-    isAdmin = !!adminUser;
-  }
-
-  // Check if user has admin cookie for coming soon page
-  const hasAdminCookie = request.cookies.get(ADMIN_LAST_ACTIVITY_COOKIE) !== undefined;
-  const isPublicRoute =
-    !request.nextUrl.pathname.startsWith("/admin") &&
-    !request.nextUrl.pathname.startsWith("/api") &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/coming-soon") &&
-    !request.nextUrl.pathname.startsWith("/icon") &&
-    !request.nextUrl.pathname.startsWith("/apple-icon") &&
-    request.nextUrl.pathname !== "/manifest.webmanifest" &&
-    !request.nextUrl.pathname.startsWith("/robots.txt") &&
-    !request.nextUrl.pathname.startsWith("/sitemap.xml");
-
-  console.log("Route:", request.nextUrl.pathname, "isAdmin:", isAdmin, "hasAdminCookie:", hasAdminCookie, "isPublicRoute:", isPublicRoute);
-
-  // Temporarily disabled: the site needs to be publicly visible so NetFree's
-  // own team can load and diagnose the real page (not the coming-soon
-  // placeholder) while investigating why they're blocking it. Re-enable by
-  // uncommenting once that's resolved.
-  // if (isPublicRoute && !isAdmin && !hasAdminCookie) {
-  //   console.log("Redirecting to coming-soon");
-  //   return NextResponse.redirect(new URL("/coming-soon", request.url));
-  // }
+  // The "coming soon" gate for public pages was removed (the site is public).
+  // If it is ever brought back, public routes must be re-added to the matcher
+  // below — and note that running this middleware on every public request was
+  // the single biggest source of Vercel CPU time.
 
   if (request.nextUrl.pathname.startsWith("/admin") || request.nextUrl.pathname.startsWith("/api/admin")) {
     const isServerAction = isServerActionRequest(request);
@@ -106,9 +76,14 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // Only run where auth matters: the admin area, admin APIs and the login page.
+  // Public pages don't need it — running it there cost a Supabase auth call on
+  // every page view, prefetch and bot hit.
   matcher: [
+    "/admin/:path*",
     // Exclude media upload so large multipart bodies are not buffered/truncated
     // by the Next.js proxy layer (see proxyClientMaxBodySize in next.config).
-    "/((?!_next/static|_next/image|favicon.ico|api/admin/media/upload|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/api/admin/((?!media/upload).*)",
+    "/login",
   ],
 };

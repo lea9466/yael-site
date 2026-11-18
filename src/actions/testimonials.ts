@@ -42,6 +42,9 @@ function revalidateTestimonialPaths(
   serviceId?: string | null
 ) {
   revalidatePath("/admin/testimonials");
+  // Public pages are cached; refresh the whole site so every page (incl.
+  // header/footer content) reflects this change on the next visit.
+  revalidatePath("/", "layout");
 
   if (testimonialId) {
     revalidatePath(`/admin/testimonials/${testimonialId}`);

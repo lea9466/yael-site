@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/auth/session";
+import { createPublicClient } from "@/lib/auth/session";
 import { CERTIFICATES_SITE_CONTENT_KEY } from "@/lib/certificates/constants";
 import { sortCertificatesByOrder } from "@/lib/certificates/order";
 import type {
@@ -28,7 +28,7 @@ export type CertificatesContentSnapshot = {
 
 export async function fetchCertificatesContentSnapshot(): Promise<CertificatesContentSnapshot | null> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("site_content")
       .select("data, updated_at")
@@ -73,7 +73,7 @@ async function fetchMediaPreviewsByIds(
     return new Map();
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const uniqueIds = [...new Set(mediaIds)];
   const { data, error } = await supabase
     .from("media_library")

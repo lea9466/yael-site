@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/auth/session";
+import { createPublicClient } from "@/lib/auth/session";
 import { MEDIA_LIBRARY_SELECT_COLUMNS } from "@/lib/media/constants";
 import type { UploadProfile } from "@/lib/media/constants";
 import type { MediaRecord } from "@/lib/media/media-types";
@@ -36,7 +36,7 @@ async function fetchHeroMediaPreview(
     return null;
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("media_library")
     .select(MEDIA_LIBRARY_SELECT_COLUMNS)
@@ -66,7 +66,7 @@ export async function fetchHomepageSiteContent(): Promise<{
   updatedAt: string;
 } | null> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("site_content")
       .select("data, updated_at")

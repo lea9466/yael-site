@@ -54,6 +54,9 @@ async function getAdminSupabase(): Promise<{
 
 function revalidateArticlePaths(articleId?: string) {
   revalidatePath("/admin/articles");
+  // Public pages are cached; refresh the whole site so every page (incl.
+  // header/footer content) reflects this change on the next visit.
+  revalidatePath("/", "layout");
   revalidatePath("/blog");
   revalidatePath("/blog", "layout");
   revalidatePath("/");

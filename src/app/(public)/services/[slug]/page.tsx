@@ -17,8 +17,6 @@ import {
 } from "@/lib/seo/resolve";
 import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 
-/** Avoid Next.js cache-tag header crash on non-ASCII (Hebrew) slugs. */
-export const dynamic = "force-dynamic";
 
 type ServiceDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -108,4 +106,10 @@ export default async function PublicServiceDetailPage({
       />
     </>
   );
+}
+
+// Render each page on its first visit, then serve it from cache until an admin
+// save revalidates it (see revalidatePath("/", "layout") in src/actions).
+export async function generateStaticParams() {
+  return [];
 }

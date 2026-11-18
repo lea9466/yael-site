@@ -53,6 +53,9 @@ async function getAdminSupabase(): Promise<{
 
 function revalidateServicePaths(serviceId?: string) {
   revalidatePath("/admin/services");
+  // Public pages are cached; refresh the whole site so every page (incl.
+  // header/footer content) reflects this change on the next visit.
+  revalidatePath("/", "layout");
 
   // Public surfaces that list services and link to their (slug-based) detail
   // pages. Without this a publish / unpublish / feature change — or a rename

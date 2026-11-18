@@ -1,6 +1,5 @@
 import {
-  createClient,
-  getAuthenticatedAdmin,
+  createPublicClient,
   isSupabaseConfigured,
 } from "@/lib/auth/session";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
@@ -48,7 +47,7 @@ async function fetchMediaMap(
     return new Map();
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("media_library")
     .select("id, storage_path, alt_text")
@@ -70,7 +69,7 @@ async function fetchCategorySummaries(
     return new Map();
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("categories")
     .select("id, name, slug")
@@ -170,7 +169,7 @@ async function fetchRecipeDetailBySlug(
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     let query = supabase
       .from("recipes")
       .select(RECIPE_DETAIL_COLUMNS)
@@ -280,34 +279,20 @@ export async function getPublishedRecipeBySlug(
 
 /**
  * Resolves a recipe for the public detail route.
- * Published recipes are available to everyone.
- * Draft/archived recipes are available only to the authenticated administrator
- * (so local "view on site" works before publish).
+ * Only published recipes are served here. Drafts are previewed in the admin
+ * (/admin/recipes/[id]/preview). This route must not read cookies: doing so
+ * would make every recipe page uncacheable and render on each request.
  */
 export async function resolvePublicRecipePage(
   slug: string
 ): Promise<{ recipe: RecipeDetail; isAdminOnlyPreview: boolean } | null> {
   const published = await getPublishedRecipeBySlug(slug);
 
-  if (published) {
-    return { recipe: published, isAdminOnlyPreview: false };
-  }
-
-  const admin = await getAuthenticatedAdmin();
-
-  if (!admin) {
+  if (!published) {
     return null;
   }
 
-  const unpublished = await fetchRecipeDetailBySlug(slug, {
-    publishedOnly: false,
-  });
-
-  if (!unpublished || unpublished.status === "published") {
-    return null;
-  }
-
-  return { recipe: unpublished, isAdminOnlyPreview: true };
+  return { recipe: published, isAdminOnlyPreview: false };
 }
 
 export async function getRelatedRecipes(input: {
@@ -322,7 +307,7 @@ export async function getRelatedRecipes(input: {
   const limit = input.limit ?? 3;
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
 
     const { data: sameCategoryData, error: sameCategoryError } = await supabase
       .from("recipes")

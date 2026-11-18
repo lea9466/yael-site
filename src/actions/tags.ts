@@ -36,6 +36,9 @@ async function getAdminSupabase(): Promise<{
 
 function revalidateTagPaths(tagId?: string) {
   revalidatePath("/admin/tags");
+  // Public pages are cached; refresh the whole site so every page (incl.
+  // header/footer content) reflects this change on the next visit.
+  revalidatePath("/", "layout");
   revalidatePath("/admin/recipes", "layout");
   revalidatePath("/admin/articles", "layout");
   revalidatePath("/blog", "layout");

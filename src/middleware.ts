@@ -13,31 +13,7 @@ function isServerActionRequest(request: NextRequest): boolean {
   );
 }
 
-function isAuthRoute(pathname: string): boolean {
-  return (
-    pathname.startsWith("/admin") ||
-    pathname.startsWith("/api/admin") ||
-    pathname.startsWith("/login")
-  );
-}
-
-function hasSupabaseAuthCookie(request: NextRequest): boolean {
-  return request.cookies
-    .getAll()
-    .some(({ name }) => name.startsWith("sb-") && name.includes("-auth-token"));
-}
-
 export async function middleware(request: NextRequest) {
-  // Anonymous visitors on public pages (almost all traffic, incl. bots) have no
-  // session to refresh — bail out before doing any work. A signed-in admin
-  // browsing the public site still gets her session refreshed here: public
-  // pages read Supabase with her cookies, and an expired token refreshed inside
-  // a Server Component can't be saved, which would rotate the refresh token
-  // without persisting it and later log her out.
-  if (!isAuthRoute(request.nextUrl.pathname) && !hasSupabaseAuthCookie(request)) {
-    return NextResponse.next();
-  }
-
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -71,9 +47,9 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // The "coming soon" gate for public pages was removed (the site is public).
-  // If it is ever brought back, the early return for anonymous visitors above
-  // must change — and note that doing auth work on every public request was
-  // the single biggest source of Vercel CPU time.
+  // If it is ever brought back, public routes must be re-added to the matcher
+  // below — but running middleware on every public request was the single
+  // biggest source of Vercel CPU time, so prefer another approach.
 
   if (request.nextUrl.pathname.startsWith("/admin") || request.nextUrl.pathname.startsWith("/api/admin")) {
     const isServerAction = isServerActionRequest(request);
@@ -100,10 +76,13 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // Only where auth matters. Public pages must never read auth cookies (they
+  // use createPublicClient), so they need no session refresh and stay cacheable.
   matcher: [
+    "/admin/:path*",
     // Exclude media upload so large multipart bodies are not buffered/truncated
     // by the Next.js proxy layer (see proxyClientMaxBodySize in next.config).
-    // Public requests without an auth cookie return immediately (see above).
-    "/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|manifest.webmanifest|robots.txt|sitemap.xml|api/media|api/favicon|api/admin/media/upload|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/api/admin/((?!media/upload).*)",
+    "/login",
   ],
 };

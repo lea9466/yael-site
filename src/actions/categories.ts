@@ -37,6 +37,9 @@ async function getAdminSupabase(): Promise<{
 
 function revalidateCategoryPaths(categoryId?: string) {
   revalidatePath("/admin/categories");
+  // Public pages are cached; refresh the whole site so every page (incl.
+  // header/footer content) reflects this change on the next visit.
+  revalidatePath("/", "layout");
   revalidatePath("/admin/recipes", "layout");
   revalidatePath("/admin/articles", "layout");
   revalidatePath("/blog", "layout");

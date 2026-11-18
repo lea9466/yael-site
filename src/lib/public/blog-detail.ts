@@ -1,4 +1,4 @@
-import { createClient, isSupabaseConfigured } from "@/lib/auth/session";
+import { createPublicClient, isSupabaseConfigured } from "@/lib/auth/session";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
 import { normalizeArticleContent } from "@/lib/articles/content";
 import type { ArticleDetail } from "@/lib/articles/types";
@@ -44,7 +44,7 @@ async function fetchMediaMap(
     return new Map();
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("media_library")
     .select("id, storage_path, alt_text")
@@ -130,7 +130,7 @@ export async function getPublishedPostBySlug(
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("articles")
       .select(ARTICLE_DETAIL_COLUMNS)
@@ -239,7 +239,7 @@ export async function getRelatedPosts(input: {
   const limit = input.limit ?? 3;
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
 
     const { data: recentData, error: recentError } = await supabase
       .from("articles")

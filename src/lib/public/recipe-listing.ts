@@ -1,4 +1,4 @@
-import { createClient, isSupabaseConfigured } from "@/lib/auth/session";
+import { createPublicClient, isSupabaseConfigured } from "@/lib/auth/session";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
 import type { PublicRecipeSummary } from "@/lib/public/types";
 import {
@@ -51,7 +51,7 @@ async function fetchCoverMediaMap(
     return new Map();
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("media_library")
     .select("id, storage_path, alt_text")
@@ -81,7 +81,7 @@ async function fetchCategoryMap(
     return new Map();
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("categories")
     .select("id, name, slug")
@@ -112,7 +112,7 @@ export async function getPublicRecipeCategories(): Promise<
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("categories")
       .select("id, name, slug")
@@ -139,7 +139,7 @@ export async function getPublicRecipeTags(): Promise<PublicRecipeTag[]> {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("tags")
       .select("id, name, slug")
@@ -174,7 +174,7 @@ export async function getPublicRecipeCategoryBySlug(
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("categories")
       .select("id, name, slug")
@@ -216,7 +216,7 @@ export async function getPublicRecipeListing(options: {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const [categories, tags] = await Promise.all([
       getPublicRecipeCategories(),
       getPublicRecipeTags(),

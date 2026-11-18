@@ -21,8 +21,6 @@ import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { shortenForSeoDescription } from "@/lib/seo/resolve";
 import { normalizeRouteSlug } from "@/lib/slug/normalize-route-slug";
 
-/** Avoid Next.js cache-tag header crash on non-ASCII (Hebrew) slugs. */
-export const dynamic = "force-dynamic";
 
 type RecipeDetailPageProps = {
   params: Promise<{ categorySlug: string; recipeSlug: string }>;
@@ -153,4 +151,10 @@ export default async function PublicRecipeDetailPage({
       </div>
     </>
   );
+}
+
+// Render each page on its first visit, then serve it from cache until an admin
+// save revalidates it (see revalidatePath("/", "layout") in src/actions).
+export async function generateStaticParams() {
+  return [];
 }

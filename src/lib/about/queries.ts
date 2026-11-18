@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/auth/session";
+import { createPublicClient } from "@/lib/auth/session";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
 import { normalizeArticleContent } from "@/lib/articles/content";
 import type { ArticleBlock } from "@/lib/articles/types";
@@ -30,7 +30,7 @@ async function fetchMediaMap(
     return new Map();
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("media_library")
     .select("id, storage_path, file_name, original_file_name, alt_text")
@@ -80,7 +80,7 @@ export async function fetchAboutSiteContent(): Promise<{
   updatedAt: string;
 } | null> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("site_content")
       .select("data, updated_at")

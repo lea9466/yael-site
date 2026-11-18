@@ -1,6 +1,7 @@
 "use server";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
 
 import { deleteMediaItem } from "@/lib/media/delete-media.server";
 import { MEDIA_ERRORS } from "@/lib/media/media-errors";
@@ -107,6 +108,8 @@ export async function deleteMediaAction(
   const result = await deleteMediaItem(session.supabase, parsed.data.mediaId);
 
   if (result.outcome === "deleted") {
+    // Public pages are cached; refresh them so a removed image disappears.
+    revalidatePath("/", "layout");
     return { success: true };
   }
 
@@ -189,7 +192,10 @@ export async function bulkDeleteMediaAction(
     };
   }
 
-  return processBulkDelete(session.supabase, parsed.data.mediaIds);
+  const bulkResult = await processBulkDelete(session.supabase, parsed.data.mediaIds);
+  // Public pages are cached; refresh them so removed images disappear.
+  revalidatePath("/", "layout");
+  return bulkResult;
 }
 
 export async function updateMediaAltTextAction(
@@ -229,6 +235,9 @@ export async function updateMediaAltTextAction(
     if (!updated) {
       return { success: false, error: MEDIA_ERRORS.deleteNotFound };
     }
+
+    // Public pages are cached; refresh them so the new alt text is served.
+    revalidatePath("/", "layout");
 
     return {
       success: true,

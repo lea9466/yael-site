@@ -29,6 +29,9 @@ async function getAdminSupabase(): Promise<{ supabase: SupabaseClient } | null> 
 
 function revalidateAboutPaths() {
   revalidatePath("/admin/about");
+  // Public pages are cached; refresh the whole site so every page (incl.
+  // header/footer content) reflects this change on the next visit.
+  revalidatePath("/", "layout");
   revalidatePath("/admin/about/preview");
   revalidatePath("/about");
   revalidatePath("/");

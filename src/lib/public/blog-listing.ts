@@ -1,4 +1,4 @@
-import { createClient, isSupabaseConfigured } from "@/lib/auth/session";
+import { createPublicClient, isSupabaseConfigured } from "@/lib/auth/session";
 import { getPublicMediaUrl } from "@/lib/media/public-url";
 import { shortenForSeoDescription } from "@/lib/seo/resolve";
 import type { PublicPostSummary } from "@/lib/public/types";
@@ -43,7 +43,7 @@ async function fetchCoverMediaMap(
     return new Map();
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("media_library")
     .select("id, storage_path, alt_text")
@@ -70,7 +70,7 @@ export async function getPublicBlogTags(): Promise<PublicBlogTag[]> {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("tags")
       .select("id, name, slug")
@@ -108,7 +108,7 @@ export async function getPublicBlogListing(options: {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const tags = await getPublicBlogTags();
 
     const { count: heroCountValue } = await supabase

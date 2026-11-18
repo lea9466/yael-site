@@ -57,6 +57,9 @@ function revalidateRecipePaths(
   categorySlug?: string | null
 ) {
   revalidatePath("/admin/recipes");
+  // Public pages are cached; refresh the whole site so every page (incl.
+  // header/footer content) reflects this change on the next visit.
+  revalidatePath("/", "layout");
   revalidatePath("/recipes", "layout");
 
   if (recipeId) {

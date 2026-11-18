@@ -15,6 +15,10 @@ import {
 } from "@/lib/press/queries";
 import { getSiteOrigin } from "@/lib/seo/metadata";
 
+// Prerendered at build; refresh hourly so newly published content shows up
+// for search engines without waiting for the next deploy.
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = getSiteOrigin();
   const [
